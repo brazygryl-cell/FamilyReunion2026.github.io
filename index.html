@@ -1,14 +1,17 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Family Reunion 2026</title>
+<title>Johnson Family Reunion 2025</title>
 <link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
+
 <header>
-  <h1>The Williams Family Reunion 2026</h1>
+  <h1>Johnson Family Reunion 2025</h1>
   <p>July 19–21 • Myrtle Beach, SC</p>
 </header>
 
@@ -18,7 +21,7 @@
 </section>
 
 <section id="gallery">
-  <h2>Florida Rentals</h2>
+  <h2>Family Memories</h2>
   <div class="slider">
     <img src="images/family1.jpg" alt="Family 1">
     <img src="images/family2.jpg" alt="Family 2">
@@ -28,33 +31,42 @@
 
 <section id="rsvp">
   <h2>RSVP</h2>
-  <p>Please let us know if you’ll be attending by emailing <a href="familyreunionwilliams2026@gmail.com">familyreunionwilliams2026@gmail.com</a>.</p>
+  <p>Please let us know if you’ll be attending by emailing <a href="mailto:johnsonreunion2025@gmail.com">johnsonreunion2025@gmail.com</a>.</p>
 </section>
 
 <footer>
-  <p>Made with ❤️ by Taylor Clark Jones, Generation 5</p>
+  <p>Made with ❤️ by [Your Name]</p>
 </footer>
 
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <script>
-/* Gallery Slider */
+// Redirect to login if not logged in
+if (window.netlifyIdentity) {
+  window.netlifyIdentity.init();
+  const user = window.netlifyIdentity.currentUser();
+  if (!user) {
+    window.location.href = "login.html";
+  }
+}
+</script>
+
+<script>
+// Gallery Slider
 let slides = document.querySelectorAll('.slider img');
 let current = 0;
-
 function showSlide(index) {
   slides.forEach(img => img.classList.remove('active'));
   slides[index].classList.add('active');
 }
-
 function nextSlide() {
   current = (current + 1) % slides.length;
   showSlide(current);
 }
-
 showSlide(current);
 setInterval(nextSlide, 3000);
 
-/* Countdown Timer */
-const countdownDate = new Date("July 26, 2026 12:00:00").getTime();
+// Countdown Timer
+const countdownDate = new Date("July 19, 2025 12:00:00").getTime();
 const timer = setInterval(function() {
   const now = new Date().getTime();
   const distance = countdownDate - now;
@@ -65,7 +77,7 @@ const timer = setInterval(function() {
   const seconds = Math.floor((distance % (1000*60)) / 1000);
 
   document.getElementById("timer").innerHTML = 
-    days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+    `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
   if(distance < 0) {
     clearInterval(timer);
@@ -73,5 +85,10 @@ const timer = setInterval(function() {
   }
 }, 1000);
 </script>
+
+<script>
+// Gallery Slider JS (already included above)
+</script>
+
 </body>
 </html>
