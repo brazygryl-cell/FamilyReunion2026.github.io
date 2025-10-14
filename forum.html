@@ -5,49 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Family Forum - Williams Reunion</title>
 <link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
 
 <header>
   <h1>Williams Family Reunion Forum</h1>
   <nav>
-    <a href="index.html">Home</a> | 
+    <a href="index.html">Home</a> |
     <a href="forum.html">Forum</a>
-    <a href="pricing.html">Pricing</a>
-    <a href="tshirts.html">T-Shirts</a>
   </nav>
 </header>
 
 <section id="boards">
   <h2>Discussion Boards</h2>
-
-  <div class="board" id="board-general">
-    <h3>General Chat</h3>
-    <div class="posts" id="posts-general"></div>
-    <textarea id="input-general" placeholder="Write a message..."></textarea>
-    <button onclick="postMessage('general')">Post</button>
-  </div>
-
-  <div class="board" id="board-plans">
-    <h3>Reunion Planning</h3>
-    <div class="posts" id="posts-plans"></div>
-    <textarea id="input-plans" placeholder="Share your ideas..."></textarea>
-    <button onclick="postMessage('plans')">Post</button>
-  </div>
-
-  <div class="board" id="board-memories">
-    <h3>Family Memories</h3>
-    <div class="posts" id="posts-memories"></div>
-    <textarea id="input-memories" placeholder="Share a memory..."></textarea>
-    <button onclick="postMessage('memories')">Post</button>
-  </div>
+  <ul>
+    <li><a href="forum-general.html">General Chat</a></li>
+    <li><a href="forum-plans.html">Reunion Planning</a></li>
+    <li><a href="forum-memories.html">Family Memories</a></li>
+  </ul>
 </section>
 
 <footer>
-  <p>Made with ❤️ by Taylor Clark Jones </p>
-  <p> Art by 🔥 Andre Clark</p>
+  <p>Made with ❤️ by Taylor Clark Jones</p>
 </footer>
+
+</body>
+</html>
 
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
