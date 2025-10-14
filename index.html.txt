@@ -32,7 +32,8 @@
   </section>
 
   <footer>
-    <p>Made with ❤️ by [Your Name]</p>
+    <p>Made with ❤️ by Taylor Clark Jones</p>
   </footer>
 </body>
 </html>
+
