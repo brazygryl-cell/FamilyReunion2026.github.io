@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Family Reunion 2026</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>The Williams Family Reunion 2026</h1>
+  <p>July 19–21 • Myrtle Beach, SC</p>
+</header>
+
+<section id="login">
+  <h2>Login</h2>
+  <div class="login-container">
+    <form id="loginForm" class="login-form">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      
+      <button type="submit" class="login-btn">Login</button>
+      
+      <div class="form-links">
+        <a href="#" id="forgotPassword">Forgot Password?</a>
+        <a href="index.html">Back to Home</a>
+      </div>
+    </form>
+    
+    <div id="loginMessage" class="message"></div>
+  </div>
+</section>
+
+<footer>
+  <p>Made with ❤️ by Taylor Clark Jones, Generation 5</p>
+</footer>
+
+<script>
+// Login form handling
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const messageDiv = document.getElementById('loginMessage');
+  
+  // Basic validation
+  if (!email || !password) {
+    showMessage('Please fill in all fields.', 'error');
+    return;
+  }
+  
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    showMessage('Please enter a valid email address.', 'error');
+    return;
+  }
+  
+  // Simulate login process
+  showMessage('Logging in...', 'info');
+  
+  // In a real application, this would make an API call
+  setTimeout(() => {
+    // For demo purposes, accept any email with password "reunion2026"
+    if (password === 'reunion2026') {
+      showMessage('Login successful! Welcome to the family reunion portal.', 'success');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 2000);
+    } else {
+      showMessage('Invalid credentials. Please try again.', 'error');
+    }
+  }, 1000);
+});
+
+// Forgot password handling
+document.getElementById('forgotPassword').addEventListener('click', function(e) {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  
+  if (!email) {
+    showMessage('Please enter your email address first.', 'error');
+    return;
+  }
+  
+  showMessage('Password reset instructions have been sent to your email.', 'success');
+});
+
+// Message display function
+function showMessage(text, type) {
+  const messageDiv = document.getElementById('loginMessage');
+  messageDiv.textContent = text;
+  messageDiv.className = `message ${type}`;
+  messageDiv.style.display = 'block';
+  
+  // Clear message after 5 seconds for non-success messages
+  if (type !== 'success') {
+    setTimeout(() => {
+      messageDiv.style.display = 'none';
+    }, 5000);
+  }
+}
+</script>
+</body>
+</html>
