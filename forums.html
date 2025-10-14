@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Forum - Williams Reunion</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+  <h1>Williams Family Reunion Forum</h1>
+  <nav>
+    <a href="index.html">Home</a> | 
+    <a href="forum.html">Forum</a>
+  </nav>
+</header>
+
+<section id="boards">
+  <h2>Discussion Boards</h2>
+
+  <div class="board" id="board-general">
+    <h3>General Chat</h3>
+    <div class="posts" id="posts-general"></div>
+    <textarea id="input-general" placeholder="Write a message..."></textarea>
+    <button onclick="postMessage('general')">Post</button>
+  </div>
+
+  <div class="board" id="board-plans">
+    <h3>Reunion Planning</h3>
+    <div class="posts" id="posts-plans"></div>
+    <textarea id="input-plans" placeholder="Share your ideas..."></textarea>
+    <button onclick="postMessage('plans')">Post</button>
+  </div>
+
+  <div class="board" id="board-memories">
+    <h3>Family Memories</h3>
+    <div class="posts" id="posts-memories"></div>
+    <textarea id="input-memories" placeholder="Share a memory..."></textarea>
+    <button onclick="postMessage('memories')">Post</button>
+  </div>
+</section>
+
+<footer>
+  <p>Made with ❤️ by Taylor Clark JOnes </p>
+  <p> Art by 🔥 Andre Clark</p>
+</footer>
+
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+// 1️⃣ Netlify Identity Redirect
+if (window.netlifyIdentity) {
+  window.netlifyIdentity.init();
+  const user = window.netlifyIdentity.currentUser();
+  if (!user) window.location.href = "login.html";
+}
+
+// 2️⃣ Firebase Setup
+const firebaseConfig = {
+  apiKey: "YOUR_FIREBASE_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// 3️⃣ Load posts
+const boards = ['general', 'plans', 'memories'];
+boards.forEach(board => {
+  db.ref('boards/' + board).on('value', snapshot => {
+    const postsDiv = document.getElementById('posts-' + board);
+    postsDiv.innerHTML = '';
+    snapshot.forEach(child => {
+      const msg = child.val();
+      const p = document.createElement('p');
+      p.innerHTML = `<strong>${msg.user}:</strong> ${msg.text}`;
+      postsDiv.appendChild(p);
+    });
+  });
+});
+
+// 4️⃣ Post messages
+function postMessage(board) {
+  const input = document.getElementById('input-' + board);
+  const text = input.value.trim();
+  if (!text) return;
+
+  const user = window.netlifyIdentity.currentUser().email;
+  db.ref('boards/' + board).push({ user, text });
+  input.value = '';
+}
+</script>
+</body>
+</html>
