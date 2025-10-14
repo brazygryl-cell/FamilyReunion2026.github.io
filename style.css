@@ -156,3 +156,54 @@ footer {
 .card button:hover {
   background: #004d40;
 }
+.tshirt-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.tshirt-card {
+  background: #f0f4c3;
+  border: 2px solid #8bc34a;
+  border-radius: 15px;
+  padding: 1rem;
+  text-align: center;
+  width: 220px;
+}
+
+.tshirt-card img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+}
+
+.tshirt-card label, .tshirt-card input, .tshirt-card select {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+#order-form {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+#order-form input, #order-form button {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  width: 80%;
+  max-width: 300px;
+}
+
+#order-form button {
+  background: #8bc34a;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#order-form button:hover {
+  background: #689f38;
+}
