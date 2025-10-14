@@ -1,1 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Williams Family Reunion T-Shirts</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
 
+<header>
+  <h1>Williams Family Reunion 2026</h1>
+  <nav>
+    <a href="index.html">Home</a> | 
+    <a href="forum.html">Forum</a> | 
+    <a href="pricing.html">Pricing</a> |
+    <a href="tshirts.html">T-Shirts</a>
+  </nav>
+</header>
+
+<section id="tshirts">
+  <h2>Order Your Reunion T-Shirt!</h2>
+  <p>Select your size and quantity, then submit your order. We’ll email you confirmation.</p>
+
+  <div class="tshirt-options">
+    <div class="tshirt-card">
+      <img src="images/tshirt1.png" alt="Blue Reunion T-Shirt">
+      <h3>Blue Reunion T-Shirt</h3>
+      <p>$20 each</p>
+      <label>Size:
+        <select id="size1">
+          <option>S</option>
+          <option>M</option>
+          <option>L</option>
+          <option>XL</option>
+          <option>XXL</option>
+        </select>
+      </label>
+      <label>Quantity:
+        <input type="number" id="qty1" min="1" value="1">
+      </label>
+    </div>
+
+    <div class="tshirt-card">
+      <img src="images/tshirt2.png" alt="White Reunion T-Shirt">
+      <h3>White Reunion T-Shirt</h3>
+      <p>$20 each</p>
+      <label>Size:
+        <select id="size2">
+          <option>S</option>
+          <option>M</option>
+          <option>L</option>
+          <option>XL</option>
+          <option>XXL</option>
+        </select>
+      </label>
+      <label>Quantity:
+        <input type="number" id="qty2" min="1" value="1">
+      </label>
+    </div>
+  </div>
+
+  <form id="order-form" action="mailto:youremail@example.com" method="post" enctype="text/plain">
+    <label>Your Name: <input type="text" name="name" required></label>
+    <label>Your Email: <input type="email" name="email" required></label>
+    <input type="hidden" name="order-details" id="order-details">
+    <button type="submit" onclick="compileOrder()">Submit Order</button>
+  </form>
+</section>
+
+<footer>
+  <p>Made with ❤️ by Taylor Clark Jones</p>
+  <p> ARt by 🔥 Andre Clark</p>
+</footer>
+
+<script>
+function compileOrder() {
+  const orderDetails = `
+Blue T-Shirt: ${document.getElementById('qty1').value} pcs, Size: ${document.getElementById('size1').value}
+White T-Shirt: ${document.getElementById('qty2').value} pcs, Size: ${document.getElementById('size2').value}
+`;
+  document.getElementById('order-details').value = orderDetails;
+}
+</script>
+
+</body>
+</html>
