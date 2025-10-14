@@ -2,33 +2,47 @@ body {
   font-family: 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
-  background: linear-gradient(180deg, #fefefe, #f0f8ff);
+  background: linear-gradient(180deg, #fefefe, #e0f7fa);
   color: #333;
   text-align: center;
 }
 
+/* Header */
 header {
-  background: #3b5998;
+  background: #00796b;
   color: white;
-  padding: 4rem 1rem;
+  padding: 5rem 1rem;
+  font-family: 'Playfair Display', serif;
 }
 
-section {
-  padding: 3rem 1rem;
-}
-
-h1, h2 {
+header h1 {
+  font-size: 3rem;
   margin-bottom: 1rem;
 }
 
+header p {
+  font-size: 1.5rem;
+}
+
+/* Sections */
+section {
+  padding: 4rem 1rem;
+}
+
+h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Gallery */
 .slider {
   position: relative;
   width: 80%;
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 700px;
+  margin: 2rem auto;
   overflow: hidden;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
 }
 
 .slider img {
@@ -38,11 +52,46 @@ h1, h2 {
 
 .slider img.active {
   display: block;
+  transition: opacity 1s ease-in-out;
 }
 
+/* Countdown */
+#countdown p {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #d32f2f;
+  margin-top: 1rem;
+}
+
+/* RSVP */
+#rsvp a {
+  color: #00796b;
+  text-decoration: none;
+  font-weight: 600;
+}
+#rsvp a:hover {
+  text-decoration: underline;
+}
+
+/* Footer */
 footer {
-  background: #3b5998;
+  background: #00796b;
   color: white;
-  padding: 1.5rem 0;
-  margin-top: 2rem;
+  padding: 2rem 0;
+  font-size: 1.2rem;
+}
+
+/* Login Page */
+#login-page {
+  padding: 8rem 1rem;
+}
+
+#login-page h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+#login-page p {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
 }
