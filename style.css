@@ -116,4 +116,108 @@ footer {
   color: #fff;
   margin-top: 30px;
 }
+/* ----------------- Forum Navigation ----------------- */
+.forum-nav {
+  margin: 20px 0;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.forum-nav a {
+  text-decoration: none;
+  color: #333;
+  margin: 0 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.forum-nav a:hover {
+  background-color: #a3f0d1; /* mint-green highlight */
+  color: #000;
+}
+
+/* ----------------- Messages Container ----------------- */
+#messages {
+  max-width: 800px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* ----------------- Individual Message Card ----------------- */
+#messages div {
+  background-color: #f5f5f5; /* light grey */
+  border-left: 5px solid #a3f0d1; /* mint-green stripe */
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  color: #111;
+  transition: transform 0.2s;
+}
+
+#messages div:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* ----------------- Message Form ----------------- */
+#message-form {
+  max-width: 800px;
+  margin: 20px auto 40px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#message-form textarea {
+  resize: vertical;
+  min-height: 80px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+}
+
+#message-form button {
+  width: 120px;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #333;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#message-form button:hover {
+  background-color: #a3f0d1; /* mint-green */
+  color: #000;
+}
+
+/* ----------------- Logout Button ----------------- */
+#logout {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 20px;
+  transition: background 0.3s;
+}
+
+#logout:hover {
+  background-color: #a3f0d1;
+  color: #000;
+}
+
+/* ---------*
+
 
