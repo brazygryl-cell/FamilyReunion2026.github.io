@@ -3,123 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Williams Family Reunion - Login</title>
+<title>Login - Williams Family Reunion</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>
-  <h1>Williams Family Reunion Login</h1>
-</header>
+<h1>Login</h1>
 
-<section id="login-section">
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Password">
-  <button id="signup">Sign Up</button>
-  <button id="login">Log In</button>
-  <button id="logout" style="display:none;">Log Out</button>
-  <p id="status"></p>
-</section>
+<form id="login-form">
+  <label>Email: <input type="email" id="email" required></label>
+  <label>Password: <input type="password" id="password" required></label>
+  <button type="submit">Login</button>
+</form>
 
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script type="module" src="firebase-init.js"></script>
+<script type="module">
+import { auth, db } from './firebase-init.js';
 
-<script>
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyAldYSp37LZO31XkGc4F1xhnQ9bpBXLU6Q",
-    authDomain: "williams-reunion.firebaseapp.com",
-    projectId: "williams-reunion",
-    storageBucket: "williams-reunion.firebasestorage.app",
-    messagingSenderId: "1053815265185",
-    appId: "1:1053815265185:web:050db056f81ab9d2d81de0"
-  };
+const form = document.getElementById('login-form');
 
-  // Initialize Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
 
-  const emailInput = document.getElementById('email');
-  const passInput = document.getElementById('password');
-  const status = document.getElementById('status');
+  try {
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
 
-  const loginBtn = document.getElementById('login');
-  const signupBtn = document.getElementById('signup');
-  const logoutBtn = document.getElementById('logout');
-
-  function updateUI(user){
-    if(user){
-      status.textContent = `Logged in as ${user.email}`;
-      loginBtn.style.display = 'none';
-      signupBtn.style.display = 'none';
-      logoutBtn.style.display = 'inline-block';
+    const doc = await db.collection('approvedUsers').doc(user.email).get();
+    if(doc.exists && doc.data().approved){
+      window.location.href = "index.html";
     } else {
-      status.textContent = 'Not logged in';
-      loginBtn.style.display = 'inline-block';
-      signupBtn.style.display = 'inline-block';
-      logoutBtn.style.display = 'none';
+      await auth.signOut();
+      alert("You are not approved yet.");
     }
+
+  } catch(err) {
+    alert(err.message);
   }
-
-  // Check auth state on page load
-  auth.onAuthStateChanged(user => {
-    if(user){
-      db.collection('approvedUsers').doc(user.email).get().then(doc => {
-        if(doc.exists && doc.data().approved){
-          updateUI(user);
-        } else {
-          auth.signOut();
-          updateUI(null);
-        }
-      });
-    } else updateUI(null);
-  });
-
-  // Sign Up
-  signupBtn.addEventListener('click', () => {
-    const email = emailInput.value.trim();
-    const password = passInput.value.trim();
-    if(!email || !password) return;
-
-    auth.createUserWithEmailAndPassword(email, password)
-      .then(userCred => {
-        status.textContent = "Signup successful. Waiting for approval.";
-        db.collection('approvedUsers').doc(email).set({ approved: false });
-      })
-      .catch(err => status.textContent = err.message);
-  });
-
-  // Log In
-  loginBtn.addEventListener('click', () => {
-    const email = emailInput.value.trim();
-    const password = passInput.value.trim();
-    if(!email || !password) return;
-
-    auth.signInWithEmailAndPassword(email, password)
-      .then(userCred => {
-        const email = userCred.user.email;
-        db.collection('approvedUsers').doc(email).get().then(doc => {
-          if(doc.exists && doc.data().approved){
-            updateUI(userCred.user);
-          } else {
-            auth.signOut();
-            status.textContent = "Your account is not approved yet.";
-          }
-        });
-      })
-      .catch(err => status.textContent = err.message);
-  });
-
-  // Log Out
-  logoutBtn.addEventListener('click', () => {
-    auth.signOut();
-    updateUI(null);
-  });
+});
 </script>
-
 </body>
 </html>
-
