@@ -51,7 +51,7 @@ messageForm.addEventListener('submit',async e=>{
     await db.collection('forumMessages').add({
       text,
       user:user.email,
-      board: 'plans', // <-- IMPORTANT: assign this board
+      board: 'planning', // <-- IMPORTANT: assign this board
       timestamp:new Date()
     });
     document.getElementById('message').value='';
@@ -59,7 +59,7 @@ messageForm.addEventListener('submit',async e=>{
 });
 
 // Display messages for this board only
-db.collection('forumMessages').where('board','==','plans').orderBy('timestamp')
+db.collection('forumMessages').where('board','==','planning').orderBy('timestamp')
 .onSnapshot(snapshot=>{
   const container=document.getElementById('messages');
   container.innerHTML='';
