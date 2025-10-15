@@ -1,204 +1,109 @@
-/* Global Styles */
+/* Fonts */
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: #f5f5f5; /* light grey background */
-  color: #111111; /* black text */
+  background-color: #f2f2f2;
+  color: #333;
   margin: 0;
   padding: 0;
-  line-height: 1.6;
 }
 
+/* Headers */
 h1, h2, h3 {
   font-family: 'Playfair Display', serif;
-  color: #2e7d7d; /* mint-green headings */
-  margin-bottom: 10px;
-}
-
-h1 {
-  font-size: 3rem;
-  text-align: center;
-  margin-top: 20px;
-}
-
-h2 {
-  font-size: 2.2rem;
-  margin-top: 30px;
-}
-
-h3 {
-  font-size: 1.8rem;
-  margin-top: 20px;
-}
-
-/* Header */
-header {
-  background-color: #111111;
-  color: #f5f5f5;
-  padding: 20px 10px;
+  color: #2c3e50;
   text-align: center;
 }
 
-header nav a {
-  color: #a5f0d1; /* mint-green links */
+/* Navigation */
+nav {
+  text-align: center;
+  margin-bottom: 20px;
+}
+nav a {
   text-decoration: none;
-  font-weight: 600;
   margin: 0 15px;
+  color: #27ae60; /* mint-green */
+  font-weight: 600;
   font-size: 1.1rem;
-  transition: color 0.3s;
 }
-
-header nav a:hover {
-  color: #ffffff;
-}
-
-header nav button {
-  background-color: #2e7d7d; /* mint-green button */
-  color: #fff;
-  border: none;
-  padding: 8px 15px;
-  font-size: 1rem;
-  cursor: pointer;
-  border-radius: 5px;
-  margin-left: 15px;
-  transition: background-color 0.3s;
-}
-
-header nav button:hover {
-  background-color: #1b5f5f;
+nav a:hover {
+  color: #000;
 }
 
 /* Sections */
 section {
-  max-width: 1000px;
-  margin: 30px auto;
   padding: 20px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
-/* Countdown Timer */
-#countdown p {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #2e7d7d;
-}
-
-/* Gallery Slider */
+/* Gallery */
 .slider {
   position: relative;
+  max-width: 600px;
+  margin: 20px auto;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 10px;
 }
-
 .slider img {
   width: 100%;
   display: none;
-  transition: opacity 1s ease-in-out;
-  border-radius: 12px;
 }
-
 .slider img.active {
   display: block;
-  opacity: 1;
 }
-
-/* Forum / Cards */
-.card {
-  background-color: #f0fdf9;
-  padding: 15px;
-  margin: 15px 0;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.card h3 {
-  color: #111111;
-}
-
-/* Buttons */
-button {
-  background-color: #2e7d7d;
-  color: #fff;
-  border: none;
-  padding: 8px 15px;
-  font-size: 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: #1b5f5f;
-}
-
-/* Forms */
-input, select {
-  padding: 8px;
-  font-size: 1rem;
-  margin: 5px 0;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  width: 100%;
-  max-width: 250px;
-}
-
-/* Footer */
-footer {
-  background-color: #111111;
-  color: #f5f5f5;
-  text-align: center;
-  padding: 20px 10px;
-  margin-top: 30px;
-  border-top: 4px solid #2e7d7d;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  h1 { font-size: 2.2rem; }
-  h2 { font-size: 1.8rem; }
-  h3 { font-size: 1.4rem; }
-
-  header nav a, header nav button {
-    display: block;
-    margin: 5px 0;
-  }
-}
-/* Slider Dots */
 .slider-dots {
   text-align: center;
   margin-top: 10px;
 }
-
-.slider-dots .dot {
-  height: 12px;
+.dot {
+  display: inline-block;
   width: 12px;
+  height: 12px;
   margin: 0 5px;
   background-color: #ccc;
   border-radius: 50%;
-  display: inline-block;
   cursor: pointer;
-  transition: background-color 0.3s;
+}
+.dot.active {
+  background-color: #27ae60;
 }
 
-.slider-dots .dot.active {
-  background-color: #2e7d7d; /* mint-green active dot */
+/* Countdown */
+#countdown {
+  text-align: center;
+  font-size: 2rem;
+  margin: 20px 0;
+  color: #27ae60;
 }
 
-/* Slider Images Fade */
-.slider img {
+/* Buttons */
+button {
+  background-color: #27ae60;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #2ecc71;
+}
+
+/* Forms */
+form input, form select, form textarea {
+  padding: 8px;
+  margin: 5px 0;
   width: 100%;
-  display: none;
-  opacity: 0;
-  position: absolute;
-  left: 0;
-  top: 0;
-  transition: opacity 1s ease-in-out;
-}
-
-.slider img.active {
+  max-width: 300px;
   display: block;
-  opacity: 1;
-  position: relative;
+  border-radius: 5px;
+  border: 1px solid #ccc;
 }
 
+/* Footer */
+footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #333;
+  color: #fff;
+  margin-top: 30px;
+}
