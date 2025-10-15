@@ -3,77 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>General Chat - Williams Reunion</title>
+<title>Forum - General - Williams Family Reunion</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>
-  <h1>General Chat</h1>
-  <nav>
-    <a href="index.html">Home</a> |
-    <a href="forum.html">Back to Boards</a>
-  </nav>
-</header>
+<h1>General Discussion</h1>
+<nav class="forum-nav">
+  <a href="forum-general.html">General</a> |
+  <a href="forum-memories.html">Memories</a> |
+  <a href="forum-pictures.html">Pictures</a> |
+  <a href="forum-planning.html">Planning</a>
+</nav>
 
-<section id="board">
-  <div id="posts"></div>
-  <textarea id="new-post" placeholder="Write a message..."></textarea>
-  <button onclick="postMessage()">Post</button>
-</section>
+<button id="logout">Logout</button>
+<div id="messages"></div>
 
-<footer>
-  <p>Made with ❤️ by Taylor Clark Jones</p>
-</footer>
+<form id="message-form">
+  <textarea id="message" placeholder="Write a message..." required></textarea>
+  <button type="submit">Post</button>
+</form>
 
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script type="module" src="firebase-init.js"></script>
+<script type="module">
+import { auth, db } from './firebase-init.js';
 
-<script>
-// 1️⃣ Netlify Identity
-if (window.netlifyIdentity) {
-  window.netlifyIdentity.init();
-  const user = window.netlifyIdentity.currentUser();
-  if (!user) window.location.href = "login.html";
-}
-
-// 2️⃣ Firebase setup
-const firebaseConfig = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT.firebaseio.com",
-  projectId: "YOUR_PROJECT",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const boardName = 'general';
-
-// 3️⃣ Load posts
-db.ref('boards/' + boardName).on('value', snapshot => {
-  const postsDiv = document.getElementById('posts');
-  postsDiv.innerHTML = '';
-  snapshot.forEach(child => {
-    const msg = child.val();
-    const p = document.createElement('p');
-    p.innerHTML = `<strong>${msg.user}:</strong> ${msg.text}`;
-    postsDiv.appendChild(p);
-  });
+// Login + approval check
+auth.onAuthStateChanged(async user=>{
+  if(!user){window.location.href="login.html";return;}
+  const doc=await db.collection('approvedUsers').doc(user.email).get();
+  if(!doc.exists||!doc.data().approved){await auth.signOut();alert("Not approved.");window.location.href="login.html";}
 });
 
-// 4️⃣ Post new message
-function postMessage() {
-  const input = document.getElementById('new-post');
-  const text = input.value.trim();
-  if (!text) return;
-  const user = window.netlifyIdentity.currentUser().email;
-  db.ref('boards/' + boardName).push({ user, text });
-  input.value = '';
-}
-</script>
+// Logout
+document.getElementById('logout').addEventListener('click',async()=>{await auth.signOut();window.location.href="login.html";});
 
+// Message posting
+const messageForm=document.getElementById('message-form');
+messageForm.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const text=document.getElementById('message').value;
+  const user=auth.currentUser;
+  if(user){
+    await db.collection('forumMessages').add({
+      text,
+      user:user.email,
+      board: 'general', // <-- IMPORTANT: assign this board
+      timestamp:new Date()
+    });
+    document.getElementById('message').value='';
+  }
+});
+
+// Display messages for this board only
+db.collection('forumMessages').where('board','==','general').orderBy('timestamp')
+.onSnapshot(snapshot=>{
+  const container=document.getElementById('messages');
+  container.innerHTML='';
+  snapshot.forEach(doc=>{
+    const msg=doc.data();
+    const div=document.createElement('div');
+    div.textContent=`${msg.user}: ${msg.text}`;
+    container.appendChild(div);
+  });
+});
+</script>
 </body>
 </html>
