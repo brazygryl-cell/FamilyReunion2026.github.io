@@ -6,43 +6,14 @@
 <title>Pricing - Williams Family Reunion</title>
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-<!-- Your Firebase config or firebase-init.js -->
+<!-- Firebase config -->
 <script src="firebase-init.js"></script>
-
-<!-- Your custom JS -->
-<script src="forum.js"></script>
-  <script>
-const logoutBtn = document.getElementById('logout');
-
-// Enforce login + approval
-auth.onAuthStateChanged(user => {
-  if(user){
-    db.collection('approvedUsers').doc(user.email).get().then(doc => {
-      if(doc.exists && doc.data().approved){
-        // Approved user, show page normally
-      } else {
-        auth.signOut();
-        alert("You are not approved to view this page.");
-        window.location.href = "login.html";
-      }
-    });
-  } else {
-    window.location.href = "login.html";
-  }
-});
-
-// Logout button
-logoutBtn.addEventListener('click', () => {
-  auth.signOut();
-  window.location.href = "login.html";
-});
-</script>
-
 </head>
 <body>
 
@@ -51,8 +22,9 @@ logoutBtn.addEventListener('click', () => {
   <nav>
     <a href="index.html">Home</a> | 
     <a href="forum.html">Forum</a> | 
-    <a href="pricing.html">Pricing</a>
+    <a href="pricing.html">Pricing</a> | 
     <a href="tshirts.html">T-Shirts</a>
+    <button id="logout">Log Out</button>
   </nav>
 </header>
 
@@ -67,12 +39,40 @@ logoutBtn.addEventListener('click', () => {
         <li>Access to onsite amenities</li>
       </ul>
     </div>
+  </div>
 </section>
 
 <footer>
   <p>Made with ❤️ by Taylor Clark Jones</p>
-  <p> Art by 🔥 Andre Clark</p>
+  <p>Art by 🔥 Andre Clark</p>
 </footer>
+
+<!-- Login/approval check -->
+<script>
+const logoutBtn = document.getElementById('logout');
+
+auth.onAuthStateChanged(user => {
+  if(user){
+    db.collection('approvedUsers').doc(user.email).get().then(doc => {
+      if(doc.exists && doc.data().approved){
+        // Approved user, page visible
+      } else {
+        auth.signOut();
+        alert("You are not approved to view this page.");
+        window.location.href = "login.html";
+      }
+    });
+  } else {
+    window.location.href = "login.html";
+  }
+});
+
+// Logout functionality
+logoutBtn.addEventListener('click', () => {
+  auth.signOut();
+  window.location.href = "login.html";
+});
+</script>
 
 </body>
 </html>
