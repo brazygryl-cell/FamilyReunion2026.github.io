@@ -76,4 +76,79 @@ auth.onAuthStateChanged(user => {
 
 // Logout button
 logoutBtn.addEventListener('click', () => {
-  auth.signOut(
+  auth.signOut();
+  window.location.href = "login.html";
+});
+</script>
+
+<!-- Gallery Slider -->
+  <section id="gallery">
+  <h2>Family Memories</h2>
+  <div class="slider">
+    <img src="images/family1.jpg" alt="Family 1">
+    <img src="images/family2.jpg" alt="Family 2">
+    <img src="images/family3.jpg" alt="Family 3">
+  </div>
+  <div class="slider-dots">
+    <span class="dot" onclick="goToSlide(0)"></span>
+    <span class="dot" onclick="goToSlide(1)"></span>
+    <span class="dot" onclick="goToSlide(2)"></span>
+  </div>
+</section>
+<script>
+let slides = document.querySelectorAll('.slider img');
+let dots = document.querySelectorAll('.slider-dots .dot');
+let current = 0;
+
+function showSlide(index) {
+  slides.forEach((img, i) => {
+    img.classList.remove('active');
+    dots[i].classList.remove('active');
+    if(i === index){
+      img.classList.add('active');
+      dots[i].classList.add('active');
+    }
+  });
+  current = index;
+}
+
+function nextSlide() {
+  let next = (current + 1) % slides.length;
+  showSlide(next);
+}
+
+// Dots navigation
+function goToSlide(index){
+  showSlide(index);
+}
+
+// Initialize
+showSlide(current);
+setInterval(nextSlide, 3000); // 3-second automatic slideshow
+</script>
+
+<!-- Countdown Timer -->
+<script>
+const countdownDate = new Date("July 26, 2026 12:00:00").getTime();
+const timer = setInterval(function() {
+  const now = new Date().getTime();
+  const distance = countdownDate - now;
+
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
+  const minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
+  const seconds = Math.floor((distance % (1000*60)) / 1000);
+
+  document.getElementById("timer").innerHTML = 
+    `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+  if(distance < 0) {
+    clearInterval(timer);
+    document.getElementById("timer").innerHTML = "The reunion is happening now!";
+  }
+}, 1000);
+</script>
+
+</body>
+</html>
+
