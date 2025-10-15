@@ -1,24 +1,32 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Williams Family Reunion 2025</title>
+<title>Williams Family Reunion 2026</title>
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<!-- Firebase config -->
+<script src="firebase-init.js"></script>
 </head>
 <body>
 
 <header>
-  <h1>Williams Family Reunion 2025</h1>
-  <p>July 26 - August 1 • Orlando, FL </p>
+  <h1>Williams Family Reunion 2026</h1>
+  <p>July 26 - August 1 • Orlando, FL</p>
   <nav>
-  <a href="index.html">Home</a> 
-  <a href="forum.html">Forum</a>
-  <a href="pricing.html">Pricing</a>
-  <a href="tshirts.html">T-Shirts</a>
-</nav>
+    <a href="index.html">Home</a> | 
+    <a href="forum.html">Forum</a> | 
+    <a href="pricing.html">Pricing</a> | 
+    <a href="tshirts.html">T-Shirts</a>
+    <button id="logout">Log Out</button>
+  </nav>
 </header>
 
 <section id="countdown">
@@ -42,65 +50,30 @@
 
 <footer>
   <p>Made with ❤️ by Taylor Clark Jones</p>
-  <p> Ary by 🔥 Andre Clark</p>
+  <p>Art by 🔥 Andre Clark</p>
 </footer>
 
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<!-- Login/approval check -->
 <script>
-// Redirect to login if not logged in
-if (window.netlifyIdentity) {
-  window.netlifyIdentity.init();
-  const user = window.netlifyIdentity.currentUser();
-  if (!user) {
+const logoutBtn = document.getElementById('logout');
+
+// Enforce login + approval
+auth.onAuthStateChanged(user => {
+  if(user){
+    db.collection('approvedUsers').doc(user.email).get().then(doc => {
+      if(doc.exists && doc.data().approved){
+        // Approved user, page visible
+      } else {
+        auth.signOut();
+        alert("You are not approved to view this page.");
+        window.location.href = "login.html";
+      }
+    });
+  } else {
     window.location.href = "login.html";
   }
-}
-</script>
+});
 
-<script>
-// Gallery Slider
-let slides = document.querySelectorAll('.slider img');
-let current = 0;
-function showSlide(index) {
-  slides.forEach(img => img.classList.remove('active'));
-  slides[index].classList.add('active');
-}
-function nextSlide() {
-  current = (current + 1) % slides.length;
-  showSlide(current);
-}
-showSlide(current);
-setInterval(nextSlide, 3000);
-
-// Countdown Timer
-const countdownDate = new Date("July 26, 2026 12:00:00").getTime();
-const timer = setInterval(function() {
-  const now = new Date().getTime();
-  const distance = countdownDate - now;
-
-  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
-  const minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
-  const seconds = Math.floor((distance % (1000*60)) / 1000);
-
-  document.getElementById("timer").innerHTML = 
-    `${days}d ${hours}h ${minutes}m ${seconds}s`;
-
-  if(distance < 0) {
-    clearInterval(timer);
-    document.getElementById("timer").innerHTML = "The reunion is happening now!";
-  }
-}, 1000);
-</script>
-
-<script>
-// Gallery Slider JS (already included above)
-</script>
-
-</body>
-</html>
-
-
-
-
-
+// Logout button
+logoutBtn.addEventListener('click', () => {
+  auth.signOut(
