@@ -14,6 +14,15 @@ h1, h2, h3 {
   text-align: center;
 }
 
+.reunion-date {
+  text-align: center;       /* centers the text */
+  font-size: 1.2rem;        /* bigger font if you want */
+  font-family: 'Poppins', sans-serif; /* matches your style */
+  color: #333;              /* or a color that fits your theme */
+  margin: 0;                /* removes extra spacing */
+  padding: 5px 0;           /* optional: some space above/below */
+}
+
 /* Navigation */
 nav {
   text-align: center;
@@ -107,3 +116,4 @@ footer {
   color: #fff;
   margin-top: 30px;
 }
+
