@@ -6,150 +6,79 @@
 <title>Williams Family Reunion 2026</title>
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<!-- Firebase config -->
 <script type="module" src="firebase-init.js"></script>
 </head>
 <body>
 
 <header>
-  <h1>Williams Family Reunion 2026</h1>
-  <p>July 26 - August 1 • Orlando, FL</p>
-  <nav>
-    <a href="index.html">Home</a> | 
-    <a href="forum.html">Forum</a> | 
-    <a href="pricing.html">Pricing</a> | 
-    <a href="tshirts.html">T-Shirts</a>
-    <button id="logout">Log Out</button>
-  </nav>
+<h1>Williams Family Reunion 2026</h1>
+<p>July 26 - August 1 • Orlando, FL</p>
+<nav>
+  <a href="index.html">Home</a>
+  <a href="forum.html">Forum</a>
+  <a href="pricing.html">Pricing</a>
+  <a href="tshirts.html">T-Shirts</a>
+</nav>
 </header>
 
 <section id="countdown">
-  <h2>Countdown to Reunion</h2>
-  <p id="timer"></p>
+<h2>Countdown to Reunion</h2>
+<p id="timer"></p>
 </section>
 
 <section id="gallery">
-  <h2>Family Memories</h2>
-  <div class="slider">
-    <img src="images/family1.jpg" alt="Family 1">
-    <img src="images/family2.jpg" alt="Family 2">
-    <img src="images/family3.jpg" alt="Family 3">
-  </div>
-</section>
-
-<section id="rsvp">
-  <h2>RSVP</h2>
-  <p>Please let us know if you’ll be attending by emailing <a href="mailto:familyreunionwilliams2026@gmail.com">familyreunionwilliams2026@gmail.com</a>.</p>
+<h2>Family Memories</h2>
+<div class="slider">
+  <img src="images/family1.jpg" alt="Family 1">
+  <img src="images/family2.jpg" alt="Family 2">
+  <img src="images/family3.jpg" alt="Family 3">
+</div>
+<div class="slider-dots">
+  <span class="dot" onclick="goToSlide(0)"></span>
+  <span class="dot" onclick="goToSlide(1)"></span>
+  <span class="dot" onclick="goToSlide(2)"></span>
+</div>
 </section>
 
 <footer>
-  <p>Made with ❤️ by Taylor Clark Jones</p>
-  <p>Art by 🔥 Andre Clark</p>
+<p>Made with ❤️ by Taylor Clark Jones</p>
+<p>Art by 🔥 Andre Clark</p>
 </footer>
 
-<!-- Login/approval check -->
-<script>
-const logoutBtn = document.getElementById('logout');
+<script type="module">
+import { auth } from './firebase-init.js';
 
-// Enforce login + approval
+// enforce login
 auth.onAuthStateChanged(user => {
-  if(user){
-    db.collection('approvedUsers').doc(user.email).get().then(doc => {
-      if(doc.exists && doc.data().approved){
-        // Approved user, page visible
-      } else {
-        auth.signOut();
-        alert("You are not approved to view this page.");
-        window.location.href = "login.html";
-      }
-    });
-  } else {
-    window.location.href = "login.html";
-  }
+  if(!user) window.location.href = "login.html";
 });
 
-// Logout button
-logoutBtn.addEventListener('click', () => {
-  auth.signOut();
-  window.location.href = "login.html";
-});
-</script>
-
-<!-- Gallery Slider -->
-  <section id="gallery">
-  <h2>Family Memories</h2>
-  <div class="slider">
-    <img src="images/family1.jpg" alt="Family 1">
-    <img src="images/family2.jpg" alt="Family 2">
-    <img src="images/family3.jpg" alt="Family 3">
-  </div>
-  <div class="slider-dots">
-    <span class="dot" onclick="goToSlide(0)"></span>
-    <span class="dot" onclick="goToSlide(1)"></span>
-    <span class="dot" onclick="goToSlide(2)"></span>
-  </div>
-</section>
-<script>
-let slides = document.querySelectorAll('.slider img');
-let dots = document.querySelectorAll('.slider-dots .dot');
-let current = 0;
-
-function showSlide(index) {
-  slides.forEach((img, i) => {
-    img.classList.remove('active');
-    dots[i].classList.remove('active');
-    if(i === index){
-      img.classList.add('active');
-      dots[i].classList.add('active');
-    }
-  });
-  current = index;
-}
-
-function nextSlide() {
-  let next = (current + 1) % slides.length;
-  showSlide(next);
-}
-
-// Dots navigation
-function goToSlide(index){
-  showSlide(index);
-}
-
-// Initialize
-showSlide(current);
-setInterval(nextSlide, 3000); // 3-second automatic slideshow
-</script>
-
-<!-- Countdown Timer -->
-<script>
+// Countdown Timer
 const countdownDate = new Date("July 26, 2026 12:00:00").getTime();
-const timer = setInterval(function() {
+setInterval(()=>{
   const now = new Date().getTime();
-  const distance = countdownDate - now;
-
-  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
-  const minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
-  const seconds = Math.floor((distance % (1000*60)) / 1000);
-
-  document.getElementById("timer").innerHTML = 
-    `${days}d ${hours}h ${minutes}m ${seconds}s`;
-
-  if(distance < 0) {
-    clearInterval(timer);
-    document.getElementById("timer").innerHTML = "The reunion is happening now!";
+  const d = countdownDate - now;
+  const days = Math.floor(d/(1000*60*60*24));
+  const hrs = Math.floor((d%(1000*60*60*24))/(1000*60*60));
+  const min = Math.floor((d%(1000*60*60))/(1000*60));
+  const sec = Math.floor((d%(1000*60))/1000);
+  document.getElementById("timer").innerHTML = `${days}d ${hrs}h ${min}m ${sec}s`;
+  if(d<0){
+    document.getElementById("timer").innerHTML="The reunion is happening now!";
   }
-}, 1000);
+},1000);
+
+// Gallery Slider
+let slides = document.querySelectorAll('.slider img');
+let current=0;
+function showSlide(i){slides.forEach(s=>s.classList.remove('active'));slides[i].classList.add('active');}
+function nextSlide(){current=(current+1)%slides.length;showSlide(current);}
+showSlide(current);setInterval(nextSlide,3000);
+function goToSlide(i){current=i;showSlide(current);}
 </script>
 
 </body>
 </html>
-
-
