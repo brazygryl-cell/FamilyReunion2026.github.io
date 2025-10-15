@@ -1,98 +1,94 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Family Forum - Williams Reunion</title>
+<title>Williams Family Reunion - Forum</title>
 <link rel="stylesheet" href="style.css">
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<!-- Your Firebase config or firebase-init.js -->
-<script src="firebase-init.js"></script>
-
-<!-- Your custom JS -->
-<script src="forum.js"></script>
-
 </head>
 <body>
 
 <header>
   <h1>Williams Family Reunion Forum</h1>
-  <nav>
-    <a href="index.html">Home</a> |
-    <a href="forum.html">Forum</a>
-  </nav>
+  <button id="logout">Log Out</button>
 </header>
 
-<section id="boards">
-  <h2>Discussion Boards</h2>
-  <ul>
-    <li><a href="forum-general.html">General Chat</a></li>
-    <li><a href="forum-plans.html">Reunion Planning</a></li>
-    <li><a href="forum-memories.html">Family Memories</a></li>
-  </ul>
-</section>
+<main id="forum-section">
+  <p id="status"></p>
+  
+  <div id="forum-form">
+    <input type="text" id="message" placeholder="Write a message">
+    <button id="post">Post</button>
+  </div>
 
-<footer>
-  <p>Made with ❤️ by Taylor Clark Jones</p>
-</footer>
+  <ul id="messages"></ul>
+</main>
 
-</body>
-</html>
-
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-init.js"></script> <!-- Your config file -->
 
 <script>
-// 1️⃣ Netlify Identity Redirect
-if (window.netlifyIdentity) {
-  window.netlifyIdentity.init();
-  const user = window.netlifyIdentity.currentUser();
-  if (!user) window.location.href = "login.html";
-}
+const status = document.getElementById('status');
+const logoutBtn = document.getElementById('logout');
+const messageInput = document.getElementById('message');
+const postBtn = document.getElementById('post');
+const messagesList = document.getElementById('messages');
 
-// 2️⃣ Firebase Setup
-const firebaseConfig = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT.firebaseio.com",
-  projectId: "YOUR_PROJECT",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-// 3️⃣ Load posts
-const boards = ['general', 'plans', 'memories'];
-boards.forEach(board => {
-  db.ref('boards/' + board).on('value', snapshot => {
-    const postsDiv = document.getElementById('posts-' + board);
-    postsDiv.innerHTML = '';
-    snapshot.forEach(child => {
-      const msg = child.val();
-      const p = document.createElement('p');
-      p.innerHTML = `<strong>${msg.user}:</strong> ${msg.text}`;
-      postsDiv.appendChild(p);
+// Enforce login & approval
+auth.onAuthStateChanged(user => {
+  if(user){
+    db.collection('approvedUsers').doc(user.email).get().then(doc => {
+      if(doc.exists && doc.data().approved){
+        status.textContent = `Logged in as ${user.email}`;
+        loadMessages();
+      } else {
+        auth.signOut();
+        window.location.href = "login.html";
+      }
     });
+  } else {
+    window.location.href = "login.html";
+  }
+});
+
+// Logout
+logoutBtn.addEventListener('click', () => {
+  auth.signOut();
+  window.location.href = "login.html";
+});
+
+// Post a message
+postBtn.addEventListener('click', () => {
+  const msg = messageInput.value.trim();
+  if(!msg) return;
+  const user = auth.currentUser;
+  db.collection('forum').add({
+    email: user.email,
+    message: msg,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    messageInput.value = '';
   });
 });
 
-// 4️⃣ Post messages
-function postMessage(board) {
-  const input = document.getElementById('input-' + board);
-  const text = input.value.trim();
-  if (!text) return;
-
-  const user = window.netlifyIdentity.currentUser().email;
-  db.ref('boards/' + board).push({ user, text });
-  input.value = '';
+// Load all messages
+function loadMessages(){
+  db.collection('forum').orderBy('timestamp','asc').onSnapshot(snapshot => {
+    messagesList.innerHTML = '';
+    snapshot.forEach(doc => {
+      const li = document.createElement('li');
+      li.textContent = `${doc.data().email}: ${doc.data().message}`;
+      messagesList.appendChild(li);
+    });
+  });
 }
 </script>
+<footer>
+  <p>Made with ❤️ by Taylor Clark Jones </p>
+  <p> Art by 🔥 Andre Clark</p>
+</footer>
 </body>
 </html>
