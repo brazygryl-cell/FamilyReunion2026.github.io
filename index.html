@@ -25,8 +25,8 @@
 </header>
 
 <section id="countdown">
-<h2>Countdown to Reunion</h2>
-<p id="timer"></p>
+  <h2>Countdown to Reunion</h2>
+  <p id="timer"></p>
 </section>
 
 <section id="gallery">
@@ -57,19 +57,27 @@ auth.onAuthStateChanged(user => {
 });
 
 // Countdown Timer
+<script>
 const countdownDate = new Date("July 26, 2026 12:00:00").getTime();
-setInterval(()=>{
+
+const timerInterval = setInterval(function() {
   const now = new Date().getTime();
-  const d = countdownDate - now;
-  const days = Math.floor(d/(1000*60*60*24));
-  const hrs = Math.floor((d%(1000*60*60*24))/(1000*60*60));
-  const min = Math.floor((d%(1000*60*60))/(1000*60));
-  const sec = Math.floor((d%(1000*60))/1000);
-  document.getElementById("timer").innerHTML = `${days}d ${hrs}h ${min}m ${sec}s`;
-  if(d<0){
-    document.getElementById("timer").innerHTML="The reunion is happening now!";
+  const distance = countdownDate - now;
+
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
+  const minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
+  const seconds = Math.floor((distance % (1000*60)) / 1000);
+
+  document.getElementById("timer").innerHTML = 
+    `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+  if(distance < 0) {
+    clearInterval(timerInterval);
+    document.getElementById("timer").innerHTML = "The reunion is happening now!";
   }
-},1000);
+}, 1000);
+</script>
 
 // Gallery Slider
 let slides = document.querySelectorAll('.slider img');
@@ -82,4 +90,5 @@ function goToSlide(i){current=i;showSlide(current);}
 
 </body>
 </html>
+
 
