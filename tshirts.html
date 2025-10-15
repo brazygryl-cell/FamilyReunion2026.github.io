@@ -5,118 +5,67 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Williams Family Reunion T-Shirts</title>
 <link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<!-- Firebase config -->
 <script type="module" src="firebase-init.js"></script>
 </head>
 <body>
 
 <header>
-  <h1>Williams Family Reunion 2026</h1>
-  <nav>
-    <a href="index.html">Home</a> | 
-    <a href="forum.html">Forum</a> | 
-    <a href="pricing.html">Pricing</a> | 
-    <a href="tshirts.html">T-Shirts</a>
-    <button id="logout">Log Out</button>
-  </nav>
+<h1>Williams Family Reunion 2026</h1>
+<nav>
+  <a href="index.html">Home</a> | 
+  <a href="forum.html">Forum</a> | 
+  <a href="pricing.html">Pricing</a> |
+  <a href="tshirts.html">T-Shirts</a>
+</nav>
 </header>
 
 <section id="tshirts">
-  <h2>Order Your Reunion T-Shirt!</h2>
-  <p>Select your size and quantity, then submit your order. We’ll email you confirmation.</p>
+<h2>Order Your Reunion T-Shirt!</h2>
 
-  <div class="tshirt-options">
-    <div class="tshirt-card">
-      <img src="images/tshirt1.png" alt="Blue Reunion T-Shirt">
-      <h3>Blue Reunion T-Shirt</h3>
-      <p>$20 each</p>
-      <label>Size:
-        <select id="size1">
-          <option>S</option>
-          <option>M</option>
-          <option>L</option>
-          <option>XL</option>
-          <option>XXL</option>
-        </select>
-      </label>
-      <label>Quantity:
-        <input type="number" id="qty1" min="1" value="1">
-      </label>
-    </div>
+<div class="tshirt-card">
+  <h3>Blue Reunion T-Shirt</h3>
+  <label>Size: <select id="size1"><option>S</option><option>M</option><option>L</option></select></label>
+  <label>Quantity: <input type="number" id="qty1" min="1" value="1"></label>
+</div>
 
-    <div class="tshirt-card">
-      <img src="images/tshirt2.png" alt="White Reunion T-Shirt">
-      <h3>White Reunion T-Shirt</h3>
-      <p>$20 each</p>
-      <label>Size:
-        <select id="size2">
-          <option>S</option>
-          <option>M</option>
-          <option>L</option>
-          <option>XL</option>
-          <option>XXL</option>
-        </select>
-      </label>
-      <label>Quantity:
-        <input type="number" id="qty2" min="1" value="1">
-      </label>
-    </div>
-  </div>
+<div class="tshirt-card">
+  <h3>White Reunion T-Shirt</h3>
+  <label>Size: <select id="size2"><option>S</option><option>M</option><option>L</option></select></label>
+  <label>Quantity: <input type="number" id="qty2" min="1" value="1"></label>
+</div>
 
-  <form id="order-form" action="mailto:youremail@example.com" method="post" enctype="text/plain">
-    <label>Your Name: <input type="text" name="name" required></label>
-    <label>Your Email: <input type="email" name="email" required></label>
-    <input type="hidden" name="order-details" id="order-details">
-    <button type="submit" onclick="compileOrder()">Submit Order</button>
-  </form>
-</section>
+<form id="order-form" action="mailto:familyreunionwilliams2026@gmail.com" method="post" enctype="text/plain">
+<label>Your Name: <input type="text" name="name" required></label>
+<label>Your Email: <input type="email" name="email" required></label>
+<input type="hidden" name="order-details" id="order-details">
+<button type="submit" onclick="compileOrder()">Submit Order</button>
+</form>
 
 <footer>
-  <p>Made with ❤️ by Taylor Clark Jones</p>
-  <p>Art by 🔥 Andre Clark</p>
+<p>Made with ❤️ by Taylor Clark Jones</p>
+<p>Art by 🔥 Andre Clark</p>
 </footer>
 
-<!-- Login/approval check -->
 <script>
-const logoutBtn = document.getElementById('logout');
-
-auth.onAuthStateChanged(user => {
-  if(user){
-    db.collection('approvedUsers').doc(user.email).get().then(doc => {
-      if(doc.exists && doc.data().approved){
-        // Approved user, page visible
-      } else {
-        auth.signOut();
-        alert("You are not approved to view this page.");
-        window.location.href = "login.html";
-      }
-    });
-  } else {
-    window.location.href = "login.html";
-  }
-});
-
-// Logout button
-logoutBtn.addEventListener('click', () => {
-  auth.signOut();
-  window.location.href = "login.html";
-});
-
-// Compile order details
-function compileOrder() {
-  const orderDetails = `
-Blue T-Shirt: ${document.getElementById('qty1').value} pcs, Size: ${document.getElementById('size1').value}
-White T-Shirt: ${document.getElementById('qty2').value} pcs, Size: ${document.getElementById('size2').value}
+function compileOrder(){
+  const orderDetails=`
+Blue T-Shirt: ${document.getElementById('qty1').value}, Size: ${document.getElementById('size1').value}
+White T-Shirt: ${document.getElementById('qty2').value}, Size: ${document.getElementById('size2').value}
 `;
-  document.getElementById('order-details').value = orderDetails;
+  document.getElementById('order-details').value=orderDetails;
 }
+</script>
+
+<script type="module">
+import { auth, db } from './firebase-init.js';
+auth.onAuthStateChanged(async user=>{
+  if(!user){window.location.href="login.html";return;}
+  const doc=await db.collection('approvedUsers').doc(user.email).get();
+  if(!doc.exists||!doc.data().approved){await auth.signOut();alert("Not approved.");window.location.href="login.html";}
+});
 </script>
 
 </body>
