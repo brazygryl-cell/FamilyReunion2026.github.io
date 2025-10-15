@@ -1,209 +1,166 @@
+/* Global Styles */
 body {
   font-family: 'Poppins', sans-serif;
+  background-color: #f5f5f5; /* light grey background */
+  color: #111111; /* black text */
   margin: 0;
   padding: 0;
-  background: linear-gradient(180deg, #fefefe, #e0f7fa);
-  color: #333;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+  color: #2e7d7d; /* mint-green headings */
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-size: 3rem;
   text-align: center;
+  margin-top: 20px;
+}
+
+h2 {
+  font-size: 2.2rem;
+  margin-top: 30px;
+}
+
+h3 {
+  font-size: 1.8rem;
+  margin-top: 20px;
 }
 
 /* Header */
 header {
-  background: #00796b;
-  color: white;
-  padding: 5rem 1rem;
-  font-family: 'Playfair Display', serif;
+  background-color: #111111;
+  color: #f5f5f5;
+  padding: 20px 10px;
+  text-align: center;
 }
 
-header h1 {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+header nav a {
+  color: #a5f0d1; /* mint-green links */
+  text-decoration: none;
+  font-weight: 600;
+  margin: 0 15px;
+  font-size: 1.1rem;
+  transition: color 0.3s;
 }
 
-header p {
-  font-size: 1.5rem;
+header nav a:hover {
+  color: #ffffff;
+}
+
+header nav button {
+  background-color: #2e7d7d; /* mint-green button */
+  color: #fff;
+  border: none;
+  padding: 8px 15px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-left: 15px;
+  transition: background-color 0.3s;
+}
+
+header nav button:hover {
+  background-color: #1b5f5f;
 }
 
 /* Sections */
 section {
-  padding: 4rem 1rem;
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
-h2 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+/* Countdown Timer */
+#countdown p {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2e7d7d;
 }
 
-/* Gallery */
+/* Gallery Slider */
 .slider {
   position: relative;
-  width: 80%;
-  max-width: 700px;
-  margin: 2rem auto;
   overflow: hidden;
-  border-radius: 15px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+  border-radius: 12px;
 }
 
 .slider img {
   width: 100%;
   display: none;
+  transition: opacity 1s ease-in-out;
+  border-radius: 12px;
 }
 
 .slider img.active {
   display: block;
-  transition: opacity 1s ease-in-out;
+  opacity: 1;
 }
 
-/* Countdown */
-#countdown p {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #d32f2f;
-  margin-top: 1rem;
+/* Forum / Cards */
+.card {
+  background-color: #f0fdf9;
+  padding: 15px;
+  margin: 15px 0;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-/* RSVP */
-#rsvp a {
-  color: #00796b;
-  text-decoration: none;
-  font-weight: 600;
+.card h3 {
+  color: #111111;
 }
-#rsvp a:hover {
-  text-decoration: underline;
+
+/* Buttons */
+button {
+  background-color: #2e7d7d;
+  color: #fff;
+  border: none;
+  padding: 8px 15px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #1b5f5f;
+}
+
+/* Forms */
+input, select {
+  padding: 8px;
+  font-size: 1rem;
+  margin: 5px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 250px;
 }
 
 /* Footer */
 footer {
-  background: #00796b;
-  color: white;
-  padding: 2rem 0;
-  font-size: 1.2rem;
-}
-
-/* Login Page */
-#login-page {
-  padding: 8rem 1rem;
-}
-
-#login-page h1 {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
-
-#login-page p {
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
-}
-#pricing {
-  padding: 4rem 1rem;
-}
-
-.pricing-cards {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
-.card {
-  background: #e0f7fa;
-  border: 2px solid #00796b;
-  border-radius: 15px;
-  width: 250px;
-  padding: 2rem 1rem;
+  background-color: #111111;
+  color: #f5f5f5;
   text-align: center;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-  transition: transform 0.3s ease;
+  padding: 20px 10px;
+  margin-top: 30px;
+  border-top: 4px solid #2e7d7d;
 }
 
-.card:hover {
-  transform: translateY(-10px);
-}
+/* Responsive */
+@media (max-width: 768px) {
+  h1 { font-size: 2.2rem; }
+  h2 { font-size: 1.8rem; }
+  h3 { font-size: 1.4rem; }
 
-.card h3 {
-  color: #00796b;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.card p {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.card ul {
-  list-style: none;
-  padding: 0;
-  margin-bottom: 1rem;
-}
-
-.card ul li {
-  margin: 0.5rem 0;
-}
-
-.card button {
-  padding: 0.5rem 1rem;
-  background: #00796b;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.card button:hover {
-  background: #004d40;
-}
-.tshirt-options {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem;
-  margin: 2rem 0;
-}
-
-.tshirt-card {
-  background: #f0f4c3;
-  border: 2px solid #8bc34a;
-  border-radius: 15px;
-  padding: 1rem;
-  text-align: center;
-  width: 220px;
-}
-
-.tshirt-card img {
-  width: 100%;
-  border-radius: 10px;
-  margin-bottom: 0.5rem;
-}
-
-.tshirt-card label, .tshirt-card input, .tshirt-card select {
-  display: block;
-  margin: 0.5rem 0;
-}
-
-#order-form {
-  text-align: center;
-  margin-top: 2rem;
-}
-
-#order-form input, #order-form button {
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  width: 80%;
-  max-width: 300px;
-}
-
-#order-form button {
-  background: #8bc34a;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-#order-form button:hover {
-  background: #689f38;
+  header nav a, header nav button {
+    display: block;
+    margin: 5px 0;
+  }
 }
