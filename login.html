@@ -5,25 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login - Williams Family Reunion</title>
 <link rel="stylesheet" href="style.css">
-</head>
-<body>
 
-<h1>Login</h1>
-
-<form id="login-form">
-  <label>Email: <input type="email" id="email" required></label>
-  <label>Password: <input type="password" id="password" required></label>
-  <button type="submit">Login</button>
-</form>
-
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script type="module" src="firebase-init.js"></script>
+</head>
+<body>
+
+<h1>Login to Family Reunion</h1>
+<form id="login-form">
+  <input type="email" id="email" placeholder="Email" required>
+  <input type="password" id="password" placeholder="Password" required>
+  <button type="submit">Login</button>
+</form>
+<p id="error" style="color:red;"></p>
+
 <script type="module">
-import { auth, db } from './firebase-init.js';
+import { auth } from './firebase-init.js';
 
 const form = document.getElementById('login-form');
+const error = document.getElementById('error');
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -31,21 +35,13 @@ form.addEventListener('submit', async (e) => {
   const password = document.getElementById('password').value;
 
   try {
-    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-    const user = userCredential.user;
-
-    const doc = await db.collection('approvedUsers').doc(user.email).get();
-    if(doc.exists && doc.data().approved){
-      window.location.href = "index.html";
-    } else {
-      await auth.signOut();
-      alert("You are not approved yet.");
-    }
-
-  } catch(err) {
-    alert(err.message);
+    await auth.signInWithEmailAndPassword(email, password);
+    window.location.href = "forum.html";
+  } catch (err) {
+    error.textContent = err.message;
   }
 });
 </script>
+
 </body>
 </html>
