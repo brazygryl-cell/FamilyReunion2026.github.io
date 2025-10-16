@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Forum - General - Williams Family Reunion</title>
+<title>Forum - Memories - Williams Family Reunion</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>General Discussion</h1>
+<h1>Memories</h1>
 <nav class="forum-nav">
   <a href="forum-general.html">General</a> |
   <a href="forum-memories.html">Memories</a> |
@@ -19,7 +19,7 @@
 <div id="messages"></div>
 
 <form id="message-form">
-  <textarea id="message" placeholder="Write a message..." required></textarea>
+  <textarea id="message" placeholder="Write a memory..." required></textarea>
   <button type="submit">Post</button>
 </form>
 
@@ -27,69 +27,73 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script type="module" src="firebase-init.js"></script>
+
 <script type="module">
 import { auth, db } from './firebase-init.js';
 
-// Login + approval check
-auth.onAuthStateChanged(async user=>{
-  if(!user){window.location.href="login.html";return;}
-  const doc=await db.collection('approvedUsers').doc(user.email).get();
-  if(!doc.exists||!doc.data().approved){await auth.signOut();alert("Not approved.");window.location.href="login.html";}
-});
-
-// Logout
-document.getElementById('logout').addEventListener('click',async()=>{await auth.signOut();window.location.href="login.html";});
-
-// Message posting
-const messageForm=document.getElementById('message-form');
-messageForm.addEventListener('submit',async e=>{
-  e.preventDefault();
-  const text=document.getElementById('message').value;
-  const user=auth.currentUser;
-  if(user){
-    await db.collection('forumMessages').add({
-      text,
-      user:user.email,
-      board: 'planning', // <-- IMPORTANT: assign this board
-      timestamp:new Date()
-    });
-    document.getElementById('message').value='';
+// --- Auth Check ---
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+  const doc = await db.collection('approvedUsers').doc(user.email).get();
+  if (!doc.exists || !doc.data().approved) {
+    await auth.signOut();
+    alert("Not approved.");
+    window.location.href = "login.html";
   }
 });
 
-// Display messages for this board only
-// Display messages for this board only
+// --- Logout ---
+document.getElementById('logout').addEventListener('click', async () => {
+  await auth.signOut();
+  window.location.href = "login.html";
+});
+
+// --- Post Message ---
+const messageForm = document.getElementById('message-form');
+messageForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const text = document.getElementById('message').value;
+  const user = auth.currentUser;
+  if (user) {
+    await db.collection('forumMessages').add({
+      text,
+      user: user.email,
+      board: 'memories',
+      timestamp: new Date()
+    });
+    document.getElementById('message').value = '';
+  }
+});
+
+// --- Display Messages for This Board ---
 db.collection('forumMessages')
-  .where('board','==','general') // change per board
+  .where('board', '==', 'memories')
   .orderBy('timestamp')
-  .onSnapshot(snapshot=>{
-    const container=document.getElementById('messages');
-    container.innerHTML='';
+  .onSnapshot(snapshot => {
+    const container = document.getElementById('messages');
+    container.innerHTML = '';
 
-    snapshot.forEach(doc=>{
-      const msg=doc.data();
-
-      // Create message card
-      const div=document.createElement('div');
+    snapshot.forEach(doc => {
+      const msg = doc.data();
+      const div = document.createElement('div');
       div.classList.add('message-card');
 
-      // Username
-      const userEl=document.createElement('span');
+      const userEl = document.createElement('span');
       userEl.classList.add('msg-user');
       userEl.textContent = msg.user;
 
-      // Timestamp
-      const timeEl=document.createElement('span');
+      const timeEl = document.createElement('span');
       timeEl.classList.add('msg-time');
       const date = msg.timestamp.toDate ? msg.timestamp.toDate() : new Date(msg.timestamp);
       timeEl.textContent = ` • ${date.toLocaleString()}`;
 
-      // Message text
-      const textEl=document.createElement('p');
+      const textEl = document.createElement('p');
       textEl.classList.add('msg-text');
       textEl.textContent = msg.text;
 
-      // Append elements
       div.appendChild(userEl);
       div.appendChild(timeEl);
       div.appendChild(textEl);
