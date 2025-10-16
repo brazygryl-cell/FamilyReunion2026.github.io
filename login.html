@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Williams Family Reunion</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Williams Family Forum</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Login to Family Forum</h1>
+
+<div class="login-container">
+  <h1>Welcome to the Family Forum</h1>
+  <p>Please log in or create an account to continue.</p>
 
   <form id="login-form">
     <input type="email" id="email" placeholder="Email" required><br>
@@ -15,51 +18,80 @@
     <button type="submit">Login</button>
   </form>
 
-  <p>Don’t have an account? <a href="#" id="signup-link">Sign up</a></p>
+  <p>New here? <a href="#" id="register-link">Create an account</a></p>
+  <p id="status" style="color: red; margin-top: 10px;"></p>
+</div>
 
-  <!-- Firebase scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="firebase-init.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script type="module" src="firebase-init.js"></script>
 
-  <script>
-    const loginForm = document.getElementById('login-form');
-    const signupLink = document.getElementById('signup-link');
+<script type="module">
+import { auth, db } from './firebase-init.js';
 
-    // 🧾 Login
-    loginForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
+const loginForm = document.getElementById('login-form');
+const statusMsg = document.getElementById('status');
+const registerLink = document.getElementById('register-link');
 
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-        window.location.href = "forum.html";
-      } catch (error) {
-        alert(error.message);
-      }
+// --- Login ---
+loginForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+  statusMsg.textContent = "Signing in...";
+
+  try {
+    const userCred = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCred.user;
+
+    // Check approval in Firestore
+    const doc = await db.collection('approvedUsers').doc(user.email).get();
+    if (!doc.exists || !doc.data().approved) {
+      await auth.signOut();
+      statusMsg.textContent = "Account not yet approved by admin.";
+      return;
+    }
+
+    // Redirect to general forum if approved
+    window.location.href = "forum-general.html";
+  } catch (error) {
+    statusMsg.textContent = error.message;
+  }
+});
+
+// --- Register ---
+registerLink.addEventListener('click', async e => {
+  e.preventDefault();
+  const email = prompt("Enter your email:");
+  const password = prompt("Create a password (min 6 characters):");
+
+  if (!email || !password) return;
+
+  try {
+    await auth.createUserWithEmailAndPassword(email, password);
+    await db.collection('approvedUsers').doc(email).set({
+      approved: false,
+      email: email,
+      createdAt: new Date()
     });
+    alert("Account created! Please wait for admin approval before logging in.");
+    await auth.signOut();
+  } catch (error) {
+    alert(error.message);
+  }
+});
 
-    // 🆕 Signup (optional)
-    signupLink.addEventListener('click', async e => {
-      e.preventDefault();
-      const email = prompt("Enter your email:");
-      const password = prompt("Create a password (min 6 chars):");
-      if (!email || !password) return;
+// --- Redirect logged-in users ---
+auth.onAuthStateChanged(async user => {
+  if (user) {
+    const doc = await db.collection('approvedUsers').doc(user.email).get();
+    if (doc.exists && doc.data().approved) {
+      window.location.href = "forum-general.html";
+    }
+  }
+});
+</script>
 
-      try {
-        await auth.createUserWithEmailAndPassword(email, password);
-        alert("Account created! Waiting for approval.");
-        await auth.signOut();
-      } catch (error) {
-        alert(error.message);
-      }
-    });
-
-    // If logged in, redirect
-    auth.onAuthStateChanged(user => {
-      if (user) window.location.href = "forum.html";
-    });
-  </script>
 </body>
 </html>
