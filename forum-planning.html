@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Forum - Memories - Williams Family Reunion</title>
+<title>Forum - Planning - Williams Family Reunion</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Memories</h1>
+<h1>Planning Help</h1>
 <nav class="forum-nav">
   <a href="forum-general.html">General</a> |
   <a href="forum-memories.html">Memories</a> |
@@ -19,84 +19,61 @@
 <div id="messages"></div>
 
 <form id="message-form">
-  <textarea id="message" placeholder="Write a memory..." required></textarea>
+  <textarea id="message" placeholder="Ask for planning help..." required></textarea>
   <button type="submit">Post</button>
 </form>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script type="module" src="firebase-init.js"></script>
 
 <script type="module">
 import { auth, db } from './firebase-init.js';
 
-// --- Auth Check ---
+// 🔒 Auth & approval check
 auth.onAuthStateChanged(async user => {
-  if (!user) {
-    window.location.href = "login.html";
-    return;
-  }
-  const doc = await db.collection('approvedUsers').doc(user.email).get();
-  if (!doc.exists || !doc.data().approved) {
+  if (!user) return window.location.href = "login.html";
+
+  const approvedDoc = await db.collection('approvedUsers').doc(user.email).get();
+  if (!approvedDoc.exists || !approvedDoc.data().approved) {
     await auth.signOut();
-    alert("Not approved.");
+    alert("Your account has not been approved yet.");
     window.location.href = "login.html";
   }
 });
 
-// --- Logout ---
+// 🚪 Logout
 document.getElementById('logout').addEventListener('click', async () => {
   await auth.signOut();
   window.location.href = "login.html";
 });
 
-// --- Post Message ---
-const messageForm = document.getElementById('message-form');
-messageForm.addEventListener('submit', async e => {
+// 💬 Post message
+const form = document.getElementById('message-form');
+form.addEventListener('submit', async e => {
   e.preventDefault();
-  const text = document.getElementById('message').value;
+  const text = document.getElementById('message').value.trim();
   const user = auth.currentUser;
-  if (user) {
-    await db.collection('forumMessages').add({
-      text,
-      user: user.email,
-      board: 'memories',
-      timestamp: new Date()
-    });
-    document.getElementById('message').value = '';
-  }
+  if (!text || !user) return;
+
+  await db.collection('forumMessages').add({
+    text,
+    user: user.email,
+    board: 'planning',
+    timestamp: new Date()
+  });
+
+  document.getElementById('message').value = '';
 });
 
-// --- Display Messages for This Board ---
+// 🧾 Display messages for this board
 db.collection('forumMessages')
-  .where('board', '==', 'memories')
-  .orderBy('timestamp')
+  .where('board', '==', 'planning')
+  .orderBy('timestamp', 'asc')
   .onSnapshot(snapshot => {
     const container = document.getElementById('messages');
     container.innerHTML = '';
-
     snapshot.forEach(doc => {
       const msg = doc.data();
       const div = document.createElement('div');
       div.classList.add('message-card');
-
-      const userEl = document.createElement('span');
-      userEl.classList.add('msg-user');
-      userEl.textContent = msg.user;
-
-      const timeEl = document.createElement('span');
-      timeEl.classList.add('msg-time');
-      const date = msg.timestamp.toDate ? msg.timestamp.toDate() : new Date(msg.timestamp);
-      timeEl.textContent = ` • ${date.toLocaleString()}`;
-
-      const textEl = document.createElement('p');
-      textEl.classList.add('msg-text');
-      textEl.textContent = msg.text;
-
-      div.appendChild(userEl);
-      div.appendChild(timeEl);
-      div.appendChild(textEl);
+      div.innerHTML = `<strong>${msg.user}</strong> • ${msg.timestamp.toDate ? msg.timestamp.toDate().toLocaleString() : new Date(msg.timestamp).toLocaleString()}<p>${msg.text}</p>`;
       container.appendChild(div);
     });
   });
