@@ -50,20 +50,20 @@
   <p>Art by 🔥 Andre Clark</p>
 </footer>
 
-<!-- Firebase login & approval check -->
+<!-- 🔒 Auth + Approval Check -->
 <script type="module">
 import { auth, db } from './firebase-init.js';
 
 auth.onAuthStateChanged(async user => {
-  if(!user){
+  if (!user) {
     window.location.href = "login.html";
     return;
   }
-  
-  const doc = await db.collection('approvedUsers').doc(user.email).get();
-  if(!doc.exists || !doc.data().approved){
+
+  const approvedDoc = await db.collection('approvedUsers').doc(user.email).get();
+  if (!approvedDoc.exists || !approvedDoc.data().approved) {
     await auth.signOut();
-    alert("You are not approved to view this page.");
+    alert("Your account has not been approved yet.");
     window.location.href = "login.html";
   }
 });
@@ -82,4 +82,39 @@ const timerInterval = setInterval(() => {
   const minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
   const seconds = Math.floor((distance % (1000*60)) / 1000);
 
-  document.getElementById("time
+  document.getElementById("timer").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+  if(distance < 0){
+    clearInterval(timerInterval);
+    document.getElementById("timer").innerHTML = "The reunion is happening now!";
+  }
+}, 1000);
+</script>
+
+<!-- Gallery Slider -->
+<script>
+let slides = document.querySelectorAll('.slider img');
+let current = 0;
+
+function showSlide(i){
+  slides.forEach(s => s.classList.remove('active'));
+  slides[i].classList.add('active');
+}
+
+function nextSlide(){
+  current = (current + 1) % slides.length;
+  showSlide(current);
+}
+
+function goToSlide(i){
+  current = i;
+  showSlide(current);
+}
+
+// Auto-slide every 3 seconds
+showSlide(current);
+setInterval(nextSlide, 3000);
+</script>
+
+</body>
+</html>
