@@ -23,12 +23,19 @@
   <button type="submit">Post</button>
 </form>
 
-<script type="module">
-import { auth, db } from './firebase-init.js';
+<!-- Firebase compat scripts -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-init.js"></script>
 
+<script>
 // 🔒 Auth & approval check
 auth.onAuthStateChanged(async user => {
-  if (!user) return window.location.href = "login.html";
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
 
   const approvedDoc = await db.collection('approvedUsers').doc(user.email).get();
   if (!approvedDoc.exists || !approvedDoc.data().approved) {
@@ -55,7 +62,7 @@ form.addEventListener('submit', async e => {
   await db.collection('forumMessages').add({
     text,
     user: user.email,
-    board: 'memories',
+    board: 'memories', // 🔹 this board
     timestamp: new Date()
   });
 
@@ -80,3 +87,4 @@ db.collection('forumMessages')
 </script>
 </body>
 </html>
+
