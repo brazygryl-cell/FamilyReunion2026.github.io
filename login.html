@@ -1,47 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - Williams Family Reunion</title>
-<link rel="stylesheet" href="style.css">
-
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<script type="module" src="firebase-init.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Williams Family Reunion</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <h1>Login to Family Forum</h1>
 
-<h1>Login to Family Reunion</h1>
-<form id="login-form">
-  <input type="email" id="email" placeholder="Email" required>
-  <input type="password" id="password" placeholder="Password" required>
-  <button type="submit">Login</button>
-</form>
-<p id="error" style="color:red;"></p>
+  <form id="login-form">
+    <input type="email" id="email" placeholder="Email" required><br>
+    <input type="password" id="password" placeholder="Password" required><br>
+    <button type="submit">Login</button>
+  </form>
 
-<script type="module">
-import { auth } from './firebase-init.js';
+  <p>Don’t have an account? <a href="#" id="signup-link">Sign up</a></p>
 
-const form = document.getElementById('login-form');
-const error = document.getElementById('error');
+  <!-- Firebase scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="firebase-init.js"></script>
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
+  <script>
+    const loginForm = document.getElementById('login-form');
+    const signupLink = document.getElementById('signup-link');
 
-  try {
-    await auth.signInWithEmailAndPassword(email, password);
-    window.location.href = "forum.html";
-  } catch (err) {
-    error.textContent = err.message;
-  }
-});
-</script>
+    // 🧾 Login
+    loginForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
 
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        window.location.href = "forum.html";
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    // 🆕 Signup (optional)
+    signupLink.addEventListener('click', async e => {
+      e.preventDefault();
+      const email = prompt("Enter your email:");
+      const password = prompt("Create a password (min 6 chars):");
+      if (!email || !password) return;
+
+      try {
+        await auth.createUserWithEmailAndPassword(email, password);
+        alert("Account created! Waiting for approval.");
+        await auth.signOut();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    // If logged in, redirect
+    auth.onAuthStateChanged(user => {
+      if (user) window.location.href = "forum.html";
+    });
+  </script>
 </body>
 </html>
