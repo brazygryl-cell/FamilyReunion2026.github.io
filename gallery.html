@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Photo Gallery | Williams Family Reunion 2026</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <script type="module" src="./firebase-init.js"></script>
+</head>
+<body>
+<header></header>
+
+<script type="module">
+  import { loadNavbar } from "./nav.js";
+  loadNavbar();
+  const currentPage = "gallery.html";
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".nav-links a").forEach(a => { if (a.getAttribute("href") === currentPage) a.classList.add("active"); });
+  });
+</script>
+
+<main>
+  <section class="hero">
+    <h1>Photo Gallery</h1>
+    <p class="reunion-date">Share memories before, during, and after!</p>
+  </section>
+
+  <section class="content">
+    <div class="photo-grid">
+      <img src="images/family1.jpg" alt="Family 1"/>
+      <img src="images/family2.jpg" alt="Family 2"/>
+      <img src="images/family3.jpg" alt="Family 3"/>
+    </div>
+    <p class="muted">Soon: upload via Firebase Storage</p>
+  </section>
+</main>
+
+<footer>
+  <p>Made with ❤️ by Taylor Clark Jones</p>
+  <p>Art by 🔥 Andre Clark</p>
+</footer>
+
+<script type="module">
+  import { auth, db } from "./firebase-init.js";
+  import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  auth.onAuthStateChanged(async user => {
+    if (!user) return (window.location.href = "login.html");
+    const approved = await getDoc(doc(db, "approvedUsers", user.email));
+    if (!approved.exists() || !approved.data().approved) { await auth.signOut(); alert("Not approved yet."); window.location.href = "login.html"; }
+  });
+</script>
+</body>
+</html>

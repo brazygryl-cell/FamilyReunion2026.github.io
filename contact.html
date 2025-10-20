@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact | Williams Family Reunion 2026</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <script type="module" src="./firebase-init.js"></script>
+</head>
+<body>
+<header></header>
+
+<script type="module">
+  import { loadNavbar } from "./nav.js";
+  loadNavbar();
+  const currentPage = "contact.html";
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".nav-links a").forEach(a => { if (a.getAttribute("href") === currentPage) a.classList.add("active"); });
+  });
+</script>
+
+<main>
+  <section class="hero">
+    <h1>Contact the Organizer</h1>
+    <p class="reunion-date">Questions, ideas, or help? Reach out.</p>
+  </section>
+
+  <section class="content">
+    <form id="contact-form" action="mailto:williamsreunion2026@gmail.com" method="post" enctype="text/plain" class="card form">
+      <label>Name
+        <input type="text" name="name" required />
+      </label>
+      <label>Email
+        <input type="email" name="email" required />
+      </label>
+      <label>Message
+        <textarea name="message" rows="5" required></textarea>
+      </label>
+      <button type="submit">Send Message</button>
+      <p class="muted">(Soon: send via a secure Cloud Function instead of email)</p>
+    </form>
+  </section>
+</main>
+
+<footer>
+  <p>Made with ❤️ by Taylor Clark Jones</p>
+  <p>Art by 🔥 Andre Clark</p>
+</footer>
+
+<script type="module">
+  import { auth, db } from "./firebase-init.js";
+  import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  auth.onAuthStateChanged(async user => {
+    if (!user) return (window.location.href = "login.html");
+    const approved = await getDoc(doc(db, "approvedUsers", user.email));
+    if (!approved.exists() || !approved.data().approved) { await auth.signOut(); alert("Not approved yet."); window.location.href = "login.html"; }
+  });
+</script>
+</body>
+</html>

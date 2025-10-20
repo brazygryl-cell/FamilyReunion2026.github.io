@@ -1,5 +1,9 @@
 # Firebase config (keep private)
 firebase-config.js
+firebase-init.js
+
+# Firebase local config
+firebase-config.local.js
 
 # Node / build folders (if using any build tools later)
 node_modules/
