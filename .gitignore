@@ -3,6 +3,7 @@ firebase-debug.log
 .firebase/
 .firebaserc
 firebase.json
+firebase-config.js
 
 # Local-only configs
 firebase-config.local.js
