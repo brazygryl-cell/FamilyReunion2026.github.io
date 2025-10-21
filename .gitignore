@@ -1,23 +1,23 @@
-# Firebase config (keep private)
-firebase-config.js
-firebase-init.js
+# Firebase build + local configs
+firebase-debug.log
+.firebase/
+.firebaserc
+firebase.json
 
-# Firebase local config
+# Local-only configs
 firebase-config.local.js
+.env
+.env.local
 
-# Node / build folders (if using any build tools later)
-node_modules/
-dist/
+# Node modules (Firebase Functions)
+functions/node_modules/
+reunion-functions/node_modules/
 
-# System files
+# macOS + Windows junk
 .DS_Store
 Thumbs.db
 
 # Logs
-*.log
-
-# VSCode settings
-.vscode/
-
-# Mac system files
-*.swp
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

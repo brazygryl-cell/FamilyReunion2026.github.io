@@ -1,105 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Williams Family Reunion 2026</title>
-<link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<script type="module" src="./firebase-init.js"></script>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>Williams Family Reunion 2026</title>
+ <link rel="stylesheet" href="style.css" />
+ <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+
+ <!-- Firebase + Nav -->
+ <script type="module" src="./firebase-init.js"></script>
+ <script type="module" src="./nav.js"></script>
 </head>
 
 <body>
-<header></header>
+ <header>
+ <div class="header-content">
+ <h1>Williams Family Reunion 2026</h1>
+ <p class="reunion-date">July 26 - August 1 • Orlando, FL</p>
+ <nav class="nav-links">
+ <a href="index.html">Home</a>
+ <a href="forum.html">Forum</a>
+ <a href="lodging.html">Lodging & Travel</a>
+ <a href="payments.html">Payments</a>
+ <a href="directory.html">Family Directory</a>
+ <a href="gallery.html">Photo Gallery</a>
+ <a href="history.html">Family History</a>
+ <a href="contact.html">Contact</a>
+ <button id="logout-btn" class="logout-btn">Logout</button>
+ </nav>
+ </div>
+ </header>
 
-<script type="module">
-  import { loadNavbar } from "./nav.js";
-  loadNavbar();
+ <section id="countdown">
+ <h2>Countdown to Reunion</h2>
+ <p id="timer"></p>
+ </section>
 
-  // Highlight current page
-  const currentPage = window.location.pathname.split("/").pop();
-  document.querySelectorAll(".nav-links a").forEach(link => {
-    if (link.getAttribute("href") === currentPage) link.classList.add("active");
-  });
-</script>
+ <section id="gallery">
+ <h2>Family Memories</h2>
+ <div class="slider">
+ <img src="images/family1.jpg" alt="Family 1" class="active" />
+ <img src="images/family2.jpg" alt="Family 2" />
+ <img src="images/family3.jpg" alt="Family 3" />
+ </div>
+ <div class="slider-dots">
+ <span class="dot" onclick="goToSlide(0)"></span>
+ <span class="dot" onclick="goToSlide(1)"></span>
+ <span class="dot" onclick="goToSlide(2)"></span>
+ </div>
+ </section>
 
-<section id="countdown">
-  <h2>Countdown to Reunion</h2>
-  <p id="timer"></p>
-</section>
+ <footer>
+ <p>Made with by Taylor Clark Jones</p>
+ <p>Art by Andre Clark</p>
+ </footer>
 
-<section id="gallery">
-  <h2>Family Memories</h2>
-  <div class="slider">
-    <img src="images/family1.jpg" alt="Family 1" class="active">
-    <img src="images/family2.jpg" alt="Family 2">
-    <img src="images/family3.jpg" alt="Family 3">
-  </div>
-  <div class="slider-dots">
-    <span class="dot" onclick="goToSlide(0)"></span>
-    <span class="dot" onclick="goToSlide(1)"></span>
-    <span class="dot" onclick="goToSlide(2)"></span>
-  </div>
-</section>
+ <!-- Auth + Approval + Logout -->
+ <script type="module">
+ import { auth, db } from "./firebase-init.js";
+ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-<footer>
-  <p>Made with ❤️ by Taylor Clark Jones</p>
-  <p>Art by 🔥 Andre Clark</p>
-</footer>
+ // Enforce login + approval
+ onAuthStateChanged(auth, async (user) => {
+ if (!user) {
+ window.location.href = "login.html";
+ return;
+ }
 
-<script type="module">
-  import { auth, db } from "./firebase-init.js";
-  import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+ const approvedDoc = await getDoc(doc(db, "approvedUsers", user.email));
+ if (!approvedDoc.exists() || !approvedDoc.data().approved) {
+ await signOut(auth);
+ alert("Your account has not been approved yet.");
+ window.location.href = "login.html";
+ }
+ });
 
-  auth.onAuthStateChanged(async user => {
-    if (!user) {
-      window.location.href = "login.html";
-      return;
-    }
+ // Logout handler
+ document.getElementById("logout-btn")?.addEventListener("click", async () => {
+ await signOut(auth);
+ window.location.href = "login.html";
+ });
+ </script>
 
-    const approvedDoc = await getDoc(doc(db, "approvedUsers", user.email));
-    if (!approvedDoc.exists() || !approvedDoc.data().approved) {
-      await auth.signOut();
-      alert("Your account has not been approved yet.");
-      window.location.href = "login.html";
-    }
-  });
-</script>
+ <!-- Countdown -->
+ <script>
+ const countdownDate = new Date("July 26, 2026 12:00:00").getTime();
+ const timerInterval = setInterval(() => {
+ const now = new Date().getTime();
+ const distance = countdownDate - now;
+ const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+ const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+ const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+ const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+ document.getElementById("timer").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+ if (distance < 0) {
+ clearInterval(timerInterval);
+ document.getElementById("timer").innerHTML = "The reunion is happening now!";
+ }
+ }, 1000);
+ </script>
 
-<script>
-  const countdownDate = new Date("July 26, 2026 12:00:00").getTime();
-  const timerInterval = setInterval(() => {
-    const now = new Date().getTime();
-    const distance = countdownDate - now;
-    const days = Math.floor(distance / (1000*60*60*24));
-    const hours = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
-    const minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
-    const seconds = Math.floor((distance % (1000*60)) / 1000);
-    document.getElementById("timer").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-    if (distance < 0) {
-      clearInterval(timerInterval);
-      document.getElementById("timer").innerHTML = "The reunion is happening now!";
-    }
-  }, 1000);
-</script>
-
-<script>
-  let slides = document.querySelectorAll(".slider img");
-  let current = 0;
-  function showSlide(i) {
-    slides.forEach(s => s.classList.remove("active"));
-    slides[i].classList.add("active");
-  }
-  function nextSlide() {
-    current = (current + 1) % slides.length;
-    showSlide(current);
-  }
-  function goToSlide(i) {
-    current = i;
-    showSlide(current);
-  }
-  showSlide(current);
-  setInterval(nextSlide, 3000);
-</script>
+ <!-- Gallery -->
+ <script>
+ let slides = document.querySelectorAll(".slider img");
+ let current = 0;
+ function showSlide(i) {
+ slides.forEach((s) => s.classList.remove("active"));
+ slides[i].classList.add("active");
+ }
+ function nextSlide() {
+ current = (current + 1) % slides.length;
+ showSlide(current);
+ }
+ function goToSlide(i) {
+ current = i;
+ showSlide(current);
+ }
+ showSlide(current);
+ setInterval(nextSlide, 3000);
+ </script>
 </body>
 </html>

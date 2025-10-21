@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - Williams Family Forum</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Williams Family Forum</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
@@ -13,8 +13,8 @@
   <p>Please log in or create an account to continue.</p>
 
   <form id="login-form">
-    <input type="email" id="email" placeholder="Email" required><br>
-    <input type="password" id="password" placeholder="Password" required><br>
+    <input type="email" id="email" placeholder="Email" required /><br />
+    <input type="password" id="password" placeholder="Password" required /><br />
     <button type="submit">Login</button>
   </form>
 
@@ -22,75 +22,77 @@
   <p id="status" style="color: red; margin-top: 10px;"></p>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script type="module" src="firebase-init.js"></script>
-
+<!-- ✅ Firebase Modules -->
 <script type="module">
-import { auth, db } from './firebase-init.js';
+  import { app, auth } from './firebase-init.js';
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } 
+    from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-const loginForm = document.getElementById('login-form');
-const statusMsg = document.getElementById('status');
-const registerLink = document.getElementById('register-link');
+  const db = getFirestore(app);
+  const loginForm = document.getElementById('login-form');
+  const statusMsg = document.getElementById('status');
+  const registerLink = document.getElementById('register-link');
 
-// --- Login ---
-loginForm.addEventListener('submit', async e => {
-  e.preventDefault();
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value.trim();
-  statusMsg.textContent = "Signing in...";
+  // --- Login ---
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    statusMsg.textContent = "Signing in...";
 
-  try {
-    const userCred = await auth.signInWithEmailAndPassword(email, password);
-    const user = userCred.user;
+    try {
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCred.user;
 
-    // Check approval in Firestore
-    const doc = await db.collection('approvedUsers').doc(user.email).get();
-    if (!doc.exists || !doc.data().approved) {
-      await auth.signOut();
-      statusMsg.textContent = "Account not yet approved by admin.";
-      return;
-    }
+      // Check Firestore approval
+      const docRef = doc(db, 'approvedUsers', user.email);
+      const docSnap = await getDoc(docRef);
+      if (!docSnap.exists() || !docSnap.data().approved) {
+        await signOut(auth);
+        statusMsg.textContent = "Account not yet approved by admin.";
+        return;
+      }
 
-    // Redirect to general forum if approved
-    window.location.href = "forum-general.html";
-  } catch (error) {
-    statusMsg.textContent = error.message;
-  }
-});
-
-// --- Register ---
-registerLink.addEventListener('click', async e => {
-  e.preventDefault();
-  const email = prompt("Enter your email:");
-  const password = prompt("Create a password (min 6 characters):");
-
-  if (!email || !password) return;
-
-  try {
-    await auth.createUserWithEmailAndPassword(email, password);
-    await db.collection('approvedUsers').doc(email).set({
-      approved: false,
-      email: email,
-      createdAt: new Date()
-    });
-    alert("Account created! Please wait for admin approval before logging in.");
-    await auth.signOut();
-  } catch (error) {
-    alert(error.message);
-  }
-});
-
-// --- Redirect logged-in users ---
-auth.onAuthStateChanged(async user => {
-  if (user) {
-    const doc = await db.collection('approvedUsers').doc(user.email).get();
-    if (doc.exists && doc.data().approved) {
+      // Redirect to forum
       window.location.href = "forum-general.html";
+    } catch (error) {
+      statusMsg.textContent = error.message;
     }
-  }
-});
+  });
+
+  // --- Register ---
+  registerLink.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const email = prompt("Enter your email:");
+    const password = prompt("Create a password (min 6 characters):");
+
+    if (!email || !password) return;
+
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      await setDoc(doc(db, 'approvedUsers', email), {
+        approved: false,
+        email,
+        createdAt: new Date(),
+      });
+      alert("Account created! Please wait for admin approval before logging in.");
+      await signOut(auth);
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+
+  // --- Redirect logged-in users ---
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const docRef = doc(db, 'approvedUsers', user.email);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists() && docSnap.data().approved) {
+        window.location.href = "forum-general.html";
+      }
+    }
+  });
 </script>
 
 </body>
