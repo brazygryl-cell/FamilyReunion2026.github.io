@@ -3,14 +3,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// ✅ Read Firebase config from environment variables injected by Netlify
+// ✅ Use values from window.env injected by env.js
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID
+  apiKey: window.env.VITE_FIREBASE_API_KEY,
+  authDomain: window.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: window.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: window.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: window.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: window.env.VITE_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);
