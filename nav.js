@@ -1,38 +1,48 @@
 // nav.js
-import { auth } from './firebase-init.js';
-import { signOut } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
+import { auth } from "./firebase-init.js";
 
-const nav = document.querySelector('nav');
-nav.innerHTML = `
-  <a href="index.html">Home</a>
-  <a href="forum.html">Forum</a>
-  <a href="events.html">Event Details</a>
-  <a href="lodging.html">Lodging & Travel</a>
-  <a href="payments.html">Payments</a>
-  <a href="directory.html">Family Directory</a>
-  <a href="gallery.html">Photo Gallery</a>
-  <a href="history.html">Family History</a>
-  <a href="contact.html">Contact</a>
-  <a id="auth-btn" href="#">Login</a>
-`;
+// Dynamically load navbar into <header>
+export function loadNavbar() {
+  const header = document.querySelector("header");
+  if (!header) return;
 
-const authBtn = document.getElementById('auth-btn');
+  header.innerHTML = `
+    <nav class="navbar">
+      <h1 class="logo">Williams Family Reunion 2026</h1>
+      <p class="reunion-date">July 26 - August 1 • Orlando, FL</p>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="forum.html">Forum</a>
+        <a href="event-details.html">Event Details</a>
+        <a href="lodging.html">Lodging & Travel</a>
+        <a href="payments.html">Payments & Deposits</a>
+        <a href="directory.html">Family Directory</a>
+        <a href="gallery.html">Photo Gallery</a>
+        <a href="history.html">Family History</a>
+        <a href="contact.html">Contact</a>
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+      </div>
+    </nav>
+  `;
 
-// Listen for auth state
-auth.onAuthStateChanged(user => {
-  if (user) {
-    authBtn.textContent = 'Logout';
-    authBtn.onclick = async e => {
-      e.preventDefault();
-      await signOut(auth);
-      window.location.href = 'login.html';
-    };
-  } else {
-    authBtn.textContent = 'Login';
-    authBtn.onclick = e => {
-      e.preventDefault();
-      window.location.href = 'login.html';
-    };
-  }
-});
+  // Highlight current page
+  const currentPage = window.location.pathname.split("/").pop();
+  document.querySelectorAll(".nav-links a").forEach(link => {
+    if (link.getAttribute("href") === currentPage) link.classList.add("active");
+  });
 
+  // Handle logout
+  const logoutBtn = document.getElementById("logoutBtn");
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      await auth.signOut();
+      alert("You’ve been logged out successfully.");
+      window.location.href = "login.html";
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  });
+}
+
+// Automatically load navbar when the page is loaded
+document.addEventListener("DOMContentLoaded", loadNavbar);
