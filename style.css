@@ -308,6 +308,16 @@ header nav a:hover {
 color: #00bfa5;
 }
 
+/* 🕶️ Navbar fade out / fade in on scroll */
+header {
+opacity: 1;
+transition: opacity 0.6s ease, background 0.6s ease;
+}
+
+header.hidden {
+opacity: 0;
+pointer-events: none; /* Prevents clicks while hidden */
+}
 
 
 
