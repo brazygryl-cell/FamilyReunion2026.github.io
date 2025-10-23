@@ -87,5 +87,26 @@ slides[currentSlide].classList.add("active");
 
 setInterval(nextSlide, 5000);
 </script>
+  <script>
+const header = document.querySelector("header");
+let lastScrollTop = 0;
+
+window.addEventListener("scroll", () => {
+const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+if (scrollTop > lastScrollTop + 50) {
+// Scrolling down — hide navbar
+header.classList.add("hidden");
+} else if (scrollTop < lastScrollTop - 50) {
+// Scrolling up — show navbar again
+header.classList.remove("hidden");
+header.classList.add("scrolled");
+}
+
+lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Prevent negative values
+});
+</script>
+
 </body>
 </html>
+
