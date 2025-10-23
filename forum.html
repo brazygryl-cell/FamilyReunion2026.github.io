@@ -1,79 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Family Forum - Williams Reunion</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Family Forum — Williams Family Reunion</title>
+
+<link rel="stylesheet" href="style.css" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+<!-- Navbar + utilities -->
+<script type="module" src="nav.js"></script>
+
+<!-- Netlify Identity (login) -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+<style>
+/* Forum-specific polish (kept local so it won't fight your main CSS) */
+.forum-hero {
+text-align: center;
+padding: 28px 16px;
+}
+.forum-hero h1 {
+font-family: 'Playfair Display', serif;
+font-size: 2.2rem;
+margin: 0 0 6px;
+}
+.forum-hero p {
+color: #666;
+margin: 0;
+}
+
+.forum-tabs {
+display: flex;
+gap: 10px;
+justify-content: center;
+margin: 18px auto 10px;
+flex-wrap: wrap;
+}
+.forum-tab {
+border: 1px solid #e3e3e3;
+padding: 8px 14px;
+border-radius: 999px;
+background: #fff;
+cursor: pointer;
+font-weight: 600;
+transition: background .2s, color .2s, border-color .2s;
+}
+.forum-tab.active {
+background: #2b8a3e; /* accent */
+color: #fff;
+border-color: #2b8a3e;
+}
+
+.composer {
+max-width: 820px;
+margin: 16px auto;
+background: #fff;
+border: 1px solid #eee;
+border-radius: 12px;
+padding: 14px;
+}
+.composer h3 {
+margin: 0 0 8px;
+font-size: 1.05rem;
+}
+.composer textarea {
+width: 100%;
+min-height: 90px;
+border: 1px solid #e5e5e5;
+border-radius: 10px;
+padding: 10px 12px;
+font-family: 'Poppins', sans-serif;
+outline: none;
+resize: vertical;
+}
+.composer .row {
+display: flex; gap: 10px; justify-content: space-between; align-items: center; margin-top: 10px;
+}
+.composer select, .composer button {
+border: 1px solid #e5e5e5;
+border-radius: 10px;
+padding: 8px 12px;
+background: #fff;
+font-weight: 600;
+cursor: pointer;
+}
+.composer button {
+background: #2b8a3e; color: #fff; border-color: #2b8a3e;
+}
+
+.posts {
+max-width: 900px;
+margin: 10px auto 40px;
+display: grid;
+gap: 12px;
+}
+.post {
+background: #fff;
+border: 1px solid #eee;
+border-radius: 14px;
+padding: 14px 16px;
+}
+.post .meta {
+font-size: .9rem; color: #777; margin-bottom: 6px;
+}
+.post .title {
+font-weight: 700; margin: 0 0 6px; font-size: 1.05rem;
+}
+.post .body {
+margin: 0; color: #444; line-height: 1.55;
+}
+.empty {
+text-align: center; color: #888; padding: 24px 8px;
+}
+</style>
 </head>
 <body>
+<header></header>
+
+<main class="section">
+<div class="forum-hero">
 <h1>Family Forum</h1>
+<p>Chat, share memories, and plan the reunion together.</p>
+</div>
 
-<nav class="forum-nav">
-  <a href="forum-general.html">General</a> |
-  <a href="forum-memories.html">Pictures</a> |
-  <a href="forum-planning.html">Need help planning?</a>
-</nav>
+<!-- Tabs -->
+<div class="forum-tabs" role="tablist" aria-label="Forum boards">
+<button class="forum-tab active" data-board="general" aria-selected="true">General</button>
+<button class="forum-tab" data-board="memories">Memories</button>
+<button class="forum-tab" data-board="planning">Planning</button>
+</div>
 
-<button id="logout">Logout</button>
-<div id="messages" class="forum-messages"></div>
+<!-- Composer (UI only for now; wire to a backend later) -->
+<div class="composer">
+<h3>Create a post</h3>
+<textarea id="postBody" placeholder="Write something for the family…"></textarea>
+<div class="row">
+<select id="postBoard" aria-label="Select board">
+<option value="general" selected>General</option>
+<option value="memories">Memories</option>
+<option value="planning">Planning</option>
+</select>
+<button id="submitPost">Post</button>
+</div>
+<small style="color:#777">Note: Posting is demo-only right now. We’ll connect this to storage next.</small>
+</div>
 
-<form id="message-form">
-  <textarea id="message" placeholder="Write a message..." required></textarea>
-  <button type="submit">Post</button>
-</form>
+<!-- Posts list -->
+<section class="posts" id="posts"></section>
+</main>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="firebase-init.js"></script>
+<footer></footer>
 
+<!-- Identity gating + forum logic -->
 <script>
-auth.onAuthStateChanged(async user => {
-  if (!user) window.location.href = "login.html";
-  const approvedDoc = await db.collection('approvedUsers').doc(user.email).get();
-  if (!approvedDoc.exists || !approvedDoc.data().approved) {
-    await auth.signOut();
-    alert("Your account has not been approved yet.");
-    window.location.href = "login.html";
-  }
+// Require login with Netlify Identity (opens modal if logged out)
+(function gateWithIdentity(){
+if (!window.netlifyIdentity) return; // widget not loaded yet
+window.netlifyIdentity.on('init', user => {
+if (!user) {
+window.netlifyIdentity.open('login');
+}
+});
+// If user logs out from the widget, kick back to login page
+window.netlifyIdentity.on('logout', () => {
+window.location.href = 'login.html';
+});
+})();
+
+// Simple in-memory demo posts (one array per board)
+const postsData = {
+general: [
+{ title: "Welcome to the forum!", body: "Say hi and introduce yourself in the comments 👋", by: "Organizer", when: "today" },
+{ title: "Sunday cookout ideas", body: "Drop your best sides & grill favorites here.", by: "Aunt Mia", when: "yesterday" },
+],
+memories: [
+{ title: "Throwback pics", body: "Share your favorite family photos. We’ll build a slideshow!", by: "Cousin Jay", when: "2 days ago" },
+],
+planning: [
+{ title: "Airport rides", body: "Arriving Monday 2pm (MCO). Anyone else on that flight?", by: "Taylor", when: "1 hour ago" },
+]
+};
+
+const postsEl = document.getElementById('posts');
+const tabs = Array.from(document.querySelectorAll('.forum-tab'));
+const bodyEl = document.getElementById('postBody');
+const boardEl = document.getElementById('postBoard');
+const submitBtn = document.getElementById('submitPost');
+
+let currentBoard = 'general';
+
+function renderPosts(board) {
+const list = postsData[board] || [];
+postsEl.innerHTML = '';
+if (!list.length) {
+postsEl.innerHTML = '<div class="empty">No posts yet. Be the first to start a conversation!</div>';
+return;
+}
+list.forEach(p => {
+const card = document.createElement('article');
+card.className = 'post';
+card.innerHTML = `
+<div class="meta">${p.by} • ${p.when} • <span style="text-transform:capitalize">${board}</span></div>
+<h3 class="title">${p.title}</h3>
+<p class="body">${p.body}</p>
+`;
+postsEl.appendChild(card);
+});
+}
+
+// Tab click behavior
+tabs.forEach(btn => {
+btn.addEventListener('click', () => {
+tabs.forEach(b => b.classList.remove('active'));
+btn.classList.add('active');
+currentBoard = btn.dataset.board;
+boardEl.value = currentBoard;
+renderPosts(currentBoard);
+window.scrollTo({ top: document.querySelector('.forum-hero').offsetTop, behavior: 'smooth' });
+});
 });
 
-document.getElementById('logout').addEventListener('click', async () => {
-  await auth.signOut();
-  window.location.href = "login.html";
+// Demo "post" button (adds to in-memory array only)
+submitBtn.addEventListener('click', () => {
+const text = bodyEl.value.trim();
+const board = boardEl.value;
+if (!text) return;
+postsData[board] = postsData[board] || [];
+postsData[board].unshift({
+title: "New post",
+body: text,
+by: (window.netlifyIdentity?.currentUser()?.email || "You"),
+when: "just now"
+});
+bodyEl.value = '';
+if (board !== currentBoard) {
+// switch to the board where the post was added
+document.querySelector(`.forum-tab[data-board="${board}"]`).click();
+} else {
+renderPosts(currentBoard);
+}
 });
 
-const form = document.getElementById('message-form');
-form.addEventListener('submit', async e => {
-  e.preventDefault();
-  const text = document.getElementById('message').value.trim();
-  const user = auth.currentUser;
-  if (!text || !user) return;
-
-  await db.collection('forumMessages').add({
-    text,
-    user: user.email,
-    board: 'forum',
-    timestamp: new Date()
-  });
-  document.getElementById('message').value = '';
-});
-
-db.collection('forumMessages')
-  .where('board', '==', 'forum')
-  .orderBy('timestamp', 'asc')
-  .onSnapshot(snapshot => {
-    const container = document.getElementById('messages');
-    container.innerHTML = '';
-    snapshot.forEach(doc => {
-      const msg = doc.data();
-      const div = document.createElement('div');
-      div.classList.add('message-card');
-      div.innerHTML = `<strong>${msg.user}</strong> • ${msg.timestamp.toDate ? msg.timestamp.toDate().toLocaleString() : new Date(msg.timestamp).toLocaleString()}<p>${msg.text}</p>`;
-      container.appendChild(div);
-    });
-  });
+// Initial render
+renderPosts(currentBoard);
 </script>
 </body>
 </html>
