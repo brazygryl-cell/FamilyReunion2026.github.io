@@ -59,8 +59,23 @@
       requireAuth();
     });
   </script>
+
+  <script>
+  const slides = document.querySelectorAll("#hero-slideshow .slide");
+  let currentSlide = 0;
+
+  function nextSlide() {
+    slides[currentSlide].classList.remove("active");
+    currentSlide = (currentSlide + 1) % slides.length;
+    slides[currentSlide].classList.add("active");
+  }
+
+  setInterval(nextSlide, 5000); // change every 5 seconds
+</script>
+
 </body>
 </html>
+
 
 
 
