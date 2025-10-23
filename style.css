@@ -131,6 +131,76 @@ label{font-size:14px;color:var(--muted)}
 .table td,.table th{padding:12px 14px}
 .table th{color:var(--muted);text-align:left;border-bottom:1px solid var(--border)}
 .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid var(--border);color:var(--muted)}
+/* Fullscreen Hero Slideshow */
+#hero-slideshow {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+#hero-slideshow .slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: scale(1.05);
+  transition: opacity 2s ease-in-out, transform 6s ease-in-out;
+}
+
+#hero-slideshow .slide.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+#hero-slideshow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+#hero-slideshow .overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  z-index: 2;
+}
+
+#hero-slideshow h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+#hero-slideshow p {
+  font-size: 1.3rem;
+  opacity: 0.9;
+}
+
+#hero-slideshow .btn {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.5rem;
+  background: #2c2c2c;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+#hero-slideshow .btn:hover {
+  background: #00bfa5;
+}
+
 
 
 
