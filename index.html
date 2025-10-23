@@ -1,106 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Williams Family Reunion 2026</title>
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Williams Family Reunion — Home</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
-<script src="env.js"></script>
-<script type="module" src="./firebase-init.js"></script>
-<script type="module" src="./nav.js"></script>
-
+  <script type="module" src="nav.js"></script>
 </head>
-
 <body>
   <header></header>
 
-  <!-- 🧭 Load navbar and protect access -->
-  <script type="module" src="./nav.js"></script>
+  <section class="hero">
+    <div class="container">
+      <div class="wrap">
+        <div class="card pad">
+          <h1>Williams Family Reunion 2026</h1>
+          <p>July 26 – August 1 • Orlando, FL</p>
 
-  <section id="countdown">
-    <h2>Countdown to Reunion</h2>
-    <p id="timer"></p>
+          <div class="countdown" id="countdown">
+            <div class="count-chip"><div class="n" id="d">–</div><div class="l">Days</div></div>
+            <div class="count-chip"><div class="n" id="h">–</div><div class="l">Hours</div></div>
+            <div class="count-chip"><div class="n" id="m">–</div><div class="l">Minutes</div></div>
+            <div class="count-chip"><div class="n" id="s">–</div><div class="l">Seconds</div></div>
+          </div>
+
+          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+            <a class="btn mint" href="event-details.html">See Event Details</a>
+            <a class="btn ghost" href="photo-gallery.html">View Photos</a>
+          </div>
+        </div>
+
+        <div class="card pad">
+          <div class="kpis">
+            <div class="kpi"><div class="big">100+</div><div class="sub">Family Attending</div></div>
+            <div class="kpi"><div class="big">7</div><div class="sub">Days Together</div></div>
+            <div class="kpi"><div class="big">∞</div><div class="sub">Memories</div></div>
+          </div>
+          <div class="section">
+            <h2>Family Memories (Preview)</h2>
+            <div class="gallery">
+              <img src="images/family1.jpg" alt="Family 1">
+              <img src="images/family2.jpg" alt="Family 2">
+              <img src="images/family3.jpg" alt="Family 3">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </section>
 
-  <section id="gallery">
-    <h2>Family Memories</h2>
-    <div class="slider">
-      <img src="images/family1.jpg" alt="Family 1" class="active">
-      <img src="images/family2.jpg" alt="Family 2">
-      <img src="images/family3.jpg" alt="Family 3">
-    </div>
-    <div class="slider-dots">
-      <span class="dot" onclick="goToSlide(0)"></span>
-      <span class="dot" onclick="goToSlide(1)"></span>
-      <span class="dot" onclick="goToSlide(2)"></span>
-    </div>
-  </section>
+  <footer></footer>
 
-  <footer>
-    <p>Made with ❤️ by Taylor Clark Jones</p>
-    <p>Art by 🔥 Andre Clark</p>
-  </footer>
-
-  <!-- 🔒 Firebase login/approval protection -->
-  <script type="module">
-    import { auth, db } from "./firebase-init.js";
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-    auth.onAuthStateChanged(async user => {
-      if (!user) {
-        window.location.href = "login.html";
+  <!-- Countdown -->
+  <script>
+    const target = new Date("July 26, 2026 12:00:00").getTime();
+    const dEl = document.getElementById("d");
+    const hEl = document.getElementById("h");
+    const mEl = document.getElementById("m");
+    const sEl = document.getElementById("s");
+    setInterval(()=>{
+      const now = Date.now();
+      const diff = target - now;
+      if(diff <= 0){
+        dEl.textContent=hEl.textContent=mEl.textContent=sEl.textContent="0";
         return;
       }
-
-      const approvedDoc = await getDoc(doc(db, "approvedUsers", user.email));
-      if (!approvedDoc.exists() || !approvedDoc.data().approved) {
-        await auth.signOut();
-        alert("Your account has not been approved yet.");
-        window.location.href = "login.html";
-      }
-    });
-  </script>
-
-  <!-- ⏳ Countdown Timer -->
-  <script>
-    const countdownDate = new Date("July 26, 2026 12:00:00").getTime();
-    const timerInterval = setInterval(() => {
-      const now = new Date().getTime();
-      const distance = countdownDate - now;
-      const days = Math.floor(distance / (1000*60*60*24));
-      const hours = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
-      const minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
-      const seconds = Math.floor((distance % (1000*60)) / 1000);
-      document.getElementById("timer").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-      if (distance < 0) {
-        clearInterval(timerInterval);
-        document.getElementById("timer").innerHTML = "The reunion is happening now!";
-      }
+      const days = Math.floor(diff / (1000*60*60*24));
+      const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+      const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
+      const secs = Math.floor((diff % (1000*60)) / 1000);
+      dEl.textContent = days; hEl.textContent = hours; mEl.textContent = mins; sEl.textContent = secs;
     }, 1000);
   </script>
 
-  <!-- 🖼️ Gallery Slider -->
-  <script>
-    let slides = document.querySelectorAll(".slider img");
-    let current = 0;
-    function showSlide(i) {
-      slides.forEach(s => s.classList.remove("active"));
-      slides[i].classList.add("active");
-    }
-    function nextSlide() {
-      current = (current + 1) % slides.length;
-      showSlide(current);
-    }
-    function goToSlide(i) {
-      current = i;
-      showSlide(current);
-    }
-    showSlide(current);
-    setInterval(nextSlide, 3000);
-  </script>
-
+  <!-- Netlify Identity -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </body>
 </html>
