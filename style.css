@@ -201,6 +201,112 @@ label{font-size:14px;color:var(--muted)}
   background: #00bfa5;
 }
 
+/* 🌌 Hero Slideshow */
+#hero-slideshow {
+position: relative;
+height: 100vh;
+width: 100%;
+overflow: hidden;
+}
+
+#hero-slideshow .slide {
+position: absolute;
+inset: 0;
+background-size: cover;
+background-position: center;
+opacity: 0;
+transform: scale(1.05);
+transition: opacity 2s ease-in-out, transform 6s ease-in-out;
+}
+
+#hero-slideshow .slide.active {
+opacity: 1;
+transform: scale(1);
+}
+
+#hero-slideshow::after {
+content: "";
+position: absolute;
+inset: 0;
+background: rgba(0, 0, 0, 0.6);
+z-index: 1;
+}
+
+#hero-slideshow .overlay {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+text-align: center;
+color: #fff;
+z-index: 2;
+}
+
+#hero-slideshow h1 {
+font-family: 'Playfair Display', serif;
+font-size: 3.5rem;
+margin-bottom: 0.3rem;
+}
+
+#hero-slideshow p {
+font-size: 1.3rem;
+margin-bottom: 1rem;
+opacity: 0.9;
+}
+
+.countdown-timer {
+font-size: 2rem;
+letter-spacing: 3px;
+font-weight: 700;
+color: #00bfa5;
+margin-bottom: 1.5rem;
+}
+
+.countdown-timer span {
+color: #fff;
+}
+
+#hero-slideshow .btn {
+display: inline-block;
+padding: 0.8rem 1.6rem;
+background: #00bfa5;
+color: #fff;
+border-radius: 6px;
+text-decoration: none;
+font-weight: 600;
+font-size: 1.1rem;
+transition: background 0.3s ease;
+}
+
+#hero-slideshow .btn:hover {
+background: #009e8b;
+}
+
+/* 🧭 Center Navbar */
+header {
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 15px 0;
+background: rgba(0, 0, 0, 0.5);
+position: absolute;
+top: 0;
+width: 100%;
+z-index: 10;
+}
+
+header nav a {
+color: #fff;
+text-decoration: none;
+margin: 0 18px;
+font-weight: 600;
+font-size: 1.1rem;
+transition: color 0.3s ease;
+}
+
+header nav a:hover {
+color: #00bfa5;
+}
 
 
 
