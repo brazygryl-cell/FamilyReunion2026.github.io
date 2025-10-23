@@ -1,298 +1,109 @@
-/* Fonts */
-body {
-  font-family: 'Poppins', sans-serif;
-  background-color: #f2f2f2;
-  color: #333;
-  margin: 0;
-  padding: 0;
+:root{
+  --bg:#0f1115;
+  --card:#151822;
+  --mint:#7EE0C2;
+  --mint-2:#3ec9a0;
+  --text:#E9EEF2;
+  --muted:#A8B0B8;
+  --border:#222736;
+  --accent:#89B4FA;
+  --danger:#ff6b6b;
+  --shadow: 0 10px 30px rgba(0,0,0,.35);
 }
 
-/* Headers */
-h1, h2, h3 {
-  font-family: 'Playfair Display', serif;
-  color: #2c3e50;
-  text-align: center;
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:linear-gradient(180deg,#0f1115 0%, #0f1218 100%);color:var(--text);font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;line-height:1.6}
+
+a{color:var(--mint);text-decoration:none}
+a:hover{color:var(--mint-2)}
+
+.container{max-width:1050px;margin:0 auto;padding:24px}
+
+header.site-header{
+  position:sticky;top:0;z-index:50;background:rgba(15,17,21,.7);
+  backdrop-filter: blur(10px);border-bottom:1px solid var(--border)
+}
+nav.navbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 22px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .logo{
+  width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
+  background: radial-gradient(100% 100% at 100% 0%, #86F5D2 0%, #2E8B75 100%);
+  color:#0b1311;font-weight:800;box-shadow: var(--shadow)
+}
+.brand .title{font-family:"Playfair Display",serif;font-weight:700;font-size:20px;letter-spacing:.3px}
+
+.nav-links{display:flex;gap:14px;flex-wrap:wrap}
+.nav-links a{
+  padding:8px 12px;border:1px solid transparent;border-radius:10px;color:var(--text)
+}
+.nav-links a.active,.nav-links a:hover{border-color:var(--border);background:#131725}
+
+.auth-actions{display:flex;gap:10px;align-items:center}
+.btn{border:1px solid var(--border);background:#121520;color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer}
+.btn:hover{border-color:#2a3145}
+.btn.mint{background:linear-gradient(180deg,var(--mint) 0%, var(--mint-2) 100%);color:#0a1310;border:none}
+.btn.mint:hover{filter:brightness(.98)}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+
+.hero{padding:48px 22px}
+.hero .wrap{display:grid;gap:24px;grid-template-columns:1.2fr .8fr;align-items:center}
+@media (max-width:900px){.hero .wrap{grid-template-columns:1fr}}
+
+.hero h1{
+  font-family:"Playfair Display",serif;
+  font-size: clamp(28px,4vw,44px);
+  line-height:1.15;margin:0 0 10px
+}
+.hero p{color:var(--muted);margin:0 0 16px}
+.card{background:linear-gradient(180deg,#121624 0%,#0f121a 100%);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+.card.pad{padding:20px}
+
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.kpi{background:#101420;border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center}
+.kpi .big{font-size:26px;font-weight:700;color:var(--mint)}
+.kpi .sub{font-size:12px;color:var(--muted)}
+@media (max-width:700px){.kpis{grid-template-columns:1fr}}
+
+.section{padding:26px 22px}
+.section h2{
+  font-family:"Playfair Display",serif;font-size: clamp(22px,3vw,28px);
+  margin:0 0 14px
+}
+.grid{display:grid;gap:16px}
+.grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.grid.cols-2{grid-template-columns:repeat(2,1fr)}
+@media (max-width:900px){.grid.cols-3{grid-template-columns:1fr}}
+@media (max-width:700px){.grid.cols-2{grid-template-columns:1fr}}
+
+.gallery{display:grid;gap:10px;grid-template-columns:repeat(3,1fr)}
+.gallery img{width:100%;height:180px;object-fit:cover;border-radius:12px;border:1px solid var(--border)}
+@media (max-width:900px){.gallery{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:600px){.gallery{grid-template-columns:1fr}}
+
+.countdown{
+  display:flex;gap:10px;flex-wrap:wrap
+}
+.count-chip{
+  padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#121624;
+  min-width:100px;text-align:center
+}
+.count-chip .n{font-weight:800;font-size:20px;color:var(--accent)}
+.count-chip .l{font-size:12px;color:var(--muted)}
+
+footer.site-footer{
+  margin-top:40px;border-top:1px solid var(--border);padding:18px 22px;color:var(--muted);text-align:center
 }
 
-.reunion-date {
-  text-align: center;       /* centers the text */
-  font-size: 1.2rem;        /* bigger font if you want */
-  font-family: 'Poppins', sans-serif; /* matches your style */
-  color: #333;              /* or a color that fits your theme */
-  margin: 0;                /* removes extra spacing */
-  padding: 5px 0;           /* optional: some space above/below */
+/* forms / tables */
+form .row{display:grid;gap:12px;margin:10px 0}
+input,select,textarea{
+  width:100%;background:#0f121a;border:1px solid var(--border);border-radius:12px;
+  padding:12px;color:var(--text)
 }
-
-/* Navigation */
-nav {
-  text-align: center;
-  margin-bottom: 20px;
-}
-nav a {
-  text-decoration: none;
-  margin: 0 15px;
-  color: #27ae60; /* mint-green */
-  font-weight: 600;
-  font-size: 1.1rem;
-}
-nav a:hover {
-  color: #000;
-}
-
-/* Sections */
-section {
-  padding: 20px;
-}
-
-/* Gallery */
-.slider {
-  position: relative;
-  max-width: 600px;
-  margin: 20px auto;
-  overflow: hidden;
-  border-radius: 10px;
-}
-.slider img {
-  width: 100%;
-  display: none;
-}
-.slider img.active {
-  display: block;
-}
-.slider-dots {
-  text-align: center;
-  margin-top: 10px;
-}
-.dot {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  margin: 0 5px;
-  background-color: #ccc;
-  border-radius: 50%;
-  cursor: pointer;
-}
-.dot.active {
-  background-color: #27ae60;
-}
-
-/* Countdown */
-#countdown {
-  text-align: center;
-  font-size: 2rem;
-  margin: 20px 0;
-  color: #27ae60;
-}
-
-/* Buttons */
-button {
-  background-color: #27ae60;
-  color: #fff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-button:hover {
-  background-color: #2ecc71;
-}
-
-/* Forms */
-form input, form select, form textarea {
-  padding: 8px;
-  margin: 5px 0;
-  width: 100%;
-  max-width: 300px;
-  display: block;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-/* Footer */
-footer {
-  text-align: center;
-  padding: 20px;
-  background-color: #333;
-  color: #fff;
-  margin-top: 30px;
-}
-/* ----------------- Forum Navigation ----------------- */
-.forum-nav {
-  margin: 20px 0;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.forum-nav a {
-  text-decoration: none;
-  color: #333;
-  margin: 0 10px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  transition: background 0.3s, color 0.3s;
-}
-
-.forum-nav a:hover {
-  background-color: #a3f0d1; /* mint-green highlight */
-  color: #000;
-}
-
-/* ----------------- Messages Container ----------------- */
-#messages {
-  max-width: 800px;
-  margin: 20px auto;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-/* ----------------- Individual Message Card ----------------- */
-#messages div {
-  background-color: #f5f5f5; /* light grey */
-  border-left: 5px solid #a3f0d1; /* mint-green stripe */
-  padding: 15px 20px;
-  border-radius: 8px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 16px;
-  color: #111;
-  transition: transform 0.2s;
-}
-
-#messages div:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-/* ----------------- Message Form ----------------- */
-#message-form {
-  max-width: 800px;
-  margin: 20px auto 40px auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-#message-form textarea {
-  resize: vertical;
-  min-height: 80px;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  font-family: 'Poppins', sans-serif;
-}
-
-#message-form button {
-  width: 120px;
-  padding: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  background-color: #333;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-#message-form button:hover {
-  background-color: #a3f0d1; /* mint-green */
-  color: #000;
-}
-
-/* ----------------- Logout Button ----------------- */
-#logout {
-  background-color: #333;
-  color: #fff;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-left: 20px;
-  transition: background 0.3s;
-}
-
-#logout:hover {
-  background-color: #a3f0d1;
-  color: #000;
-}
-
-/* ---------*
-
-/* Reddit-style message elements */
-.message-card {
-  background-color: #f5f5f5;
-  border-left: 5px solid #a3f0d1;
-  padding: 15px 20px;
-  border-radius: 8px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 16px;
-  color: #111;
-  transition: transform 0.2s;
-}
-
-.message-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.msg-user {
-  font-weight: 700;
-  color: #333;
-}
-
-.msg-time {
-  font-weight: 400;
-  font-size: 0.85em;
-  color: #555;
-  margin-left: 5px;
-}
-
-.msg-text {
-  margin-top: 5px;
-  line-height: 1.4;
-}
-
-/* --- NAVBAR STYLING --- */
-.navbar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: #1e2a47;
-  color: white;
-  padding: 1rem;
-}
-
-.nav-links {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 10px;
-}
-
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.nav-links a.active {
-  border-bottom: 2px solid #ffd700;
-}
-
-.logout-btn {
-  background: #ff4d4d;
-  border: none;
-  padding: 0.5rem 1rem;
-  color: white;
-  cursor: pointer;
-  font-weight: bold;
-  border-radius: 6px;
-}
-
-.logout-btn:hover {
-  background: #e63946;
-}
+label{font-size:14px;color:var(--muted)}
+.table{width:100%;border-collapse:separate;border-spacing:0 8px}
+.table tr{background:#0f131c}
+.table td,.table th{padding:12px 14px}
+.table th{color:var(--muted);text-align:left;border-bottom:1px solid var(--border)}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid var(--border);color:var(--muted)}
 
