@@ -8,11 +8,11 @@ const navbarHTML = `
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a href="event-details.html">Event Details</a></li>
-      <li><a href="lodging.html">Lodging & Travel</a></li>
+      <li><a href="lodging-travel.html">Lodging & Travel</a></li>
       <li><a href="payments.html">Payments</a></li>
-      <li><a href="directory.html">Family Directory</a></li>
-      <li><a href="gallery.html">Photo Gallery</a></li>
-      <li><a href="history.html">Family History</a></li>
+      <li><a href="family-directory.html">Family Directory</a></li>
+      <li><a href="photo-gallery.html">Photo Gallery</a></li>
+      <li><a href="family-history.html">Family History</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
     <button id="logoutBtn" class="logout-btn">Logout</button>
