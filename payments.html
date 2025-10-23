@@ -1,63 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Payments & Deposits | Williams Family Reunion 2026</title>
-  <link rel="stylesheet" href="style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
-  <script type="module" src="./firebase-init.js"></script>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Event Details — Williams Family Reunion</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <script type="module" src="nav.js"></script>
+  <script type="module">
+    import { requireAuth } from "./nav.js"; requireAuth();
+  </script>
 </head>
 <body>
-<header></header>
+  <header></header>
 
-<script type="module">
-  import { loadNavbar } from "./nav.js";
-  loadNavbar();
-  const currentPage = "payments.html";
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".nav-links a").forEach(a => { if (a.getAttribute("href") === currentPage) a.classList.add("active"); });
-  });
-</script>
-
-<main>
-  <section class="hero">
-    <h1>Payments & Deposits</h1>
-    <p class="reunion-date">$700 per person • Deposit & deadlines below</p>
-  </section>
-
-  <section class="content grid-2">
-    <div class="card">
-      <h2>Deadlines</h2>
-      <ul>
-        <li><strong>$200 Deposit:</strong> Jan 15, 2026</li>
-        <li><strong>Remaining Balance:</strong> May 15, 2026</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h2>How to Pay</h2>
-      <ul>
-        <li><strong>Zelle:</strong> williamsreunion2026@gmail.com</li>
-        <li><strong>Cash App:</strong> $WilliamsReunion2026</li>
-        <li><strong>Check:</strong> Request mailing address via <a href="contact.html">Contact</a></li>
-      </ul>
+  <section class="section">
+    <div class="container">
+      <h2>Event Details</h2>
+      <div class="grid cols-2">
+        <div class="card pad">
+          <h3>Itinerary</h3>
+          <table class="table">
+            <tr><th>Day</th><th>Plan</th></tr>
+            <tr><td>Sun</td><td>Arrival &amp; Welcome Dinner</td></tr>
+            <tr><td>Mon</td><td>Theme Park Day</td></tr>
+            <tr><td>Tue</td><td>Pool + BBQ</td></tr>
+          </table>
+        </div>
+        <div class="card pad">
+          <h3>Dress Code &amp; Packing</h3>
+          <ul>
+            <li><span class="badge">Casual</span> Shorts, tees, sandals</li>
+            <li><span class="badge">Pool</span> Swimwear, sunscreen</li>
+            <li><span class="badge">Dinner</span> White &amp; Mint Theme</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </section>
-</main>
 
-<footer>
-  <p>Made with ❤️ by Taylor Clark Jones</p>
-  <p>Art by 🔥 Andre Clark</p>
-</footer>
+  <footer></footer>
 
-<script type="module">
-  import { auth, db } from "./firebase-init.js";
-  import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-  auth.onAuthStateChanged(async user => {
-    if (!user) return (window.location.href = "login.html");
-    const approved = await getDoc(doc(db, "approvedUsers", user.email));
-    if (!approved.exists() || !approved.data().approved) { await auth.signOut(); alert("Not approved yet."); window.location.href = "login.html"; }
-  });
-</script>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </body>
 </html>
