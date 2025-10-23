@@ -1,70 +1,79 @@
 // nav.js
-// Handles navbar, footer, and Netlify Identity authentication
+// Handles navigation bar, footer, and Netlify Identity auth (login/logout)
 
-// --- 🔹 Navbar + Footer HTML ---
-const navbarHTML = `
-  <nav class="navbar">
-    <div class="logo">Williams Reunion 2026</div>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="event-details.html">Event Details</a></li>
-      <li><a href="lodging-travel.html">Lodging</a></li>
-      <li><a href="photo-gallery.html">Photo Gallery</a></li>
-      <li><a href="family-history.html">Family History</a></li>
-      <li><a href="forum.html">Communication</a></li>
-      <li><a href="contact.html">Contact</a></li>
-    </ul>
-    <button id="logoutBtn" class="logout-btn">Logout</button>
-  </nav>
-`;
-
-const footerHTML = `
-  <footer>
-    <p>Made with ❤️ by Taylor Clark Jones</p>
-    <p>Art by 🔥 Andre Clark</p>
-  </footer>
-`;
-
-// --- 🔹 Insert Navbar and Footer ---
+// 🧭 Load Navbar & Footer
 export function loadNavbar() {
-  document.querySelector("header").innerHTML = navbarHTML;
-  document.querySelector("footer").innerHTML = footerHTML;
+  const header = document.querySelector("header");
+  const footer = document.querySelector("footer");
 
-  // Highlight the current page
-  const currentPage = window.location.pathname.split("/").pop();
-  document.querySelectorAll(".nav-links a").forEach(link => {
-    if (link.getAttribute("href") === currentPage) {
-      link.classList.add("active");
+  if (header) {
+    header.innerHTML = `
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="event-details.html">Event Details</a>
+        <a href="forum.html">Forum</a>
+        <a href="contact.html">Contact</a>
+        <a href="#" id="logoutBtn" style="color:#c33;font-weight:600">Logout</a>
+      </nav>
+    `;
+  }
+
+  if (footer) {
+    footer.innerHTML = `
+      <p>Made with ❤️ by 
+        <a href="mailto:taylorkjones@example.com">Taylor Clark Jones</a>
+      </p>
+      <p>Art by 🔥 Andre Clark</p>
+    `;
+  }
+}
+
+// 🧾 Enable Logout Button Functionality
+export function enableLogout() {
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (!logoutBtn) return;
+
+  // Make sure widget is ready
+  if (!window.netlifyIdentity) {
+    console.warn("Netlify Identity not loaded yet.");
+    return;
+  }
+
+  logoutBtn.addEventListener("click", e => {
+    e.preventDefault();
+    const user = window.netlifyIdentity.currentUser();
+    if (user) {
+      window.netlifyIdentity.logout();
+    } else {
+      alert("You are not logged in.");
     }
   });
 
-  // Logout button
-  const logoutBtn = document.getElementById("logoutBtn");
-  logoutBtn.addEventListener("click", () => {
-    const user = netlifyIdentity.currentUser();
-    if (user) {
-      netlifyIdentity.logout();
-      alert("You have been logged out.");
-      window.location.href = "login.html";
-    }
+  // When user logs out, return to login screen
+  window.netlifyIdentity.on("logout", () => {
+    window.location.href = "login.html";
   });
 }
 
-// --- 🔹 Require Login Protection ---
+// 🔒 Require Login (used on protected pages)
 export function requireAuth() {
   if (!window.netlifyIdentity) {
-    console.error("Netlify Identity not loaded!");
+    console.warn("Netlify Identity widget not loaded yet.");
     return;
   }
 
   window.netlifyIdentity.on("init", user => {
     if (!user) {
-      window.location.href = "login.html";
+      window.netlifyIdentity.open("login");
     }
   });
-}
 
-// --- 🔹 Initialize on Load ---
-document.addEventListener("DOMContentLoaded", () => {
-  loadNavbar();
-});
+  window.netlifyIdentity.on("login", () => {
+    console.log("✅ Logged in!");
+  });
+
+  window.netlifyIdentity.on("logout", () => {
+    console.log("👋 Logged out");
+    window.location.href = "login.html";
+  });
+}
