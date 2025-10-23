@@ -6,7 +6,12 @@
   <title>Williams Family Reunion — Home</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-  <script type="module" src="nav.js"></script>
+  <script type="module" src="./nav.js"></script>
+<script type="module">
+  import { requireAuth } from "./nav.js";
+  requireAuth();
+</script>
+
 </head>
 <body>
   <header></header>
@@ -79,4 +84,5 @@
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </body>
 </html>
+
 
