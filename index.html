@@ -1,83 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Williams Family Reunion — Home</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-  <script type="module" src="./nav.js"></script>
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Williams Family Reunion — Home</title>
+<link rel="stylesheet" href="style.css" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
+
 <body>
-  <header></header>
+<!-- Navbar -->
+<header></header>
 
+<!-- Hero Slideshow -->
 <section id="hero-slideshow">
-  <div class="slide active" style="background-image: url('images/family1.jpg')"></div>
-  <div class="slide" style="background-image: url('images/family2.jpg')"></div>
-  <div class="slide" style="background-image: url('images/family3.jpg')"></div>
+<div class="slide active" style="background-image: url('images/family1.jpg')"></div>
+<div class="slide" style="background-image: url('images/family2.jpg')"></div>
+<div class="slide" style="background-image: url('images/family3.jpg')"></div>
 
-  <div class="overlay">
-    <h1>Williams Family Reunion 2026</h1>
-    <p>July 26 - August 1 • Orlando, FL</p>
-    <a href="event-details.html" class="btn">View Schedule</a>
-  </div>
+<div class="overlay">
+<h1>Williams Family Reunion 2026</h1>
+<p>July 26 - August 1 • Orlando, FL</p>
+<a href="event-details.html" class="btn">View Schedule</a>
+</div>
 </section>
 
+<!-- Countdown -->
+<section id="countdown" class="section">
+<div class="container center">
+<h2>Countdown to Reunion</h2>
+<div class="countdown-timer">
+<span id="d">0</span>d :
+<span id="h">0</span>h :
+<span id="m">0</span>m :
+<span id="s">0</span>s
+</div>
+</div>
+</section>
 
-  <footer></footer>
+<footer></footer>
 
-  <!-- Countdown -->
-  <script>
-    const target = new Date("July 26, 2026 12:00:00").getTime();
-    const dEl = document.getElementById("d");
-    const hEl = document.getElementById("h");
-    const mEl = document.getElementById("m");
-    const sEl = document.getElementById("s");
-    setInterval(()=>{
-      const now = Date.now();
-      const diff = target - now;
-      if(diff <= 0){
-        dEl.textContent=hEl.textContent=mEl.textContent=sEl.textContent="0";
-        return;
-      }
-      const days = Math.floor(diff / (1000*60*60*24));
-      const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-      const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
-      const secs = Math.floor((diff % (1000*60)) / 1000);
-      dEl.textContent = days; hEl.textContent = hours; mEl.textContent = mins; sEl.textContent = secs;
-    }, 1000);
-  </script>
-
-  <!-- Netlify Identity -->
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <script type="module">
-    import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-    document.addEventListener("DOMContentLoaded", () => {
-      loadNavbar();
-      enableLogout();
-      requireAuth();
-    });
-  </script>
-
-  <script>
-  const slides = document.querySelectorAll("#hero-slideshow .slide");
-  let currentSlide = 0;
-
-  function nextSlide() {
-    slides[currentSlide].classList.remove("active");
-    currentSlide = (currentSlide + 1) % slides.length;
-    slides[currentSlide].classList.add("active");
-  }
-
-  setInterval(nextSlide, 5000); // change every 5 seconds
+<!-- JS Imports -->
+<script type="module" src="./nav.js"></script>
+<script type="module">
+import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+document.addEventListener("DOMContentLoaded", () => {
+loadNavbar();
+enableLogout();
+requireAuth();
+});
 </script>
 
+<!-- Countdown Script -->
+<script>
+const target = new Date("July 26, 2026 12:00:00").getTime();
+const dEl = document.getElementById("d");
+const hEl = document.getElementById("h");
+const mEl = document.getElementById("m");
+const sEl = document.getElementById("s");
+
+setInterval(() => {
+const now = Date.now();
+const diff = target - now;
+if (diff <= 0) {
+dEl.textContent = hEl.textContent = mEl.textContent = sEl.textContent = "0";
+return;
+}
+const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+const secs = Math.floor((diff % (1000 * 60)) / 1000);
+dEl.textContent = days;
+hEl.textContent = hours;
+mEl.textContent = mins;
+sEl.textContent = secs;
+}, 1000);
+</script>
+
+<!-- Slideshow Script -->
+<script>
+const slides = document.querySelectorAll("#hero-slideshow .slide");
+let currentSlide = 0;
+
+function nextSlide() {
+slides[currentSlide].classList.remove("active");
+currentSlide = (currentSlide + 1) % slides.length;
+slides[currentSlide].classList.add("active");
+}
+
+setInterval(nextSlide, 5000); // every 5 seconds
+</script>
 </body>
 </html>
-
-
-
-
-
-
