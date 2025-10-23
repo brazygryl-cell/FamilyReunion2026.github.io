@@ -13,7 +13,7 @@
 <!-- Navbar -->
 <header></header>
 
-<!-- Hero Slideshow -->
+<!-- Hero Slideshow with Countdown -->
 <section id="hero-slideshow">
 <div class="slide active" style="background-image: url('images/family1.jpg')"></div>
 <div class="slide" style="background-image: url('images/family2.jpg')"></div>
@@ -22,20 +22,16 @@
 <div class="overlay">
 <h1>Williams Family Reunion 2026</h1>
 <p>July 26 - August 1 • Orlando, FL</p>
-<a href="event-details.html" class="btn">View Schedule</a>
-</div>
-</section>
 
-<!-- Countdown -->
-<section id="countdown" class="section">
-<div class="container center">
-<h2>Countdown to Reunion</h2>
+<!-- ✨ Countdown integrated into hero -->
 <div class="countdown-timer">
 <span id="d">0</span>d :
 <span id="h">0</span>h :
 <span id="m">0</span>m :
 <span id="s">0</span>s
 </div>
+
+<a href="event-details.html" class="btn">View Schedule</a>
 </div>
 </section>
 
@@ -52,7 +48,7 @@ requireAuth();
 });
 </script>
 
-<!-- Countdown Script -->
+<!-- Countdown Timer Script -->
 <script>
 const target = new Date("July 26, 2026 12:00:00").getTime();
 const dEl = document.getElementById("d");
@@ -78,7 +74,7 @@ sEl.textContent = secs;
 }, 1000);
 </script>
 
-<!-- Slideshow Script -->
+<!-- Hero Slideshow Script -->
 <script>
 const slides = document.querySelectorAll("#hero-slideshow .slide");
 let currentSlide = 0;
@@ -89,7 +85,7 @@ currentSlide = (currentSlide + 1) % slides.length;
 slides[currentSlide].classList.add("active");
 }
 
-setInterval(nextSlide, 5000); // every 5 seconds
+setInterval(nextSlide, 5000);
 </script>
 </body>
 </html>
