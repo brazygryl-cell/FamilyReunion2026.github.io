@@ -1,9 +1,0 @@
-[build]
-publish = "."
-command = ""
-
-# Proxy Firebase init JSON from Firebase Hosting
-[[redirects]]
-from = "/__/firebase/init.json"
-to = "https://williams-reunion.firebaseapp.com/__/firebase/init.json"
-status = 200
