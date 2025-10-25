@@ -23,8 +23,10 @@ export function loadNavbar() {
   if (footer) {
     footer.innerHTML = `
       <p>Made with ❤️ by 
-        <a href="mailto:taylor.clarkjones25@gmail.com">Taylor Clark Jones</a>
-      </p>
+  <a href="mailto:taylor.clarkjones25@gmail.com" target="_blank" rel="noopener noreferrer">
+    Taylor Clark Jones
+  </a>
+</p>
       <p>Art by 🔥 Andre Clark</p>
     `;
   }
