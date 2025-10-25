@@ -65,6 +65,17 @@
 
 <footer></footer>
 
+ <!-- JS Imports -->
+<script type="module" src="./nav.js"></script>
+<script type="module">
+import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+document.addEventListener("DOMContentLoaded", () => {
+loadNavbar();
+enableLogout();
+requireAuth();
+});
+</script>
+ 
 <script>
 const slides = document.querySelectorAll('#villa-slideshow .slide');
 let current = 0;
