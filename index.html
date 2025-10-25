@@ -1,60 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Williams Family Reunion 2026</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Williams Family Reunion — Home</title>
+<link rel="stylesheet" href="style.css" />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<script type="module" src="nav.js"></script>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 
 <body>
+<!-- Navbar -->
 <header></header>
 
+<!-- Hero Slideshow with Countdown -->
 <section id="hero-slideshow">
- <div class="slide active" style="background-image:url('images/family1.jpg')"></div>
- <div class="slide" style="background-image:url('images/family2.jpg')"></div>
- <div class="slide" style="background-image:url('images/family3.jpg')"></div>
+<div class="slide active" style="background-image: url('images/family1.jpg')"></div>
+<div class="slide" style="background-image: url('images/family2.jpg')"></div>
+<div class="slide" style="background-image: url('images/family3.jpg')"></div>
 
- <div class="overlay">
- <h1>Williams Family Reunion 2026</h1>
- <p>July 26 – August 1, 2026 • Orlando, Florida</p>
- <div class="countdown">
- <div class="count-chip"><div class="n" id="days">00</div><div class="l">Days</div></div>
- <div class="count-chip"><div class="n" id="hours">00</div><div class="l">Hours</div></div>
- <div class="count-chip"><div class="n" id="minutes">00</div><div class="l">Minutes</div></div>
- <div class="count-chip"><div class="n" id="seconds">00</div><div class="l">Seconds</div></div>
- </div>
- <a href="events.html" class="btn mint">View Itinerary</a>
- </div>
+<div class="overlay">
+<h1>Williams Family Reunion 2026</h1>
+<p>July 26 - August 1 • Orlando, FL</p>
+
+<!-- ✨ Countdown integrated into hero -->
+<div class="countdown-timer">
+<span id="d">0</span>d :
+<span id="h">0</span>h :
+<span id="m">0</span>m :
+<span id="s">0</span>s
+</div>
+
+<a href="event-details.html" class="btn">View Schedule</a>
+</div>
 </section>
 
-<footer>
- <p>Made with by 
- <a href="mailto:taylor.clarkjones25@gmail.com">Taylor Clark Jones</a></p>
-</footer>
+<footer></footer>
 
+<!-- JS Imports -->
+<script type="module" src="./nav.js"></script>
+<script type="module">
+import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+document.addEventListener("DOMContentLoaded", () => {
+loadNavbar();
+enableLogout();
+requireAuth();
+});
+</script>
+
+<!-- Countdown Timer Script -->
 <script>
-const slides = document.querySelectorAll('#hero-slideshow .slide');
-let current = 0;
-setInterval(() => {
- slides[current].classList.remove('active');
- current = (current + 1) % slides.length;
- slides[current].classList.add('active');
-}, 7000);
+const target = new Date("July 26, 2026 12:00:00").getTime();
+const dEl = document.getElementById("d");
+const hEl = document.getElementById("h");
+const mEl = document.getElementById("m");
+const sEl = document.getElementById("s");
 
-// Countdown timer
-const targetDate = new Date("July 26, 2026 00:00:00").getTime();
-const timer = setInterval(() => {
- const now = new Date().getTime();
- const distance = targetDate - now;
- if (distance < 0) return clearInterval(timer);
- document.getElementById("days").innerText = Math.floor(distance / (1000 * 60 * 60 * 24));
- document.getElementById("hours").innerText = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
- document.getElementById("minutes").innerText = Math.floor((distance % (1000*60*60)) / (1000*60));
- document.getElementById("seconds").innerText = Math.floor((distance % (1000*60)) / 1000);
+setInterval(() => {
+const now = Date.now();
+const diff = target - now;
+if (diff <= 0) {
+dEl.textContent = hEl.textContent = mEl.textContent = sEl.textContent = "0";
+return;
+}
+const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+const secs = Math.floor((diff % (1000 * 60)) / 1000);
+dEl.textContent = days;
+hEl.textContent = hours;
+mEl.textContent = mins;
+sEl.textContent = secs;
 }, 1000);
 </script>
+
+<!-- Hero Slideshow Script -->
+<script>
+const slides = document.querySelectorAll("#hero-slideshow .slide");
+let currentSlide = 0;
+
+function nextSlide() {
+slides[currentSlide].classList.remove("active");
+currentSlide = (currentSlide + 1) % slides.length;
+slides[currentSlide].classList.add("active");
+}
+
+setInterval(nextSlide, 5000);
+</script>
+  <script>
+const header = document.querySelector("header");
+let lastScrollTop = 0;
+
+window.addEventListener("scroll", () => {
+const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+if (scrollTop > lastScrollTop + 50) {
+// Scrolling down — hide navbar
+header.classList.add("hidden");
+} else if (scrollTop < lastScrollTop - 50) {
+// Scrolling up — show navbar again
+header.classList.remove("hidden");
+header.classList.add("scrolled");
+}
+
+lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Prevent negative values
+});
+</script>
+
 </body>
 </html>
+
+
