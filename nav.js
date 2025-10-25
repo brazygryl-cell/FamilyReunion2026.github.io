@@ -22,11 +22,30 @@ export function loadNavbar() {
 
   if (footer) {
     footer.innerHTML = `
-      <p>Made with ❤️ by 
-  <a href="mailto:taylor.clarkjones25@gmail.com" target="_blank" rel="noopener noreferrer">
-    Taylor Clark Jones
-  </a>
+    <p>Made with by 
+ <a href="#" id="emailLink">Taylor Clark Jones</a>
 </p>
+
+<script>
+ const email = "taylor.clarkjones25@gmail.com";
+ const subject = "Williams Family Reunion Registration";
+ const body = "Hi Taylor,%0A%0AI'd like to register or learn more about the reunion.%0A%0AThanks,%0A[Your Name]";
+ 
+ document.getElementById("emailLink").addEventListener("click", (e) => {
+ e.preventDefault();
+
+ // Try Gmail first
+ const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(subject)}&body=${body}`;
+ const win = window.open(gmailURL, "_blank");
+
+ // If Gmail can't open, fallback to system email app
+ setTimeout(() => {
+ if (!win || win.closed || typeof win.closed === "undefined") {
+ window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${body}`;
+ }
+ }, 500);
+ });
+</script>
       <p>Art by 🔥 Andre Clark</p>
     `;
   }
