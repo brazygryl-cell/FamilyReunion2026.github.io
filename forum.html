@@ -1,248 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Family Forum — Williams Family Reunion</title>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Family Forum — Williams Family Reunion</title>
 
-<link rel="stylesheet" href="style.css" />
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
-<!-- Navbar + utilities -->
-<script type="module" src="nav.js"></script>
+  <!-- Navbar -->
+  <script type="module" src="nav.js"></script>
 
-<!-- Netlify Identity (login) -->
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Netlify Identity -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-<style>
-/* Forum-specific polish (kept local so it won't fight your main CSS) */
-.forum-hero {
-text-align: center;
-padding: 28px 16px;
-}
-.forum-hero h1 {
-font-family: 'Playfair Display', serif;
-font-size: 2.2rem;
-margin: 0 0 6px;
-}
-.forum-hero p {
-color: #666;
-margin: 0;
-}
+  <style>
+    .forum-hero {
+      text-align: center;
+      padding: 28px 16px;
+    }
+    .forum-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      margin: 0 0 6px;
+    }
+    .forum-hero p {
+      color: #aaa;
+      margin: 0;
+    }
 
-.forum-tabs {
-display: flex;
-gap: 10px;
-justify-content: center;
-margin: 18px auto 10px;
-flex-wrap: wrap;
-}
-.forum-tab {
-border: 1px solid #e3e3e3;
-padding: 8px 14px;
-border-radius: 999px;
-background: #fff;
-cursor: pointer;
-font-weight: 600;
-transition: background .2s, color .2s, border-color .2s;
-}
-.forum-tab.active {
-background: #2b8a3e; /* accent */
-color: #fff;
-border-color: #2b8a3e;
-}
+    .forum-tabs {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 18px auto 10px;
+      flex-wrap: wrap;
+    }
+    .forum-tab {
+      border: 1px solid #555;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #222;
+      color: #ddd;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background .2s, color .2s, border-color .2s;
+    }
+    .forum-tab.active {
+      background: #ffd700;
+      color: #000;
+      border-color: #ffd700;
+    }
 
-.composer {
-max-width: 820px;
-margin: 16px auto;
-background: #fff;
-border: 1px solid #eee;
-border-radius: 12px;
-padding: 14px;
-}
-.composer h3 {
-margin: 0 0 8px;
-font-size: 1.05rem;
-}
-.composer textarea {
-width: 100%;
-min-height: 90px;
-border: 1px solid #e5e5e5;
-border-radius: 10px;
-padding: 10px 12px;
-font-family: 'Poppins', sans-serif;
-outline: none;
-resize: vertical;
-}
-.composer .row {
-display: flex; gap: 10px; justify-content: space-between; align-items: center; margin-top: 10px;
-}
-.composer select, .composer button {
-border: 1px solid #e5e5e5;
-border-radius: 10px;
-padding: 8px 12px;
-background: #fff;
-font-weight: 600;
-cursor: pointer;
-}
-.composer button {
-background: #2b8a3e; color: #fff; border-color: #2b8a3e;
-}
+    .composer {
+      max-width: 820px;
+      margin: 16px auto;
+      background: #1c1c1c;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 14px;
+      color: #eee;
+    }
+    .composer textarea {
+      width: 100%;
+      min-height: 90px;
+      border: 1px solid #444;
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #111;
+      color: #fff;
+      resize: vertical;
+    }
+    .composer select, .composer button {
+      border: 1px solid #444;
+      border-radius: 10px;
+      padding: 8px 12px;
+      background: #222;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .composer button {
+      background: #ffd700; color: #000; border-color: #ffd700;
+    }
 
-.posts {
-max-width: 900px;
-margin: 10px auto 40px;
-display: grid;
-gap: 12px;
-}
-.post {
-background: #fff;
-border: 1px solid #eee;
-border-radius: 14px;
-padding: 14px 16px;
-}
-.post .meta {
-font-size: .9rem; color: #777; margin-bottom: 6px;
-}
-.post .title {
-font-weight: 700; margin: 0 0 6px; font-size: 1.05rem;
-}
-.post .body {
-margin: 0; color: #444; line-height: 1.55;
-}
-.empty {
-text-align: center; color: #888; padding: 24px 8px;
-}
-</style>
+    .posts {
+      max-width: 900px;
+      margin: 10px auto 40px;
+      display: grid;
+      gap: 12px;
+    }
+    .post {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: #eee;
+    }
+    .post .meta {
+      font-size: .85rem; color: #999; margin-bottom: 6px;
+    }
+    .post .body {
+      margin: 0; line-height: 1.55;
+    }
+    .reply-section {
+      margin-top: 10px; border-top: 1px solid #333; padding-top: 10px;
+    }
+    .reply-input {
+      width: 100%; border-radius: 8px; padding: 8px; border: 1px solid #444;
+      background: #111; color: #fff; margin-bottom: 6px;
+    }
+    .reply-btn {
+      background: #444; border: none; color: #fff; padding: 6px 10px;
+      border-radius: 8px; cursor: pointer;
+    }
+    .reply {
+      font-size: 0.9rem; color: #ccc; margin-top: 6px;
+      border-left: 3px solid #444; padding-left: 8px;
+    }
+    .empty { text-align: center; color: #777; padding: 24px 8px; }
+  </style>
 </head>
+
 <body>
-<header></header>
+  <header></header>
 
-<main class="section">
-<div class="forum-hero">
-<h1>Family Forum</h1>
-<p>Chat, share memories, and plan the reunion together.</p>
-</div>
+  <main class="section">
+    <div class="forum-hero">
+      <h1>Family Forum</h1>
+      <p>Chat, share memories, and plan the reunion together.</p>
+    </div>
 
-<!-- Tabs -->
-<div class="forum-tabs" role="tablist" aria-label="Forum boards">
-<button class="forum-tab active" data-board="general" aria-selected="true">General</button>
-<button class="forum-tab" data-board="memories">Memories</button>
-<button class="forum-tab" data-board="planning">Planning</button>
-</div>
+    <div class="forum-tabs" role="tablist" aria-label="Forum boards">
+      <button class="forum-tab active" data-board="general" aria-selected="true">General</button>
+      <button class="forum-tab" data-board="memories">Memories</button>
+      <button class="forum-tab" data-board="planning">Planning</button>
+    </div>
 
-<!-- Composer (UI only for now; wire to a backend later) -->
-<div class="composer">
-<h3>Create a post</h3>
-<textarea id="postBody" placeholder="Write something for the family…"></textarea>
-<div class="row">
-<select id="postBoard" aria-label="Select board">
-<option value="general" selected>General</option>
-<option value="memories">Memories</option>
-<option value="planning">Planning</option>
-</select>
-<button id="submitPost">Post</button>
-</div>
-<small style="color:#777">Note: Posting is demo-only right now. We’ll connect this to storage next.</small>
-</div>
+    <div class="composer">
+      <h3>Create a post</h3>
+      <textarea id="postBody" placeholder="Write something for the family…"></textarea>
+      <div class="row" style="display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:10px;">
+        <select id="postBoard" aria-label="Select board">
+          <option value="general" selected>General</option>
+          <option value="memories">Memories</option>
+          <option value="planning">Planning</option>
+        </select>
+        <button id="submitPost">Post</button>
+      </div>
+    </div>
 
-<!-- Posts list -->
-<section class="posts" id="posts"></section>
-</main>
+    <section class="posts" id="posts"></section>
+  </main>
 
-<footer></footer>
+  <footer></footer>
 
-<!-- Identity gating + forum logic -->
-<script>
-// Require login with Netlify Identity (opens modal if logged out)
-(function gateWithIdentity(){
-if (!window.netlifyIdentity) return; // widget not loaded yet
-window.netlifyIdentity.on('init', user => {
-if (!user) {
-window.netlifyIdentity.open('login');
-}
-});
-// If user logs out from the widget, kick back to login page
-window.netlifyIdentity.on('logout', () => {
-window.location.href = 'login.html';
-});
-})();
+  <!-- 🔐 Firestore Forum Logic -->
+  <script type="module">
+    import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+    import { auth, db } from "./firebase-init.js";
+    import {
+      collection, addDoc, getDocs, query, orderBy, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// Simple in-memory demo posts (one array per board)
-const postsData = {
-general: [
-{ title: "Welcome to the forum!", body: "Say hi and introduce yourself in the comments 👋", by: "Organizer", when: "today" },
-{ title: "Sunday cookout ideas", body: "Drop your best sides & grill favorites here.", by: "Aunt Mia", when: "yesterday" },
-],
-memories: [
-{ title: "Throwback pics", body: "Share your favorite family photos. We’ll build a slideshow!", by: "Cousin Jay", when: "2 days ago" },
-],
-planning: [
-{ title: "Airport rides", body: "Arriving Monday 2pm (MCO). Anyone else on that flight?", by: "Taylor", when: "1 hour ago" },
-]
-};
+    document.addEventListener("DOMContentLoaded", () => {
+      loadNavbar();
+      enableLogout();
+      requireAuth();
+    });
 
-const postsEl = document.getElementById('posts');
-const tabs = Array.from(document.querySelectorAll('.forum-tab'));
-const bodyEl = document.getElementById('postBody');
-const boardEl = document.getElementById('postBoard');
-const submitBtn = document.getElementById('submitPost');
+    const postsEl = document.getElementById("posts");
+    const bodyEl = document.getElementById("postBody");
+    const boardEl = document.getElementById("postBoard");
+    const submitBtn = document.getElementById("submitPost");
+    const tabs = document.querySelectorAll(".forum-tab");
+    let currentBoard = "general";
 
-let currentBoard = 'general';
+    async function loadPosts(board) {
+      postsEl.innerHTML = "<div class='empty'>Loading posts...</div>";
+      const q = query(collection(db, "forum_" + board), orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(q);
+      postsEl.innerHTML = "";
+      if (snapshot.empty) {
+        postsEl.innerHTML = "<div class='empty'>No posts yet. Be the first to start a conversation!</div>";
+        return;
+      }
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const postId = docSnap.id;
+        const post = document.createElement("article");
+        post.className = "post";
+        post.innerHTML = `
+          <div class="meta">${data.by || "Anonymous"} • 
+            ${data.createdAt ? new Date(data.createdAt.toDate()).toLocaleString() : "just now"} •
+            <span style="text-transform:capitalize">${board}</span>
+          </div>
+          <p class="body">${data.body || ""}</p>
+          <div class="reply-section" id="replies-${postId}">
+            <input class="reply-input" type="text" placeholder="Reply…" id="input-${postId}">
+            <button class="reply-btn" onclick="addReply('${board}', '${postId}')">Reply</button>
+          </div>
+        `;
+        postsEl.appendChild(post);
+      });
+    }
 
-function renderPosts(board) {
-const list = postsData[board] || [];
-postsEl.innerHTML = '';
-if (!list.length) {
-postsEl.innerHTML = '<div class="empty">No posts yet. Be the first to start a conversation!</div>';
-return;
-}
-list.forEach(p => {
-const card = document.createElement('article');
-card.className = 'post';
-card.innerHTML = `
-<div class="meta">${p.by} • ${p.when} • <span style="text-transform:capitalize">${board}</span></div>
-<h3 class="title">${p.title}</h3>
-<p class="body">${p.body}</p>
-`;
-postsEl.appendChild(card);
-});
-}
+    // Add a new post
+    submitBtn.addEventListener("click", async () => {
+      const user = auth.currentUser;
+      const text = bodyEl.value.trim();
+      const board = boardEl.value;
+      if (!text) return;
+      await addDoc(collection(db, "forum_" + board), {
+        body: text,
+        by: user ? user.email : "Guest",
+        createdAt: serverTimestamp()
+      });
+      bodyEl.value = "";
+      loadPosts(board);
+    });
 
-// Tab click behavior
-tabs.forEach(btn => {
-btn.addEventListener('click', () => {
-tabs.forEach(b => b.classList.remove('active'));
-btn.classList.add('active');
-currentBoard = btn.dataset.board;
-boardEl.value = currentBoard;
-renderPosts(currentBoard);
-window.scrollTo({ top: document.querySelector('.forum-hero').offsetTop, behavior: 'smooth' });
-});
-});
+    // Add a reply (threaded)
+    window.addReply = async function(board, postId) {
+      const user = auth.currentUser;
+      const input = document.getElementById(`input-${postId}`);
+      const reply = input.value.trim();
+      if (!reply) return;
+      await addDoc(collection(db, `forum_${board}/${postId}/replies`), {
+        body: reply,
+        by: user ? user.email : "Guest",
+        createdAt: serverTimestamp()
+      });
+      input.value = "";
+      alert("Reply added!");
+    };
 
-// Demo "post" button (adds to in-memory array only)
-submitBtn.addEventListener('click', () => {
-const text = bodyEl.value.trim();
-const board = boardEl.value;
-if (!text) return;
-postsData[board] = postsData[board] || [];
-postsData[board].unshift({
-title: "New post",
-body: text,
-by: (window.netlifyIdentity?.currentUser()?.email || "You"),
-when: "just now"
-});
-bodyEl.value = '';
-if (board !== currentBoard) {
-// switch to the board where the post was added
-document.querySelector(`.forum-tab[data-board="${board}"]`).click();
-} else {
-renderPosts(currentBoard);
-}
-});
+    // Switch boards
+    tabs.forEach(btn => {
+      btn.addEventListener("click", () => {
+        tabs.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentBoard = btn.dataset.board;
+        boardEl.value = currentBoard;
+        loadPosts(currentBoard);
+      });
+    });
 
-// Initial render
-renderPosts(currentBoard);
-</script>
+    loadPosts(currentBoard);
+  </script>
 </body>
 </html>
+
