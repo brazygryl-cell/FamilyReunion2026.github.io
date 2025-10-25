@@ -1,46 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Event Details — Williams Family Reunion</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lodging & Travel — Williams Family Reunion</title>
+
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-  <script type="module" src="nav.js"></script>
-
+  <script type="module" src="./nav.js"></script>
 </head>
+
 <body>
   <header></header>
 
-  <section class="section">
-    <div class="container">
-      <h2>Event Details</h2>
-      <div class="grid cols-2">
-        <div class="card pad">
-          <h3>Itinerary</h3>
-          <table class="table">
-            <tr><th>Day</th><th>Plan</th></tr>
-            <tr><td>Sun</td><td>Arrival &amp; Welcome Dinner</td></tr>
-            <tr><td>Mon</td><td>Theme Park Day</td></tr>
-            <tr><td>Tue</td><td>Pool + BBQ</td></tr>
-          </table>
+  <section class="section container">
+    <h2>Lodging & Travel</h2>
+    <p class="subtitle">Villatel Orlando Homes • July 26 – August 1, 2026</p>
+
+    <div class="grid cols-2">
+      <!-- 🏠 Lodging Info -->
+      <div class="card pad">
+        <h3>Where We'll Stay</h3>
+        <p>We’ll be staying at <strong>Villatel Orlando Resort</strong>, featuring private villas, pools, and family-sized spaces so multiple families can stay together comfortably.</p>
+
+        <ul>
+          <li><strong>Villa Features:</strong> Private spa pools, kitchens, game rooms, and themed kids’ bedrooms.</li>
+          <li><strong>Assignments:</strong> Each family’s villa assignment will be shared after final payments.</li>
+          <li><strong>Check-in:</strong> Standard check-in times; detailed info will be provided closer to arrival.</li>
+        </ul>
+
+        <div class="notice">
+          <strong>Special Requests?</strong> For accessibility needs, early check-in, or family grouping, please email us directly.
         </div>
-        <div class="card pad">
-          <h3>Dress Code &amp; Packing</h3>
-          <ul>
-            <li><span class="badge">Casual</span> Shorts, tees, sandals</li>
-            <li><span class="badge">Pool</span> Swimwear, sunscreen</li>
-            <li><span class="badge">Dinner</span> White &amp; Mint Theme</li>
-          </ul>
-        </div>
+
+        <a class="btn" href="https://villatel.com/villatel-orlando-resort" target="_blank" rel="noopener">Visit Villatel Site</a>
       </div>
+
+      <!-- ✈️ Travel Info -->
+      <div class="card pad">
+        <h3>Getting There</h3>
+        <p>Most guests will fly into <strong>Orlando International Airport (MCO)</strong>. It’s a short 25–35 minute drive to the resort.</p>
+
+        <h4>Airports</h4>
+        <ul>
+          <li><strong>MCO (Orlando Intl):</strong> Closest airport, best option for most guests.</li>
+          <li><strong>SFB (Sanford):</strong> Smaller airport with some low-cost carriers.</li>
+        </ul>
+
+        <h4>Transfers</h4>
+        <ul>
+          <li><strong>Shared Shuttle:</strong> Mears Connect offers shared and private shuttles from MCO.</li>
+          <li><strong>Private Van:</strong> Ideal for larger families — we’ll help coordinate options.</li>
+        </ul>
+
+        <h4>Rental Cars</h4>
+        <p>Renting is recommended for families planning local trips. Major brands operate at MCO — book vans early!</p>
+      </div>
+    </div>
+
+    <div class="card pad" style="margin-top: 2rem;">
+      <h3>Travel Checklist</h3>
+      <ul>
+        <li>✅ Bring a <strong>Real ID</strong> or valid passport for TSA.</li>
+        <li>🕒 Share your arrival times to help us coordinate shuttles.</li>
+        <li>🚐 Request private vans early if traveling in a large group.</li>
+      </ul>
+
+      <p>Need assistance? Contact <a href="mailto:travel@williamsreunion.example">travel@williamsreunion.example</a></p>
     </div>
   </section>
 
   <footer></footer>
 
+  <!-- Netlify Identity (Login) -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
-    <script type="module">
+  <script type="module">
     import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
     document.addEventListener("DOMContentLoaded", () => {
       loadNavbar();
@@ -48,25 +82,5 @@
       requireAuth();
     });
   </script>
-  <script>
-const header = document.querySelector("header");
-let lastScrollTop = 0;
-
-window.addEventListener("scroll", () => {
-const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-if (scrollTop > lastScrollTop + 50) {
-// Scrolling down — hide navbar
-header.classList.add("hidden");
-} else if (scrollTop < lastScrollTop - 50) {
-// Scrolling up — show navbar again
-header.classList.remove("hidden");
-header.classList.add("scrolled");
-}
-
-lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Prevent negative values
-});
-</script>
-
 </body>
 </html>
