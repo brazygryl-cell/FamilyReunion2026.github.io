@@ -319,5 +319,52 @@ opacity: 0;
 pointer-events: none; /* Prevents clicks while hidden */
 }
 
+.itinerary {
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.itinerary details {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.itinerary details[open] {
+  background: rgba(255,255,255,0.15);
+  transform: scale(1.01);
+}
+
+.itinerary summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 1rem 1.25rem;
+  font-size: 1.05rem;
+  color: #fff;
+  background: linear-gradient(90deg, #3a3a3a, #222);
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  list-style: none;
+  outline: none;
+}
+
+.itinerary summary::-webkit-details-marker {
+  display: none;
+}
+
+.itinerary ul {
+  padding: 1rem 1.5rem;
+  background-color: rgba(255,255,255,0.03);
+  color: #eaeaea;
+  line-height: 1.6;
+}
+
+.itinerary li {
+  margin: 0.5rem 0;
+}
+
 
 
