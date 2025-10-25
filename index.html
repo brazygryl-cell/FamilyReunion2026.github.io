@@ -1,139 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Williams Family Reunion — Home</title>
-
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
-  <!-- Navbar / auth helper -->
-  <script type="module" src="./nav.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Williams Family Reunion 2026</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script type="module" src="nav.js"></script>
 </head>
+
 <body>
-  <!-- 🌌 Soft parallax starfield (three subtle layers) -->
-  <div class="stars"></div>
-  <div class="stars2"></div>
-  <div class="stars3"></div>
+<header></header>
 
-  <!-- Glass header (filled by nav.js → loadNavbar) -->
-  <header>
-    <div class="site-wrap">
-      <div class="navbar">
-        <div class="nav-brand">Williams Family Reunion</div>
-        <nav class="nav-links">
-          <!-- nav.js will mark the active link -->
-          <a href="index.html">Home</a>
-          <a href="event-details.html">Event Details</a>
-          <a href="lodging-travel.html">Lodging & Travel</a>
-          <a href="payments.html">Payments</a>
-          <a href="directory.html">Directory</a>
-          <a href="gallery.html">Gallery</a>
-          <a href="history.html">Family History</a>
-          <a href="forum.html">Forum</a>
-          <a href="contact.html">Contact</a>
-          <a id="logout-link" href="#" style="display:none">Logout</a>
-        </nav>
-      </div>
-    </div>
-  </header>
+<section id="hero-slideshow">
+ <div class="slide active" style="background-image:url('images/family1.jpg')"></div>
+ <div class="slide" style="background-image:url('images/family2.jpg')"></div>
+ <div class="slide" style="background-image:url('images/family3.jpg')"></div>
 
-  <main class="site-wrap">
-    <!-- 🎞️ Hero slideshow -->
-    <section id="hero-slideshow">
-      <div class="slide active" style="background-image:url('images/family1.jpg')"></div>
-      <div class="slide" style="background-image:url('images/family2.jpg')"></div>
-      <div class="slide" style="background-image:url('images/family3.jpg')"></div>
+ <div class="overlay">
+ <h1>Williams Family Reunion 2026</h1>
+ <p>July 26 – August 1, 2026 • Orlando, Florida</p>
+ <div class="countdown">
+ <div class="count-chip"><div class="n" id="days">00</div><div class="l">Days</div></div>
+ <div class="count-chip"><div class="n" id="hours">00</div><div class="l">Hours</div></div>
+ <div class="count-chip"><div class="n" id="minutes">00</div><div class="l">Minutes</div></div>
+ <div class="count-chip"><div class="n" id="seconds">00</div><div class="l">Seconds</div></div>
+ </div>
+ <a href="events.html" class="btn mint">View Itinerary</a>
+ </div>
+</section>
 
-      <div class="overlay">
-        <h1>Williams Family Reunion 2026</h1>
-        <p>July 26 – August 1 · Orlando, FL</p>
-        <a href="event-details.html" class="btn">View Schedule</a>
-      </div>
-    </section>
+<footer>
+ <p>Made with by 
+ <a href="mailto:taylor.clarkjones25@gmail.com">Taylor Clark Jones</a></p>
+</footer>
 
-    <!-- ⏳ Big countdown -->
-    <section class="countdown" aria-label="Countdown to Reunion">
-      <div class="count-tile">
-        <div id="cd-days"   class="num">–</div>
-        <div class="lbl">Days</div>
-      </div>
-      <div class="count-tile">
-        <div id="cd-hours"  class="num">–</div>
-        <div class="lbl">Hours</div>
-      </div>
-      <div class="count-tile">
-        <div id="cd-mins"   class="num">–</div>
-        <div class="lbl">Minutes</div>
-      </div>
-      <div class="count-tile">
-        <div id="cd-secs"   class="num">–</div>
-        <div class="lbl">Seconds</div>
-      </div>
-    </section>
-  </main>
+<script>
+const slides = document.querySelectorAll('#hero-slideshow .slide');
+let current = 0;
+setInterval(() => {
+ slides[current].classList.remove('active');
+ current = (current + 1) % slides.length;
+ slides[current].classList.add('active');
+}, 7000);
 
-  <!-- Glass footer -->
-  <footer>
-    <div class="site-wrap site-footer">
-      <p>Made with ❤️ by
-        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=taylor.clarkjones25@gmail.com&su=Williams%20Family%20Reunion%202026%20Website"
-           target="_blank" rel="noopener noreferrer">Taylor Clark Jones</a>
-        · Art by 🔥 Andre Clark
-      </p>
-    </div>
-  </footer>
-
-  <!-- Netlify Identity (optional widget UI) -->
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
-  <!-- Navbar load + require login -->
-  <script type="module">
-    import { loadNavbar, enableLogout, requireAuth } from './nav.js';
-    loadNavbar?.();          // if nav.js populates header dynamically
-    enableLogout?.();        // show & wire logout if logged in
-    requireAuth?.();         // gate page if you want login required on Home
-  </script>
-
-  <!-- Slideshow (fade every 5s) -->
-  <script>
-    const slides = document.querySelectorAll('#hero-slideshow .slide');
-    let idx = 0;
-    setInterval(() => {
-      slides[idx].classList.remove('active');
-      idx = (idx + 1) % slides.length;
-      slides[idx].classList.add('active');
-    }, 5000);
-  </script>
-
-  <!-- Countdown logic -->
-  <script>
-    const target = new Date("July 26, 2026 12:00:00").getTime();
-    const dEl = document.getElementById('cd-days');
-    const hEl = document.getElementById('cd-hours');
-    const mEl = document.getElementById('cd-mins');
-    const sEl = document.getElementById('cd-secs');
-
-    function tick(){
-      const now = Date.now(), diff = target - now;
-      if (diff <= 0){
-        dEl.textContent = hEl.textContent = mEl.textContent = sEl.textContent = "0";
-        return;
-      }
-      const days = Math.floor(diff / (1000*60*60*24));
-      const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-      const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
-      const secs = Math.floor((diff % (1000*60)) / 1000);
-      dEl.textContent = days;
-      hEl.textContent = hours.toString().padStart(2,'0');
-      mEl.textContent = mins.toString().padStart(2,'0');
-      sEl.textContent = secs.toString().padStart(2,'0');
-    }
-    tick(); setInterval(tick, 1000);
-  </script>
+// Countdown timer
+const targetDate = new Date("July 26, 2026 00:00:00").getTime();
+const timer = setInterval(() => {
+ const now = new Date().getTime();
+ const distance = targetDate - now;
+ if (distance < 0) return clearInterval(timer);
+ document.getElementById("days").innerText = Math.floor(distance / (1000 * 60 * 60 * 24));
+ document.getElementById("hours").innerText = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
+ document.getElementById("minutes").innerText = Math.floor((distance % (1000*60*60)) / (1000*60));
+ document.getElementById("seconds").innerText = Math.floor((distance % (1000*60)) / 1000);
+}, 1000);
+</script>
 </body>
 </html>
-
-
-
