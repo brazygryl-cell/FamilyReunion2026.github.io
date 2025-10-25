@@ -24,7 +24,7 @@ export function loadNavbar() {
  // Footer
  if (footer) {
  footer.innerHTML = `
- <p>Made with by 
+ <p>Made with ❤️ by 
  <a href="#" id="emailLink">Taylor Clark Jones</a>
  </p>
  <p>Art by Andre Clark</p>
