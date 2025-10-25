@@ -1,184 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Lodging & Travel — Williams Family Reunion</title>
-
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-  <script type="module" src="./nav.js"></script>
-
-  <style>
-    /* --- Lodging Slideshow --- */
-    #villa-slideshow {
-      position: relative;
-      border-radius: 12px;
-      overflow: hidden;
-      height: 380px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    }
-
-    #villa-slideshow .slide {
-      position: absolute;
-      inset: 0;
-      background-size: cover;
-      background-position: center;
-      opacity: 0;
-      transition: opacity 2.5s ease-in-out;
-      filter: brightness(65%) contrast(1.15);
-    }
-
-    #villa-slideshow .slide.active {
-      opacity: 1;
-    }
-
-    #villa-slideshow .overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent 70%);
-      color: #fff;
-      padding: 2rem;
-      text-align: left;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-    }
-
-    #villa-slideshow h2 {
-      font-family: "Playfair Display", serif;
-      font-size: 2.4rem;
-      margin: 0;
-    }
-
-    #villa-slideshow p {
-      font-size: 1.05rem;
-      margin-top: 0.5rem;
-      opacity: 0.9;
-    }
-
-    /* --- Map --- */
-    .map-frame {
-      width: 100%;
-      height: 260px;
-      border-radius: 10px;
-      margin-top: 1rem;
-      overflow: hidden;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-    }
-
-    .map-frame iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    /* --- Travel Links --- */
-    .travel-links {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-top: 1rem;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lodging & Travel — Williams Family Reunion</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script type="module" src="nav.js"></script>
 </head>
 
 <body>
-  <header></header>
+<header></header>
 
-  <section class="section container">
-    <div id="villa-slideshow">
-      <div class="slide active" style="background-image: url('images/villa1.jpg')"></div>
-      <div class="slide" style="background-image: url('images/villa2.jpg')"></div>
-      <div class="slide" style="background-image: url('images/villa3.jpg')"></div>
+<section class="section container">
+ <div id="villa-slideshow">
+ <div class="slide active" style="background-image:url('images/villa1.jpg')"></div>
+ <div class="slide" style="background-image:url('images/villa2.jpg')"></div>
+ <div class="slide" style="background-image:url('images/villa3.jpg')"></div>
+ <div class="overlay">
+ <h2>Villatel Orlando Resort</h2>
+ <p>Elegant family villas with private pools and game rooms — the perfect home base for our 2026 reunion.</p>
+ </div>
+ </div>
 
-      <div class="overlay">
-        <h2>Villatel Orlando Resort</h2>
-        <p>Elegant family villas with private pools and game rooms — your home away from home for the 2026 reunion.</p>
-      </div>
-    </div>
+ <div class="lodging-grid">
+ <div class="card pad">
+ <h3>Where We'll Stay</h3>
+ <p><strong>Villatel Orlando Resort</strong> offers private family villas (4–9 bedrooms), each with a pool, game room, and kitchen — designed for togetherness and comfort.</p>
+ <ul>
+ <li>Private spa pools, game rooms, and full kitchens.</li>
+ <li>Spacious family layouts with modern amenities.</li>
+ <li>Villa assignments shared after final payments.</li>
+ </ul>
+ <div class="travel-links">
+ <a class="btn mint" href="https://villatel.com/villatel-orlando-resort" target="_blank">Visit Villatel</a>
+ <a class="btn ghost" href="https://flymco.com" target="_blank">Orlando Intl (MCO)</a>
+ </div>
+ </div>
 
-    <div class="grid cols-2" style="margin-top: 2rem;">
-      <!-- 🏠 Lodging -->
-      <div class="card pad">
-        <h3>Where We'll Stay</h3>
-        <p><strong>Villatel Orlando Resort</strong> offers 4–9 bedroom family villas, each with private pools, game rooms, and large kitchens for shared meals and late-night laughs.</p>
-        <ul>
-          <li>Private spa pools, themed rooms, and entertainment spaces.</li>
-          <li>Villa assignments released after final payments.</li>
-          <li>Walking distance to resort clubhouse and waterpark.</li>
-        </ul>
+ <div class="card pad">
+ <h3>Getting There</h3>
+ <ul>
+ <li><strong>Orlando Intl (MCO):</strong> 25–35 min drive to resort.</li>
+ <li><strong>Sanford (SFB):</strong> Smaller airport (~1 hr drive).</li>
+ <li><strong>Shuttles:</strong> Mears Connect & van services available.</li>
+ <li><strong>Car Rentals:</strong> Best for flexible family travel.</li>
+ </ul>
+ <div class="map-frame">
+ <iframe src="https://www.google.com/maps?q=Villatel+Orlando+Resort&output=embed" allowfullscreen loading="lazy"></iframe>
+ </div>
+ </div>
+ </div>
 
-        <div class="notice">
-          <strong>Special Requests?</strong> Accessibility needs, cribs, or early check-in — email us and we’ll coordinate directly with Villatel.
-        </div>
+ <div class="card pad" style="margin-top:2rem;">
+ <h3>Before You Travel</h3>
+ <ul>
+ <li> Bring a <strong>Real ID</strong> or passport for TSA check-in.</li>
+ <li> Share your flight info for shuttle coordination.</li>
+ <li> Book private vans early for large family groups.</li>
+ </ul>
+ <p>Questions? Email our <a href="mailto:familyreunionwilliams2026@gmail.com?subject=Williams%20Family%20Reunion%20Inquiry">Lead Coordinator: ShaSha Clark</a></p>
+ </div>
+</section>
 
-        <div class="travel-links">
-          <a class="btn" href="https://villatel.com/villatel-orlando-resort" target="_blank" rel="noopener">Visit Villatel</a>
-          <a class="btn-ghost" href="https://flymco.com" target="_blank" rel="noopener">Orlando Intl (MCO)</a>
-        </div>
-      </div>
+<footer></footer>
 
-      <!-- ✈️ Travel -->
-      <div class="card pad">
-        <h3>Getting There</h3>
-        <ul>
-          <li><strong>Orlando Intl (MCO):</strong> 25–35 min drive to the resort.</li>
-          <li><strong>Orlando Sanford (SFB):</strong> Smaller airport (~1 hr drive).</li>
-          <li><strong>Shuttles:</strong> Mears Connect & private vans available.</li>
-          <li><strong>Car Rentals:</strong> Great for grocery runs and day trips.</li>
-        </ul>
-
-        <div class="map-frame">
-          <iframe
-            src="https://www.google.com/maps?q=Villatel+Orlando+Resort&output=embed"
-            allowfullscreen
-            loading="lazy">
-          </iframe>
-        </div>
-      </div>
-    </div>
-
-    <div class="card pad" style="margin-top: 2rem;">
-      <h3>Before You Travel</h3>
-      <ul>
-        <li>✈️ Bring a <strong>Real ID</strong> or passport for TSA check-in.</li>
-        <li>🕒 Share your flight info for shuttle coordination.</li>
-        <li>🚐 Reserve group vans early to ensure availability.</li>
-      </ul>
-
-      <p>Questions? Email our
-        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=familyreunionwilliams2026@gmail.com&su=Williams%20Family%20Reunion%20Inquiry"
-          target="_blank"
-          rel="noopener noreferrer">
-          Lead Coordinator — ShaSha Clark
-        </a>
-      </p>
-    </div>
-  </section>
-
-  <footer></footer>
-
-  <!-- 🎞️ Slideshow Script -->
-  <script>
-    const slides = document.querySelectorAll('#villa-slideshow .slide');
-    let current = 0;
-    setInterval(() => {
-      slides[current].classList.remove('active');
-      current = (current + 1) % slides.length;
-      slides[current].classList.add('active');
-    }, 7000); // fades every 7s
-  </script>
-
-  <!-- 🔐 Netlify Identity -->
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <script type="module">
-    import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-    document.addEventListener("DOMContentLoaded", () => {
-      loadNavbar();
-      enableLogout();
-      requireAuth();
-    });
-  </script>
+<script>
+const slides = document.querySelectorAll('#villa-slideshow .slide');
+let current = 0;
+setInterval(() => {
+ slides[current].classList.remove('active');
+ current = (current + 1) % slides.length;
+ slides[current].classList.add('active');
+}, 8000);
+</script>
+</body>
+</html>
 </body>
 </html>
