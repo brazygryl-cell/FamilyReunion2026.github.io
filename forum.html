@@ -1,241 +1,424 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Family Forum — Williams Family Reunion</title>
 
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
-  <!-- Navbar -->
+  <!-- Navbar + auth utils -->
   <script type="module" src="nav.js"></script>
 
+  <!-- Netlify Identity (login modal) -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
   <style>
-    .forum-container {
-      max-width: 900px;
-      margin: 80px auto;
-      background: var(--card);
-      padding: 20px;
-      border-radius: 14px;
-      box-shadow: var(--shadow);
-    }
+    /* --- Forum polish (lightweight, respects your variables) --- */
+    .forum-wrap{max-width:960px;margin:0 auto;padding:22px}
+    .forum-hero{text-align:center;margin:8px 0 16px}
+    .forum-hero h1{font-family:"Playfair Display",serif;margin:.2rem 0 .3rem}
+    .forum-hero p{color:var(--muted);margin:0}
 
-    .forum-header {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
+    .forum-bar{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin:16px 0}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#101420;color:var(--text);cursor:pointer;font-weight:600}
+    .tab.active{background:var(--mint);border-color:transparent;color:#0a1310}
 
-    .forum-header h1 {
-      font-family: "Playfair Display", serif;
-      font-size: 2.2rem;
-      margin-bottom: 0.3rem;
-      color: var(--text);
-    }
+    .btn.mint{background:linear-gradient(180deg,var(--mint) 0%, var(--mint-2) 100%);color:#0a1310;border:none;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
 
-    .forum-tabs {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin: 20px 0;
-      flex-wrap: wrap;
-    }
+    /* Post cards (collapsed by default) */
+    .post{background:linear-gradient(180deg,#121624 0%,#0f121a 100%);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}
+    .post + .post{margin-top:12px}
+    .post-hd{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer}
+    .meta{font-size:.9rem;color:var(--muted)}
+    .title{font-weight:700}
+    .caret{transition:transform .25s ease}
+    .collapsed .caret{transform:rotate(-90deg)}
+    .post-bd{padding:0 14px 12px;display:none}
+    .post-bd.open{display:block;animation:fadeSlide .22s ease}
 
-    .forum-tab {
-      background: #121624;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 16px;
-      border-radius: 999px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.3s, transform 0.2s;
-    }
+    @keyframes fadeSlide{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 
-    .forum-tab.active,
-    .forum-tab:hover {
-      background: var(--mint-2);
-      color: #0b1311;
-      transform: scale(1.05);
-    }
+    /* Composer modal */
+    .modal-veil{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:60}
+    .modal{width:min(680px,92vw);background:#0f121a;border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}
+    .modal-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
+    .modal-bd{padding:14px}
+    .row{display:grid;gap:10px;margin:10px 0}
+    .row.two{grid-template-columns:160px 1fr}
+    textarea{min-height:120px}
 
-    .new-post-btn {
-      display: block;
-      margin: 0 auto 20px;
-      background: var(--mint);
-      color: #0b1311;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 999px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: filter 0.2s;
-    }
-
-    .new-post-btn:hover {
-      filter: brightness(1.1);
-    }
-
-    .post {
-      background: #101420;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 14px;
-    }
-
-    .post .meta {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 6px;
-    }
-
-    .post h3 {
-      margin: 0;
-      font-size: 1.2rem;
-      color: var(--mint);
-    }
-
-    .post p {
-      margin-top: 6px;
-      color: var(--text);
-    }
-
-    .reply-btn {
-      background: transparent;
-      border: none;
-      color: var(--mint);
-      cursor: pointer;
-      font-size: 0.9rem;
-      margin-top: 5px;
-    }
-
-    .reply-form {
-      margin-top: 8px;
-      display: none;
-    }
-
-    .reply-form textarea {
-      width: 100%;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #0f1218;
-      color: var(--text);
-      padding: 8px;
-      resize: vertical;
-    }
-
-    .reply-form button {
-      background: var(--mint);
-      color: #0b1311;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 4px;
-    }
-
-    .replies {
-      margin-top: 8px;
-      margin-left: 20px;
-      border-left: 2px solid var(--border);
-      padding-left: 10px;
-    }
-
-    /* Popup Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(8px);
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-content {
-      background: var(--card);
-      border: 1px solid var(--border);
-      padding: 20px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: var(--shadow);
-    }
-
-    .modal-content h2 {
-      margin-top: 0;
-      font-family: "Playfair Display", serif;
-    }
-
-    .modal-content textarea {
-      width: 100%;
-      height: 100px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: #0f1218;
-      color: var(--text);
-      padding: 10px;
-      margin-top: 10px;
-      resize: vertical;
-    }
-
-    .modal-content button {
-      margin-top: 10px;
-      padding: 10px 16px;
-      background: var(--mint);
-      color: #0b1311;
-      border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .close-btn {
-      float: right;
-      cursor: pointer;
-      font-size: 1.2rem;
-      color: var(--muted);
-    }
+    /* Replies (threaded) */
+    .replies{margin-top:10px}
+    .reply{border-left:2px solid #222a3a;margin-left:10px;padding-left:10px;margin-top:10px}
+    .reply .meta{font-size:.85rem}
+    .reply .body{margin:.3rem 0 .4rem}
+    .reply-actions{display:flex;gap:10px}
+    .inline-reply{margin-top:8px}
   </style>
 </head>
-
 <body>
   <header></header>
 
-  <main class="forum-container">
-    <div class="forum-header">
+  <main class="forum-wrap">
+    <div class="forum-hero">
       <h1>Family Forum</h1>
-      <p>Discuss plans, share memories, and stay connected ✨</p>
+      <p>Chat, share memories, and plan the reunion together.</p>
     </div>
 
-    <div class="forum-tabs">
-      <button class="forum-tab active" data-board="general">General</button>
-      <button class="forum-tab" data-board="memories">Memories</button>
-      <button class="forum-tab" data-board="planning">Planning</button>
+    <div class="forum-bar">
+      <div class="tabs" role="tablist" aria-label="Forum boards">
+        <button class="tab active" data-board="general" aria-selected="true">General</button>
+        <button class="tab" data-board="memories">Memories</button>
+        <button class="tab" data-board="planning">Planning</button>
+      </div>
+      <div class="actions">
+        <button id="newPostBtn" class="btn mint">New Post</button>
+      </div>
     </div>
 
-    <button class="new-post-btn">+ New Post</button>
-
+    <!-- Posts -->
     <section id="posts"></section>
   </main>
 
-  <!-- Popup for new post -->
-  <div id="newPostModal" class="modal">
-    <div class="modal-content">
-      <span class="close-btn">&times;</span>
-      <h2>Create a New Post</h2>
-      <textarea id="postText" placeholder="Write your post..."></textarea>
-      <button id="submitPost">Post</button>
+  <!-- Composer Modal -->
+  <div class="modal-veil" id="composeVeil" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="composeTitle">
+      <div class="modal-hd">
+        <strong id="composeTitle">Create a post</strong>
+        <button class="btn ghost" id="closeCompose">Close</button>
+      </div>
+      <div class="modal-bd">
+        <div class="row two">
+          <label>Board
+            <select id="composeBoard">
+              <option value="general">General</option>
+              <option value="memories">Memories</option>
+              <option value="planning">Planning</option>
+            </select>
+          </label>
+          <label>Title
+            <input id="composeTitleInput" placeholder="Add a short title…" />
+          </label>
+        </div>
+        <div class="row">
+          <label>Message
+            <textarea id="composeBody" placeholder="Write something for the family…"></textarea>
+          </label>
+        </div>
+        <div class="row" style="justify-items:end">
+          <button class="btn mint" id="composeSubmit">Post</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <footer></footer>
 
-  <!-- Firebase + Forum Script -->
-  <script type="module" src="./forum.js"></script>
+  <!-- Firebase init (your existing file) -->
+  <script type="module" src="./firebase-init.js"></script>
+
+  <!-- Firestore v10 APIs (match your installed version) -->
+  <script type="module">
+    import { app, db } from './firebase-init.js';
+    import {
+      collection, addDoc, doc, onSnapshot, query, where, orderBy,
+      serverTimestamp, getDocs
+    } from 'https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js';
+
+    // Navbar + auth gate from nav.js
+    import { loadNavbar, enableLogout, requireAuth } from './nav.js';
+    document.addEventListener('DOMContentLoaded', () => {
+      loadNavbar();
+      enableLogout();
+      requireAuth(); // opens Netlify Identity if not logged in
+    });
+
+    // --- Helpers ---
+    const postsEl = document.getElementById('posts');
+    const tabs = [...document.querySelectorAll('.tab')];
+    const newPostBtn = document.getElementById('newPostBtn');
+    const veil = document.getElementById('composeVeil');
+    const closeCompose = document.getElementById('closeCompose');
+    const composeBoard = document.getElementById('composeBoard');
+    const composeTitleInput = document.getElementById('composeTitleInput');
+    const composeBody = document.getElementById('composeBody');
+    const composeSubmit = document.getElementById('composeSubmit');
+
+    let currentBoard = 'general';
+    let unsubscribe = null; // for live listener
+
+    function currentUserInfo() {
+      const u = window.netlifyIdentity?.currentUser();
+      return {
+        name: u?.user_metadata?.full_name || (u?.email?.split('@')[0] ?? 'Guest'),
+        email: u?.email ?? ''
+      };
+    }
+
+    function openModal() { veil.style.display = 'flex'; veil.setAttribute('aria-hidden','false'); }
+    function closeModal() { veil.style.display = 'none'; veil.setAttribute('aria-hidden','true'); }
+
+    newPostBtn.addEventListener('click', () => {
+      // require login
+      if (!window.netlifyIdentity?.currentUser()) {
+        window.netlifyIdentity?.open('login');
+        return;
+      }
+      composeBoard.value = currentBoard;
+      composeTitleInput.value = '';
+      composeBody.value = '';
+      openModal();
+    });
+    closeCompose.addEventListener('click', closeModal);
+    veil.addEventListener('click', (e) => { if (e.target === veil) closeModal(); });
+
+    composeSubmit.addEventListener('click', async () => {
+      const title = composeTitleInput.value.trim();
+      const body = composeBody.value.trim();
+      const board = composeBoard.value;
+      if (!title || !body) return;
+
+      const user = currentUserInfo();
+      try {
+        await addDoc(collection(db, 'forum_posts'), {
+          board,
+          title,
+          body,
+          authorName: user.name,
+          authorEmail: user.email,
+          createdAt: serverTimestamp()
+        });
+        closeModal();
+      } catch (e) {
+        alert('Error posting: ' + e.message);
+      }
+    });
+
+    // Tabs
+    tabs.forEach(t => {
+      t.addEventListener('click', () => {
+        tabs.forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+        currentBoard = t.dataset.board;
+        watchPosts(currentBoard);
+      });
+    });
+
+    // Watch posts for board
+    function watchPosts(board) {
+      if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+      postsEl.innerHTML = ''; // loading state optional
+      const q = query(
+        collection(db, 'forum_posts'),
+        where('board', '==', board),
+        orderBy('createdAt', 'desc')
+      );
+      unsubscribe = onSnapshot(q, async (snap) => {
+        const items = [];
+        for (const d of snap.docs) {
+          items.push({ id: d.id, ...d.data() });
+        }
+        renderPosts(items);
+      });
+    }
+
+    // Load replies for a post and build threaded tree
+    async function fetchRepliesTree(postId) {
+      const rCol = collection(db, 'forum_posts', postId, 'replies');
+      const q = query(rCol, orderBy('createdAt', 'asc'));
+      const rs = await getDocs(q);
+      const all = rs.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      // Build tree by parentId (null/undefined = top-level)
+      const byId = new Map(all.map(r => [r.id, r]));
+      const roots = [];
+      all.forEach(r => { r.children = []; });
+      all.forEach(r => {
+        if (r.parentId) {
+          const p = byId.get(r.parentId);
+          if (p) p.children.push(r); else roots.push(r);
+        } else {
+          roots.push(r);
+        }
+      });
+      return roots;
+    }
+
+    // Add a reply (supports replying to a reply via parentId)
+    async function addReply(postId, text, parentId = null) {
+      const user = currentUserInfo();
+      await addDoc(collection(db, 'forum_posts', postId, 'replies'), {
+        body: text,
+        authorName: user.name,
+        authorEmail: user.email,
+        parentId: parentId || null,
+        createdAt: serverTimestamp()
+      });
+    }
+
+    // Render
+    function renderPosts(list) {
+      postsEl.innerHTML = '';
+      if (!list.length) {
+        postsEl.innerHTML = `<div class="post" style="padding:16px;text-align:center;color:var(--muted)">No posts yet. Be the first!</div>`;
+        return;
+      }
+      list.forEach(post => postsEl.appendChild(renderPostCard(post)));
+    }
+
+    function renderPostCard(post) {
+      const card = document.createElement('article');
+      card.className = 'post collapsed';
+
+      const hd = document.createElement('div');
+      hd.className = 'post-hd';
+      hd.innerHTML = `
+        <div>
+          <div class="title">${escapeHtml(post.title || '')}</div>
+          <div class="meta">${escapeHtml(post.authorName || 'Someone')} • ${formatWhen(post.createdAt)}</div>
+        </div>
+        <div class="meta"><span class="caret">▸</span></div>
+      `;
+
+      const bd = document.createElement('div');
+      bd.className = 'post-bd';
+
+      const bodyP = document.createElement('p');
+      bodyP.style.margin = '0 0 10px';
+      bodyP.textContent = post.body || '';
+      bd.appendChild(bodyP);
+
+      // Replies container
+      const repliesBox = document.createElement('div');
+      repliesBox.className = 'replies';
+      bd.appendChild(repliesBox);
+
+      // Inline reply form (top-level)
+      const replyForm = makeInlineReplyForm(async (txt) => {
+        if (!requireSignedIn()) return;
+        await addReply(post.id, txt, null);
+      });
+      bd.appendChild(replyForm);
+
+      // Toggle open/closed (default collapsed)
+      hd.addEventListener('click', async () => {
+        const isOpen = bd.classList.contains('open');
+        if (isOpen) {
+          bd.classList.remove('open');
+          card.classList.add('collapsed');
+        } else {
+          // load replies on first open
+          if (!bd.dataset.loaded) {
+            const roots = await fetchRepliesTree(post.id);
+            repliesBox.innerHTML = '';
+            roots.forEach(r => repliesBox.appendChild(renderReplyNode(post.id, r)));
+            bd.dataset.loaded = '1';
+          }
+          bd.classList.add('open');
+          card.classList.remove('collapsed');
+        }
+      });
+
+      card.appendChild(hd);
+      card.appendChild(bd);
+      return card;
+    }
+
+    function renderReplyNode(postId, node) {
+      const el = document.createElement('div');
+      el.className = 'reply';
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = `${node.authorName || 'Someone'} • ${formatWhen(node.createdAt)}`;
+      el.appendChild(meta);
+
+      const body = document.createElement('div');
+      body.className = 'body';
+      body.textContent = node.body || '';
+      el.appendChild(body);
+
+      const actions = document.createElement('div');
+      actions.className = 'reply-actions';
+      const replyBtn = document.createElement('button');
+      replyBtn.className = 'btn ghost';
+      replyBtn.textContent = 'Reply';
+      actions.appendChild(replyBtn);
+      el.appendChild(actions);
+
+      // nested children
+      const kidsWrap = document.createElement('div');
+      kidsWrap.className = 'children';
+      el.appendChild(kidsWrap);
+
+      // reply form (hidden until clicked)
+      let formShown = false;
+      let form;
+      replyBtn.addEventListener('click', () => {
+        if (!requireSignedIn()) return;
+        if (!formShown) {
+          form = makeInlineReplyForm(async (txt) => {
+            await addReply(postId, txt, node.id);
+          });
+          el.appendChild(form);
+          formShown = true;
+        }
+        form.querySelector('textarea').focus();
+      });
+
+      // render children
+      if (node.children?.length) {
+        node.children.forEach(c => kidsWrap.appendChild(renderReplyNode(postId, c)));
+      }
+      return el;
+    }
+
+    function makeInlineReplyForm(onSubmit) {
+      const wrap = document.createElement('div');
+      wrap.className = 'inline-reply';
+      wrap.innerHTML = `
+        <textarea placeholder="Write a reply…"></textarea>
+        <div style="margin-top:6px;display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn ghost" type="button">Cancel</button>
+          <button class="btn mint" type="button">Reply</button>
+        </div>
+      `;
+      const ta = wrap.querySelector('textarea');
+      const cancel = wrap.querySelector('.btn.ghost');
+      const ok = wrap.querySelector('.btn.mint');
+
+      cancel.addEventListener('click', () => wrap.remove());
+      ok.addEventListener('click', async () => {
+        const v = ta.value.trim();
+        if (!v) return;
+        try { await onSubmit(v); ta.value=''; }
+        catch(e){ alert('Error: ' + e.message); }
+      });
+      return wrap;
+    }
+
+    function requireSignedIn() {
+      if (!window.netlifyIdentity?.currentUser()) {
+        window.netlifyIdentity?.open('login');
+        return false;
+      }
+      return true;
+    }
+
+    function formatWhen(ts) {
+      if (!ts) return 'just now';
+      const d = ts.toDate ? ts.toDate() : ts.seconds ? new Date(ts.seconds * 1000) : new Date();
+      return d.toLocaleString();
+    }
+
+    function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+    // Start
+    watchPosts(currentBoard);
+  </script>
 </body>
 </html>
 
