@@ -1,17 +1,27 @@
 // netlify/functions/forum-get.js
-import admin from "firebase-admin";
+import { initializeApp, applicationDefault } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
 
-if (!admin.apps.length) {
-  const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+let app;
+try {
+  app = initializeApp({
+    credential: applicationDefault(),
   });
+} catch (e) {
+  // Ignore error if app already initialized
 }
 
-const db = admin.firestore();
+const db = getFirestore();
 
-export default async (req, res) => {
-  const board = req.query.board || "general";
+export const handler = async (event) => {
+  const { board } = event.queryStringParameters || {};
+
+  if (!board) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Missing board parameter" }),
+    };
+  }
 
   try {
     const snapshot = await db
@@ -24,10 +34,18 @@ export default async (req, res) => {
       ...doc.data(),
     }));
 
-    res.status(200).json(posts);
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(posts),
+    };
   } catch (error) {
-    console.error("Error fetching posts:", error);
-    res.status(500).json({ error: "Failed to fetch posts." });
+    console.error("❌ Firestore query failed:", error);
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Firestore query failed" }),
+    };
   }
 };
 
