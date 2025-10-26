@@ -1,117 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Williams Family Reunion 2026</title>
 
-<link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<script type="module" src="nav.js"></script>
+<link rel="stylesheet" href="style.css" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
 
-<style>
-/* 🧭 Fix for hero slideshow and countdown centering */
-#hero-slideshow {
-  position: relative;
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-}
-
-#hero-slideshow .slide {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  opacity: 0;
-  transform: scale(1.05);
-  transition: opacity 2s ease-in-out, transform 6s ease-in-out;
-}
-#hero-slideshow .slide.active {
-  opacity: 1;
-  transform: scale(1);
-}
-#hero-slideshow::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 1;
-}
-
-#hero-slideshow .overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  color: var(--text);
-  z-index: 2;
-  width: 90%;
-  max-width: 900px;
-}
-
-#hero-slideshow h1 {
-  font-family: "Playfair Display", serif;
-  font-size: clamp(2rem, 5vw, 4rem);
-  margin-bottom: 0.5rem;
-}
-#hero-slideshow p {
-  font-size: 1.3rem;
-  color: var(--muted);
-  margin-bottom: 2rem;
-}
-
-/* 💫 Countdown layout */
-.countdown {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
-}
-.count-chip {
-  background: rgba(18, 22, 30, 0.85);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  min-width: 120px;
-  padding: 18px;
-  text-align: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-}
-.count-chip .n {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: var(--mint);
-}
-.count-chip .l {
-  font-size: 1rem;
-  color: var(--muted);
-}
-
-#hero-slideshow .btn {
-  display: inline-block;
-  background: linear-gradient(180deg, var(--mint) 0%, var(--mint-2) 100%);
-  color: #0a1310;
-  border-radius: 10px;
-  padding: 0.9rem 1.8rem;
-  text-decoration: none;
-  font-weight: 600;
-  transition: filter 0.3s ease;
-}
-#hero-slideshow .btn:hover { filter: brightness(1.1); }
-</style>
+<!-- ✅ Move this BELOW fonts but ABOVE style scripts -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 
 <body>
 <header></header>
 
 <section id="hero-slideshow">
-  <!-- 🖼️ Make sure these images exist inside your /images folder -->
   <div class="slide active" style="background-image:url('images/family1.jpg')"></div>
   <div class="slide" style="background-image:url('images/family2.jpg')"></div>
   <div class="slide" style="background-image:url('images/family3.jpg')"></div>
-   <div class="slide" style="background-image:url('images/family4.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family4.jpg')"></div>
  <div class="slide" style="background-image:url('images/family5.jpg')"></div>
    <div class="slide" style="background-image:url('images/family6.jpg')"></div>
  <div class="slide" style="background-image:url('images/family7.jpg')"></div>
@@ -120,7 +28,6 @@
    <div class="slide" style="background-image:url('images/family10.jpg')"></div>
    <div class="slide" style="background-image:url('images/family11.jpg')"></div>
    <div class="slide" style="background-image:url('images/family12.jpg')"></div>
-  
   <div class="overlay">
     <h1>Williams Family Reunion 2026</h1>
     <p>July 26 – August 1, 2026 • Orlando, Florida</p>
@@ -138,9 +45,7 @@
 
 <footer></footer>
 
-<!-- ⭐ Starfield script (already included sitewide via CSS) -->
-
-<!-- 🎞️ Slideshow rotation -->
+<!-- 🎞️ Slideshow + Countdown -->
 <script>
 const slides = document.querySelectorAll('#hero-slideshow .slide');
 let current = 0;
@@ -150,32 +55,27 @@ setInterval(() => {
   slides[current].classList.add('active');
 }, 8000);
 
-// 🕒 Countdown Timer
 const targetDate = new Date("July 26, 2026 00:00:00").getTime();
-const timer = setInterval(() => {
+setInterval(() => {
   const now = new Date().getTime();
-  const distance = targetDate - now;
-  if (distance < 0) return clearInterval(timer);
-  document.getElementById("days").innerText = Math.floor(distance / (1000 * 60 * 60 * 24));
-  document.getElementById("hours").innerText = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
-  document.getElementById("minutes").innerText = Math.floor((distance % (1000*60*60)) / (1000*60));
-  document.getElementById("seconds").innerText = Math.floor((distance % (1000*60)) / 1000);
+  const dist = targetDate - now;
+  if (dist < 0) return;
+  document.getElementById("days").textContent = Math.floor(dist / (1000*60*60*24));
+  document.getElementById("hours").textContent = Math.floor((dist % (1000*60*60*24)) / (1000*60*60));
+  document.getElementById("minutes").textContent = Math.floor((dist % (1000*60*60)) / (1000*60));
+  document.getElementById("seconds").textContent = Math.floor((dist % (1000*60)) / 1000);
 }, 1000);
 </script>
 
-<!-- 🔐 Netlify Identity + Navbar/Footer loader -->
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<!-- ✅ Navbar + Footer loader -->
 <script type="module">
   import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-  document.addEventListener("DOMContentLoaded", () => {
+  window.addEventListener("DOMContentLoaded", () => {
     loadNavbar();
     enableLogout();
     requireAuth();
+    console.log("✅ Navbar + footer loaded successfully");
   });
 </script>
 </body>
 </html>
-
-
-
-
