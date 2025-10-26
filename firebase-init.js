@@ -3,19 +3,17 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/fireba
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-// ✅ Replace these with your real config values from Firebase console
+// Pull values from injected environment vars
 const firebaseConfig = {
- const firebaseConfig = {
-  apiKey: "AIzaSyAldYSp37LZO31XkGc4F1xhnQ9bpBXLU6Q",
-  authDomain: "williams-reunion.firebaseapp.com",
-  projectId: "williams-reunion",
-  storageBucket: "williams-reunion.firebasestorage.app",
-  messagingSenderId: "1053815265185",
-  appId: "1:1053815265185:web:050db056f81ab9d2d81de0"
+  apiKey: window.env.FIREBASE_API_KEY,
+  authDomain: window.env.FIREBASE_AUTH_DOMAIN,
+  projectId: window.env.FIREBASE_PROJECT_ID,
+  storageBucket: window.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: window.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: window.env.FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-export const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 console.log("✅ Firebase initialized successfully");
