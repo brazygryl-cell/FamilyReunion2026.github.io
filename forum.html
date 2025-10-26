@@ -3,42 +3,51 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Family Forum — Williams Reunion</title>
+  <title>Family Forum — Williams Family Reunion</title>
 
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
-  <!-- Navbar + Identity -->
-  <script type="module" src="nav.js"></script>
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Firebase + Nav -->
+  <script type="module" src="./firebase-init.js"></script>
+  <script type="module" src="./nav.js"></script>
 </head>
 <body>
   <header></header>
 
-  <main class="forum-wrap">
-    <div class="forum-header">
+  <main class="section">
+    <div class="forum-hero">
       <h1>Family Forum</h1>
       <p>Chat, share memories, and plan the reunion together.</p>
     </div>
 
-    <div class="forum-tabs">
-      <button class="active" data-board="general">General</button>
-      <button data-board="memories">Memories</button>
-      <button data-board="planning">Planning</button>
+    <!-- Forum Boards -->
+    <div class="forum-tabs" role="tablist" aria-label="Forum boards">
+      <button class="forum-tab active" data-board="general">General</button>
+      <button class="forum-tab" data-board="memories">Memories</button>
+      <button class="forum-tab" data-board="planning">Planning</button>
     </div>
 
-    <div style="text-align:right;margin-bottom:15px;">
-      <button id="newPost" class="btn mint">New Post</button>
+    <!-- Composer -->
+    <div class="composer">
+      <h3>Create a post</h3>
+      <textarea id="postBody" placeholder="Write something for the family…"></textarea>
+      <div class="row">
+        <select id="postBoard">
+          <option value="general" selected>General</option>
+          <option value="memories">Memories</option>
+          <option value="planning">Planning</option>
+        </select>
+        <button id="submitPost">Post</button>
+      </div>
     </div>
 
-    <div id="posts"></div>
+    <section id="posts" class="posts"></section>
   </main>
 
   <footer></footer>
 
   <!-- Forum Logic -->
-  <script type="module" src="forum.js"></script>
+  <script type="module" src="./forum.js"></script>
 </body>
 </html>
-
-
