@@ -1,7 +1,9 @@
+// ✅ forum-get.js — CommonJS + Netlify compatible version
 const admin = require("firebase-admin");
 const fs = require("fs");
 const path = require("path");
 
+// --- Load the service account JSON ---
 let serviceAccount;
 
 try {
@@ -19,6 +21,7 @@ try {
   console.error("🔥 Could not read service-account.json:", err);
 }
 
+// --- Initialize Firebase Admin ---
 if (!admin.apps.length && serviceAccount) {
   try {
     admin.initializeApp({
@@ -33,4 +36,42 @@ if (!admin.apps.length && serviceAccount) {
 }
 
 const db = admin.firestore();
+
+// --- Netlify Function Export ---
+exports.handler = async (event) => {
+  if (event.httpMethod !== "GET") {
+    return { statusCode: 405, body: "Method Not Allowed" };
+  }
+
+  try {
+    const board = event.queryStringParameters?.board || "general";
+    console.log(`📥 Fetching posts from forum_${board}`);
+
+    const snapshot = await db
+      .collection(`forum_${board}`)
+      .orderBy("createdAt", "desc")
+      .limit(50)
+      .get();
+
+    const posts = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify(posts),
+    };
+  } catch (err) {
+    console.error("🔥 Error fetching posts:", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message }),
+    };
+  }
+};
 
