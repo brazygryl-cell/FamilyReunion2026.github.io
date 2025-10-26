@@ -5,7 +5,7 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth
 
 // ✅ Public Firebase configuration (safe for client use)
 const firebaseConfig = {
-apiKey: "AIzaSyAldYSp37LZO31XkGc4F1xhnQ9bpBXLU6Q",
+publicapiKey: "AIzaSyAldYSp37LZO31XkGc4F1xhnQ9bpBXLU6Q",
 authDomain: "williams-reunion.firebaseapp.com",
 projectId: "williams-reunion",
 storageBucket: "williams-reunion.firebasestorage.app",
