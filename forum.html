@@ -1,239 +1,343 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Family Forum — Williams Family Reunion</title>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Family Forum — Williams Family Reunion</title>
 
-<link rel="stylesheet" href="style.css" />
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
-<script type="module" src="nav.js"></script>
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Navbar + utilities -->
+  <script type="module" src="nav.js"></script>
 
-<style>
-/* 🗨️ Forum Layout */
-.forum-container {
-  max-width: 850px;
-  margin: 3rem auto;
-  padding: 1rem;
-}
+  <!-- Netlify Identity (login) -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-/* Header */
-.forum-hero {
-  text-align: center;
-  padding: 2rem 1rem;
-}
-.forum-hero h1 {
-  font-family: "Playfair Display", serif;
-  font-size: clamp(2rem, 4vw, 3rem);
-  margin: 0 0 10px;
-}
-.forum-hero p {
-  color: var(--muted);
-  margin: 0;
-}
+  <!-- Forum-only polish (kept local so it won’t fight your site CSS) -->
+  <style>
+    .forum-hero{ text-align:center; padding:28px 16px; }
+    .forum-hero h1{ font-family:"Playfair Display",serif; font-size:2.2rem; margin:0 0 6px; }
+    .forum-hero p{ color:var(--muted); margin:0; }
 
-/* Composer */
-.composer {
-  background: linear-gradient(180deg,#121624 0%,#0f121a 100%);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-  padding: 16px;
-  margin-bottom: 2rem;
-}
-.composer textarea {
-  width: 100%;
-  min-height: 100px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px;
-  color: var(--text);
-  background: #0f1218;
-  font-family: "Poppins", sans-serif;
-  resize: vertical;
-}
-.composer button {
-  background: linear-gradient(180deg, var(--mint) 0%, var(--mint-2) 100%);
-  border: none;
-  border-radius: 10px;
-  color: #0a1310;
-  font-weight: 600;
-  padding: 10px 18px;
-  margin-top: 10px;
-  cursor: pointer;
-  transition: filter 0.3s ease;
-}
-.composer button:hover { filter: brightness(1.1); }
+    .forum-tabs{ display:flex; gap:10px; justify-content:center; margin:18px auto 12px; flex-wrap:wrap; }
+    .forum-tab{ border:1px solid var(--border); padding:8px 14px; border-radius:999px; background:#121520; cursor:pointer; font-weight:600; }
+    .forum-tab.active{ background:linear-gradient(180deg, var(--mint) 0%, var(--mint-2) 100%); color:#0a1310; border-color:transparent; }
 
-/* Posts */
-.posts {
-  display: grid;
-  gap: 16px;
-}
-.post {
-  background: linear-gradient(180deg,#121624 0%,#0f121a 100%);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: var(--shadow);
-}
-.post .meta {
-  font-size: 0.9rem;
-  color: var(--muted);
-  margin-bottom: 8px;
-}
-.post .body {
-  margin-bottom: 1rem;
-  line-height: 1.6;
-  color: var(--text);
-}
+    .composer{ max-width:880px; margin:16px auto; background:linear-gradient(180deg,#121624 0%,#0f121a 100%); border:1px solid var(--border); border-radius:14px; padding:14px; }
+    .composer h3{ margin:0 0 10px; font-size:1.1rem; }
+    .composer textarea,.composer input{ width:100%; background:#0f121a; border:1px solid var(--border); border-radius:10px; padding:10px 12px; color:var(--text); }
+    .composer .row{ display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:10px; flex-wrap:wrap; }
+    .composer select,.composer button{ border:1px solid var(--border); border-radius:10px; padding:8px 12px; background:#121520; color:var(--text); font-weight:600; cursor:pointer; }
+    .composer button.btn{ background:linear-gradient(180deg,var(--mint) 0%, var(--mint-2) 100%); color:#0a1310; border:none; }
 
-/* Comments */
-.comments {
-  margin-left: 1rem;
-  border-left: 2px solid var(--border);
-  padding-left: 1rem;
-}
-.comment {
-  background: rgba(255,255,255,0.03);
-  padding: 10px 12px;
-  border-radius: 8px;
-  margin-top: 8px;
-}
-.comment small {
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-.comment p {
-  margin: 4px 0;
-  color: var(--text);
-}
+    .posts{ max-width:900px; margin:12px auto 40px; display:grid; gap:12px; }
 
-/* Reply box */
-.reply-box {
-  margin-top: 8px;
-}
-.reply-box textarea {
-  width: 100%;
-  min-height: 60px;
-  background: #0f1218;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text);
-  padding: 8px;
-  resize: vertical;
-}
-.reply-box button {
-  margin-top: 6px;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 8px;
-  background: var(--mint);
-  color: #0a1310;
-  font-weight: 600;
-  cursor: pointer;
-  transition: filter 0.3s ease;
-}
-.reply-box button:hover { filter: brightness(1.1); }
-</style>
+    /* Post card */
+    .post{ background:#101420; border:1px solid var(--border); border-radius:14px; padding:14px 16px; }
+    .post .meta{ font-size:.9rem; color:var(--muted); margin-bottom:6px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .post .title{ font-weight:700; font-size:1.05rem; margin:0 0 6px; }
+    .post .body{ margin:0 0 10px; color:#dfe6ee; line-height:1.6; }
+
+    /* Actions + reply form */
+    .actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .action-link{ color:var(--mint); font-weight:600; cursor:pointer; }
+    .action-link:hover{ color:var(--mint-2); }
+    .reply-form{ margin-top:10px; display:none; }
+    .reply-form textarea{ min-height:70px; }
+
+    /* Thread indentation */
+    .children{ margin-top:8px; border-left:2px solid #1d2333; padding-left:12px; }
+    .collapsed .children{ display:none; }
+    .toggle{ color:var(--muted); cursor:pointer; font-size:.9rem; }
+    .toggle:hover{ color:var(--text); }
+
+    .empty{ text-align:center; color:#888; padding:24px 8px; }
+    .badge-board{ font-size:.75rem; border:1px solid var(--border); color:var(--muted); padding:2px 8px; border-radius:999px; }
+  </style>
 </head>
-
 <body>
-<header></header>
+  <header></header>
 
-<main class="forum-container">
-  <div class="forum-hero">
-    <h1>Family Forum</h1>
-    <p>Chat, share memories, and plan the reunion together 💬</p>
-  </div>
+  <main class="section">
+    <div class="forum-hero">
+      <h1>Family Forum</h1>
+      <p>Chat, share memories, and plan the reunion together.</p>
+    </div>
 
-  <!-- Post Composer -->
-  <div class="composer">
-    <textarea id="newPost" placeholder="What's on your mind, cousin?"></textarea>
-    <button id="postBtn">Post</button>
-  </div>
+    <!-- Tabs -->
+    <div class="forum-tabs" role="tablist" aria-label="Forum boards">
+      <button class="forum-tab active" data-board="general" aria-selected="true">General</button>
+      <button class="forum-tab" data-board="memories">Memories</button>
+      <button class="forum-tab" data-board="planning">Planning</button>
+    </div>
 
-  <!-- Posts Feed -->
-  <section class="posts" id="posts"></section>
-</main>
-
-<footer></footer>
-
-<!-- 💬 Forum Logic -->
-<script>
-const postsEl = document.getElementById('posts');
-const postBtn = document.getElementById('postBtn');
-const newPost = document.getElementById('newPost');
-
-let posts = [
-  {
-    author: "Aunt Mia",
-    text: "Who's bringing the potato salad this year? 👀",
-    comments: [
-      { author: "Uncle Ray", text: "Not me, last time it disappeared fast!" },
-      { author: "Taylor", text: "I'll make one batch early and hide it 😆" }
-    ]
-  },
-  {
-    author: "Jay",
-    text: "Anyone flying out of Atlanta? Maybe we can carpool to the airport.",
-    comments: []
-  }
-];
-
-// Render Posts
-function renderPosts() {
-  postsEl.innerHTML = '';
-  posts.forEach((p, i) => {
-    const postDiv = document.createElement('div');
-    postDiv.className = 'post';
-    postDiv.innerHTML = `
-      <div class="meta">${p.author}</div>
-      <p class="body">${p.text}</p>
-      <div class="comments" id="comments-${i}">
-        ${p.comments.map(c => `
-          <div class="comment"><small>${c.author}</small><p>${c.text}</p></div>
-        `).join('')}
+    <!-- Composer -->
+    <div class="composer">
+      <h3>Create a post</h3>
+      <input id="postTitle" placeholder="Title (optional but nice!)" />
+      <textarea id="postBody" placeholder="Write something for the family…"></textarea>
+      <div class="row">
+        <div style="display:flex;gap:10px;align-items:center;">
+          <label for="postBoard" style="color:var(--muted);font-size:.9rem;">Board:</label>
+          <select id="postBoard" aria-label="Select board">
+            <option value="general" selected>General</option>
+            <option value="memories">Memories</option>
+            <option value="planning">Planning</option>
+          </select>
+        </div>
+        <button class="btn" id="submitPost">Post</button>
       </div>
-      <div class="reply-box">
-        <textarea id="reply-${i}" placeholder="Reply..."></textarea>
-        <button onclick="addReply(${i})">Reply</button>
-      </div>
-    `;
-    postsEl.appendChild(postDiv);
-  });
-}
+      <small style="color:var(--muted)">Heads up: replies are threaded — you can reply to any reply.</small>
+    </div>
 
-function addReply(postIndex) {
-  const input = document.getElementById(`reply-${postIndex}`);
-  const text = input.value.trim();
-  if (!text) return;
-  const user = window.netlifyIdentity?.currentUser()?.email || "You";
-  posts[postIndex].comments.push({ author: user, text });
-  renderPosts();
-}
+    <!-- Posts list -->
+    <section class="posts" id="posts"></section>
+  </main>
 
-postBtn.addEventListener('click', () => {
-  const text = newPost.value.trim();
-  if (!text) return;
-  const user = window.netlifyIdentity?.currentUser()?.email || "You";
-  posts.unshift({ author: user, text, comments: [] });
-  newPost.value = '';
-  renderPosts();
-});
+  <footer></footer>
 
-renderPosts();
-</script>
+  <!-- Identity gating (require login) -->
+  <script>
+    (function gateWithIdentity(){
+      if (!window.netlifyIdentity) return;
+      window.netlifyIdentity.on('init', user => {
+        if (!user) window.netlifyIdentity.open('login');
+      });
+      window.netlifyIdentity.on('logout', () => {
+        window.location.href = 'login.html';
+      });
+    })();
+  </script>
 
-<script type="module">
-import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-document.addEventListener("DOMContentLoaded", () => {
-  loadNavbar();
-  enableLogout();
-  requireAuth();
-});
-</script>
+  <!-- Firestore logic -->
+  <script type="module">
+    import { db } from './firebase-init.js';
+    import {
+      collection, addDoc, serverTimestamp,
+      doc, getDoc, getDocs, onSnapshot,
+      query, orderBy
+    } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+
+    // Map UI board -> Firestore root collection
+    const BOARD_TO_COLLECTION = {
+      general:  'forum_general',
+      memories: 'forum_memories',
+      planning: 'forum_planning'
+    };
+
+    const postsEl   = document.getElementById('posts');
+    const tabs      = Array.from(document.querySelectorAll('.forum-tab'));
+    const titleEl   = document.getElementById('postTitle');
+    const bodyEl    = document.getElementById('postBody');
+    const boardEl   = document.getElementById('postBoard');
+    const submitBtn = document.getElementById('submitPost');
+
+    let currentBoard = 'general';
+    let unsubscribePosts = null;
+
+    // --- Helpers ---
+    const userEmail = () => window.netlifyIdentity?.currentUser()?.email || 'Guest';
+    const fmtWhen = (ts) => {
+      if (!ts) return 'just now';
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleString();
+    };
+
+    // Render a single post or reply node recursively
+    async function renderNode(parent, boardKey, snap, depth=0) {
+      const data = snap.data();
+      const id   = snap.id;
+
+      // Card
+      const card = document.createElement('article');
+      card.className = 'post';
+      if (depth > 0) card.style.marginTop = '8px';
+
+      // Header line
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      const who  = document.createElement('span'); who.textContent = data.by || 'Someone';
+      const when = document.createElement('span'); when.textContent = fmtWhen(data.createdAt);
+      const boardBadge = document.createElement('span');
+      boardBadge.className = 'badge-board';
+      boardBadge.textContent = depth === 0 ? boardKey : `reply`;
+      meta.append(who, '•', when, '•', boardBadge);
+
+      // Title (only for top-level posts)
+      const title = document.createElement('h3');
+      title.className = 'title';
+      title.style.display = (depth === 0 && data.title) ? 'block' : 'none';
+      title.textContent = data.title || '';
+
+      // Body
+      const body = document.createElement('p');
+      body.className = 'body';
+      body.textContent = data.body || '';
+
+      // Actions: reply / collapse toggle
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+
+      const replyLink = document.createElement('span');
+      replyLink.className = 'action-link';
+      replyLink.textContent = 'Reply';
+
+      const toggle = document.createElement('span');
+      toggle.className = 'toggle';
+      toggle.textContent = '[-] collapse';
+
+      actions.append(replyLink, '·', toggle);
+
+      // Inline reply form
+      const replyForm = document.createElement('div');
+      replyForm.className = 'reply-form';
+      replyForm.innerHTML = `
+        <textarea placeholder="Reply…"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn" type="button">Post reply</button>
+          <button class="btn ghost" type="button">Cancel</button>
+        </div>
+      `;
+
+      const replyTextarea = replyForm.querySelector('textarea');
+      const replyBtn      = replyForm.querySelector('.btn');
+      const cancelBtn     = replyForm.querySelector('.btn.ghost');
+
+      // Children container
+      const childrenWrap = document.createElement('div');
+      childrenWrap.className = 'children';
+
+      // Wire up actions
+      replyLink.addEventListener('click', () => {
+        replyForm.style.display = replyForm.style.display === 'block' ? 'none' : 'block';
+        if (replyForm.style.display === 'block') replyTextarea.focus();
+      });
+      cancelBtn.addEventListener('click', () => {
+        replyForm.style.display = 'none';
+        replyTextarea.value = '';
+      });
+      toggle.addEventListener('click', () => {
+        const collapsed = card.classList.toggle('collapsed');
+        toggle.textContent = collapsed ? '[+] expand' : '[-] collapse';
+      });
+
+      // Append assembled node
+      card.append(meta, title, body, actions, replyForm, childrenWrap);
+      parent.appendChild(card);
+
+      // Subscribe to this node’s replies (threaded)
+      const nodeRef = (depth === 0)
+        ? doc(collection(db, BOARD_TO_COLLECTION[boardKey]), id)
+        : doc(collection(db, BOARD_TO_COLLECTION[boardKey]), data.rootId).withConverter(undefined); // placeholder to satisfy TS hints
+
+      // fetch replies from this doc’s /replies subcollection
+      const repliesCol = collection(
+        db,
+        BOARD_TO_COLLECTION[boardKey],
+        depth === 0 ? id : data.rootId, // top-level’s id OR original root id
+        'replies',
+        ...(depth > 0 ? [data.replyPath].filter(Boolean) : []) // nested path segments if present
+      );
+
+      // Live subscribe replies
+      const q = query(repliesCol, orderBy('createdAt','asc'));
+      onSnapshot(q, async (replySnaps) => {
+        childrenWrap.innerHTML = '';
+        for (const r of replySnaps.docs) {
+          // For deep threads, each reply stores its own replyPath (a path string) and rootId
+          await renderNode(childrenWrap, boardKey, r, depth+1);
+        }
+      });
+
+      // Post reply handler
+      replyBtn.addEventListener('click', async () => {
+        const text = replyTextarea.value.trim();
+        if (!text) return;
+
+        // Compute rootId & replyPath to support infinite depth
+        const rootId   = data.rootId || (depth === 0 ? id : data.rootId);
+        const pathHere = data.replyPath || ''; // empty for top-level
+        const newPath  = pathHere ? `${pathHere}/${id}` : id;
+
+        // Build the collection path to write this reply under the current node
+        const writeCol = collection(
+          db,
+          BOARD_TO_COLLECTION[boardKey],
+          rootId || id,
+          'replies',
+          newPath
+        );
+
+        await addDoc(writeCol, {
+          body: text,
+          by: userEmail(),
+          createdAt: serverTimestamp(),
+          rootId: rootId || id,   // keep track of the top-level post
+          replyPath: newPath      // where this reply sits in the chain
+        });
+
+        replyTextarea.value = '';
+        replyForm.style.display = 'none';
+      });
+    }
+
+    // Subscribe to top-level posts for a board
+    function subscribePosts(boardKey){
+      // clean previous
+      if (unsubscribePosts) { unsubscribePosts(); unsubscribePosts = null; }
+      postsEl.innerHTML = '<div class="empty">Loading…</div>';
+
+      const col = collection(db, BOARD_TO_COLLECTION[boardKey]);
+      const q   = query(col, orderBy('createdAt','desc'));
+
+      unsubscribePosts = onSnapshot(q, async (snap) => {
+        postsEl.innerHTML = '';
+        if (snap.empty) {
+          postsEl.innerHTML = '<div class="empty">No posts yet. Be the first to start a conversation!</div>';
+          return;
+        }
+        for (const d of snap.docs) {
+          await renderNode(postsEl, boardKey, d, 0);
+        }
+      });
+    }
+
+    // Tab behavior
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabs.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentBoard = btn.dataset.board;
+        boardEl.value = currentBoard;
+        subscribePosts(currentBoard);
+      });
+    });
+
+    // Create a top-level post
+    submitBtn.addEventListener('click', async () => {
+      const title = titleEl.value.trim();
+      const body  = bodyEl.value.trim();
+      const board = boardEl.value;
+      if (!body) return;
+
+      await addDoc(collection(db, BOARD_TO_COLLECTION[board]), {
+        title: title || null,
+        body,
+        by: userEmail(),
+        createdAt: serverTimestamp()
+      });
+
+      titleEl.value = '';
+      bodyEl.value  = '';
+
+      if (board !== currentBoard) {
+        document.querySelector(`.forum-tab[data-board="${board}"]`).click();
+      }
+    });
+
+    // Initial
+    subscribePosts(currentBoard);
+  </script>
 </body>
 </html>
+
