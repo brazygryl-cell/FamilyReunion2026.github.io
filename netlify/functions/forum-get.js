@@ -1,38 +1,43 @@
-// forum-get.js — CommonJS-safe version
+// forum-get.js — fully defensive Netlify/Lambda version
 const admin = require("firebase-admin");
 const fs = require("fs");
 const path = require("path");
 
-let serviceAccount;
+let db;
 
-// Find and load your service-account.json
 try {
   const servicePath = path.join(__dirname, "service-account.json");
+  console.log("📄 Looking for service-account.json at:", servicePath);
+
   if (!fs.existsSync(servicePath)) {
-    throw new Error(`service-account.json not found at ${servicePath}`);
+    throw new Error(`service-account.json not found`);
   }
 
-  const data = fs.readFileSync(servicePath, "utf8");
-  serviceAccount = JSON.parse(data);
-  console.log("✅ service-account.json loaded");
+  const raw = fs.readFileSync(servicePath, "utf8");
+  const serviceAccount = JSON.parse(raw);
+
+  console.log("✅ service-account.json read successfully");
+
+  // Always init app (Netlify may clear admin.apps)
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+  console.log("✅ Firebase Admin initialized");
+
+  db = admin.firestore();
 } catch (err) {
-  console.error("🔥 Could not read service-account.json:", err);
+  console.error("🔥 Firebase init failed:", err);
 }
-
-if (!admin.apps.length) {
-  try {
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
-    console.log("✅ Firebase Admin initialized");
-  } catch (err) {
-    console.error("🔥 Firebase init error:", err);
-  }
-}
-
-const db = admin.firestore();
 
 exports.handler = async (event) => {
+  if (!db) {
+    console.error("❌ Firestore not initialized");
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Firestore not initialized" }),
+    };
+  }
+
   if (event.httpMethod !== "GET") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
