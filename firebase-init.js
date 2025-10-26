@@ -1,24 +1,19 @@
 // firebase-init.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-// ✅ Public Firebase configuration (safe for client use)
+// Pull values from Netlify environment variables
 const firebaseConfig = {
-publicapiKey: "AIzaSyAldYSp37LZO31XkGc4F1xhnQ9bpBXLU6Q",
-authDomain: "williams-reunion.firebaseapp.com",
-projectId: "williams-reunion",
-storageBucket: "williams-reunion.firebasestorage.app",
-messagingSenderId: "1053815265185",
-appId: "1:1053815265185:web:050db056f81ab9d2d81de0"
+  apiKey: import.meta.env.FIREBASE_API_KEY,
+  authDomain: import.meta.env.FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.FIREBASE_APP_ID,
 };
 
-// 🔧 Initialize Firebase
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// 🗂️ Initialize Firestore and Auth
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-// 🔁 Export for use in other scripts (login, forum, etc.)
-export { db, auth };
+export const db = getFirestore(app);
+export const auth = getAuth(app);
