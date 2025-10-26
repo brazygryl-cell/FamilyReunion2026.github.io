@@ -15,7 +15,6 @@ export function loadNavbar() {
  <a href="lodging-travel.html">Lodging</a>
  <a href="forum.html">Forum</a>
  <a href="photo-gallery.html">Photo Gallery</a>
- <a href="family-history.html">Family History</a>
  <a href="#" id="logoutBtn" style="color:#c33;font-weight:600">Logout</a>
  </nav>
  `;
