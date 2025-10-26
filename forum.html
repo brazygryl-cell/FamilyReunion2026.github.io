@@ -7,6 +7,147 @@
 
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <script type="module" src="./nav.js"></script>
+
+  <style>
+    /* ✨ Forum Styling */
+    .forum-hero {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .forum-tabs {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 1rem auto 2rem;
+    }
+
+    .forum-tab {
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--card);
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text);
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+
+    .forum-tab.active {
+      background: var(--mint);
+      color: #0a1310;
+      border-color: var(--mint-2);
+    }
+
+    .composer {
+      max-width: 800px;
+      margin: 0 auto 2rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .composer textarea {
+      width: 100%;
+      min-height: 80px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      color: var(--text);
+      background: #0f121a;
+      resize: vertical;
+    }
+
+    .composer .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      gap: 10px;
+    }
+
+    .posts {
+      max-width: 850px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+
+    .post {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.25rem;
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.4s ease both;
+    }
+
+    .meta {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .replies {
+      margin-top: 10px;
+      padding-left: 1.2rem;
+      border-left: 1px solid var(--border);
+    }
+
+    .reply {
+      margin-top: 6px;
+      background: #111520;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      animation: fadeIn 0.4s ease both;
+    }
+
+    button, select {
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      background: var(--mint);
+      color: #0a1310;
+    }
+
+    /* ✨ Fade-in animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ✨ Shimmer loading effect */
+    .loading-shimmer {
+      background: linear-gradient(
+        90deg,
+        rgba(255,255,255,0.05) 25%,
+        rgba(255,255,255,0.1) 37%,
+        rgba(255,255,255,0.05) 63%
+      );
+      background-size: 400% 100%;
+      animation: shimmer 1.2s infinite linear;
+      border-radius: 12px;
+      height: 90px;
+      margin-bottom: 10px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+  </style>
 </head>
 
 <body>
@@ -18,119 +159,144 @@
       <p>Chat, share memories, and plan the reunion together.</p>
     </div>
 
-    <!-- Forum Tabs -->
-    <div class="forum-tabs">
+    <!-- Tabs -->
+    <div class="forum-tabs" role="tablist" aria-label="Forum boards">
       <button class="forum-tab active" data-board="general">General</button>
       <button class="forum-tab" data-board="memories">Memories</button>
       <button class="forum-tab" data-board="planning">Planning</button>
     </div>
 
-    <!-- Post Composer -->
-    <div class="composer card pad">
-      <h3>Share something</h3>
-      <textarea id="postBody" placeholder="Write your message here..." rows="3"></textarea>
+    <!-- Composer -->
+    <div class="composer">
+      <h3>Create a post</h3>
+      <textarea id="postBody" placeholder="Write something for the family…"></textarea>
       <div class="row">
         <select id="postBoard">
           <option value="general" selected>General</option>
           <option value="memories">Memories</option>
           <option value="planning">Planning</option>
         </select>
-        <button id="submitPost" class="btn mint">Post</button>
+        <button id="submitPost">Post</button>
       </div>
     </div>
 
-    <!-- Posts Container -->
-    <section id="posts" class="posts"></section>
+    <!-- Posts -->
+    <section class="posts" id="posts"></section>
   </main>
 
   <footer></footer>
 
-  <!-- Scripts -->
-  <script type="module" src="./nav.js"></script>
-  <script src="./env.js"></script>
-  <script type="module" src="./firebase-init.js"></script>
-
   <script type="module">
-    import { db, auth } from "./firebase-init.js";
-    import { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } 
-      from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
     import { loadNavbar, loadFooter } from "./nav.js";
+    loadNavbar(); loadFooter();
 
-    // Load navbar/footer after DOM ready
-    window.addEventListener("DOMContentLoaded", () => {
-      loadNavbar();
-      loadFooter();
-      initForum();
-    });
+    const postsEl = document.getElementById("posts");
+    const tabs = document.querySelectorAll(".forum-tab");
+    const bodyEl = document.getElementById("postBody");
+    const boardEl = document.getElementById("postBoard");
+    const postBtn = document.getElementById("submitPost");
 
-    function initForum() {
-      const postsEl = document.getElementById("posts");
-      const tabs = document.querySelectorAll(".forum-tab");
-      const textarea = document.getElementById("postBody");
-      const postBtn = document.getElementById("submitPost");
-      const boardSelect = document.getElementById("postBoard");
-      let currentBoard = "general";
+    let currentBoard = "general";
 
-      // Render posts
-      function renderPosts(board) {
-        postsEl.innerHTML = `<p style="text-align:center;color:#aaa;">Loading ${board}...</p>`;
-        const ref = collection(db, `forum_${board}`);
-        const q = query(ref, orderBy("createdAt", "desc"));
-
-        onSnapshot(q, (snapshot) => {
-          postsEl.innerHTML = "";
-          if (snapshot.empty) {
-            postsEl.innerHTML = `<div class="empty">No posts yet in ${board}.</div>`;
-            return;
-          }
-
-          snapshot.forEach((doc) => {
-            const data = doc.data();
-            const div = document.createElement("div");
-            div.className = "post card pad";
-            div.innerHTML = `
-              <div class="meta">${data.by || "Anonymous"} • 
-                ${data.createdAt?.toDate().toLocaleString() || ""}
-              </div>
-              <p>${data.body}</p>
-            `;
-            postsEl.appendChild(div);
-          });
-        });
+    // 🔹 Render posts + replies with fade & shimmer
+    async function fetchPosts(board, showLoader = true) {
+      if (showLoader) {
+        postsEl.innerHTML = `
+          <div class="loading-shimmer"></div>
+          <div class="loading-shimmer"></div>
+          <div class="loading-shimmer"></div>
+        `;
       }
 
-      // Switch tabs
-      tabs.forEach((tab) => {
-        tab.addEventListener("click", () => {
-          tabs.forEach(t => t.classList.remove("active"));
-          tab.classList.add("active");
-          currentBoard = tab.dataset.board;
-          boardSelect.value = currentBoard;
-          renderPosts(currentBoard);
-        });
-      });
+      const res = await fetch(`/.netlify/functions/forum-get?board=${board}`);
+      const data = await res.json();
 
-      // Create new post
-      postBtn.addEventListener("click", async () => {
-        const text = textarea.value.trim();
-        if (!text) return alert("Write something first!");
-        try {
-          const ref = collection(db, `forum_${boardSelect.value}`);
-          await addDoc(ref, {
-            body: text,
-            by: auth.currentUser?.email || "Anonymous",
-            createdAt: serverTimestamp()
-          });
-          textarea.value = "";
-          renderPosts(boardSelect.value);
-        } catch (err) {
-          console.error(err);
-          alert("Could not post — try again.");
+      postsEl.innerHTML = "";
+      if (!data.length) {
+        postsEl.innerHTML = `<div class="empty">No posts yet. Be the first to share!</div>`;
+        return;
+      }
+
+      data.forEach((post) => renderPost(post, board));
+    }
+
+    function renderPost(post, board) {
+      const card = document.createElement("div");
+      card.className = "post";
+      card.innerHTML = `
+        <div class="meta">${post.by || "Anonymous"} • ${post.createdAt ? new Date(post.createdAt._seconds * 1000).toLocaleString() : "just now"}</div>
+        <div class="title">${post.title || "(untitled)"}</div>
+        <p class="body">${post.body}</p>
+        <button class="reply-toggle">💬 View Replies</button>
+        <div class="replies" style="display:none"></div>
+        <div class="reply-form" style="margin-top:10px;">
+          <textarea class="reply-text" placeholder="Write a reply..." style="width:100%;border-radius:8px;padding:8px;"></textarea>
+          <button class="reply-btn" style="margin-top:6px;">Reply</button>
+        </div>
+      `;
+
+      const repliesEl = card.querySelector(".replies");
+      const toggleBtn = card.querySelector(".reply-toggle");
+
+      toggleBtn.addEventListener("click", async () => {
+        const visible = repliesEl.style.display === "block";
+        repliesEl.style.display = visible ? "none" : "block";
+        toggleBtn.textContent = visible ? "💬 View Replies" : "➖ Hide Replies";
+        if (!visible) {
+          const res = await fetch(`/.netlify/functions/forum-reply?board=${board}&postId=${post.id}`);
+          const replies = await res.json();
+          repliesEl.innerHTML = replies.length
+            ? replies.map(r => `<div class="reply"><b>${r.by}:</b> ${r.text}</div>`).join("")
+            : "<p style='color:#888;font-size:0.9rem;'>No replies yet</p>";
         }
       });
 
-      renderPosts(currentBoard);
+      const replyBtn = card.querySelector(".reply-btn");
+      const replyText = card.querySelector(".reply-text");
+      replyBtn.addEventListener("click", async () => {
+        const text = replyText.value.trim();
+        if (!text) return;
+        await fetch("/.netlify/functions/forum-reply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ board, postId: post.id, replyText: text, by: "Family Member" })
+        });
+        replyText.value = "";
+        toggleBtn.click(); // reload replies
+      });
+
+      postsEl.appendChild(card);
     }
+
+    postBtn.addEventListener("click", async () => {
+      const text = bodyEl.value.trim();
+      const board = boardEl.value;
+      if (!text) return alert("Write something first!");
+      await fetch("/.netlify/functions/forum-add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ board, body: text, by: "Family Member" }),
+      });
+      bodyEl.value = "";
+      fetchPosts(board);
+    });
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        currentBoard = tab.dataset.board;
+        boardEl.value = currentBoard;
+        fetchPosts(currentBoard);
+      });
+    });
+
+    fetchPosts(currentBoard);
+
+    // 🔄 Auto-refresh every 30 seconds
+    setInterval(() => {
+      fetchPosts(currentBoard, false);
+    }, 30000);
   </script>
 </body>
 </html>
