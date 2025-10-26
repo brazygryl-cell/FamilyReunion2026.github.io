@@ -3,17 +3,28 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/fireba
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-// Pull values from Netlify environment variables
-const firebaseConfig = {
-  apiKey: import.meta.env.FIREBASE_API_KEY,
-  authDomain: import.meta.env.FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.FIREBASE_APP_ID,
-};
+let app, db, auth;
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-export const auth = getAuth(app);
+async function initFirebase() {
+  // 🔐 Fetch secure config from Netlify serverless function
+  const res = await fetch("/.netlify/functions/firebase-config");
+  if (!res.ok) {
+    console.error("Failed to load Firebase config:", res.status);
+    return;
+  }
+
+  const firebaseConfig = await res.json();
+
+  // ✅ Initialize Firebase
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  auth = getAuth(app);
+
+  console.log("✅ Firebase initialized successfully");
+}
+
+// Initialize immediately when imported
+await initFirebase();
+
+// Export for other files (like forum.js)
+export { app, db, auth };
