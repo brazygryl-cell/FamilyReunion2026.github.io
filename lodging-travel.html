@@ -85,6 +85,16 @@ setInterval(() => {
  slides[current].classList.add('active');
 }, 8000);
 </script>
+ <!-- 🔐 Netlify Identity + Navbar/Footer loader -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script type="module">
+  import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+  document.addEventListener("DOMContentLoaded", () => {
+    loadNavbar();
+    enableLogout();
+    requireAuth();
+  });
+</script>
 </body>
 </html>
 </body>
