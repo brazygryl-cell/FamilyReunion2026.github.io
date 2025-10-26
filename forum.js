@@ -11,13 +11,19 @@ import {
 
 import { loadNavbar, loadFooter } from "./nav.js";
 
-// Wait for DOM
-document.addEventListener("DOMContentLoaded", () => {
-  loadNavbar();
-  loadFooter();
-  console.log("✅ Forum initialized");
-  setupForum();
+// Wait until everything is fully ready
+window.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ DOM loaded — now building navbar & forum");
+  
+  // Give browser a moment to attach <header> and <footer>
+  setTimeout(() => {
+    loadNavbar();
+    loadFooter();
+    console.log("✅ Navbar + footer loaded");
+    setupForum();
+  }, 150);
 });
+
 
 function setupForum() {
   const postsEl = document.getElementById("posts");
