@@ -1,29 +1,30 @@
 // forum.js
 import { db, auth } from "./firebase-init.js";
 import {
-  collection,
-  addDoc,
-  onSnapshot,
-  query,
-  orderBy,
-  serverTimestamp
+  collection, addDoc, onSnapshot, query, orderBy, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
 import { loadNavbar, loadFooter } from "./nav.js";
 
-// Wait until everything is fully ready
-window.addEventListener("DOMContentLoaded", () => {
-  console.log("✅ DOM loaded — now building navbar & forum");
-  
-  // Give browser a moment to attach <header> and <footer>
-  setTimeout(() => {
+// Wait until header/footer exist before injecting nav
+function waitForHeader() {
+  const header = document.querySelector("header");
+  const footer = document.querySelector("footer");
+  if (header && footer) {
     loadNavbar();
     loadFooter();
     console.log("✅ Navbar + footer loaded");
     setupForum();
-  }, 150);
-});
+  } else {
+    console.log("⏳ Waiting for header/footer...");
+    setTimeout(waitForHeader, 100);
+  }
+}
 
+window.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ DOM loaded — now building navbar & forum");
+  waitForHeader();
+});
 
 function setupForum() {
   const postsEl = document.getElementById("posts");
