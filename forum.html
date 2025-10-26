@@ -2,351 +2,240 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Family Forum — Williams Family Reunion</title>
 
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-  <script type="module" src="./nav.js"></script>
+
+  <!-- Navbar -->
+  <script type="module" src="nav.js"></script>
 
   <style>
-    /* --- Scoped forum polish to match your dark mint theme --- */
-    .forum-hero{ text-align:center; padding:28px 16px; }
-    .forum-hero h1{ font-family:"Playfair Display",serif; font-size:2.2rem; margin:0 0 6px; }
-    .forum-hero p{ color:var(--muted); margin:0; }
-
-    .forum-tabs{ display:flex; gap:10px; justify-content:center; margin:18px auto 12px; flex-wrap:wrap; }
-    .forum-tab{
-      padding:8px 14px; border-radius:999px; border:1px solid var(--border);
-      background:#121624; color:var(--text); cursor:pointer; font-weight:600;
-      transition:transform .12s ease, background .2s ease, border-color .2s ease;
-    }
-    .forum-tab:hover{ transform:translateY(-1px); border-color:#2a3145; }
-    .forum-tab.active{ background:#131725; border-color:#2a3145; }
-
-    .toolbar{ display:flex; gap:10px; justify-content:center; margin:8px auto 18px; }
-    .btn.mint{ background:linear-gradient(180deg,var(--mint) 0%, var(--mint-2) 100%); color:#0a1310; border:none; }
-    .btn{ border:1px solid var(--border); background:#121520; color:var(--text); padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:700; }
-    .btn:hover{ border-color:#2a3145; filter:brightness(1.02); }
-
-    .posts{ max-width:960px; margin:0 auto 40px; display:grid; gap:12px; padding:0 16px; }
-    .post{
-      background:linear-gradient(180deg,#121624 0%,#0f121a 100%);
-      border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow);
-      padding:14px 16px;
-    }
-    .post .meta{ color:var(--muted); font-size:.9rem; margin-bottom:6px; display:flex; gap:8px; flex-wrap:wrap; }
-    .post .title{ font-weight:800; margin:0 0 6px; font-size:1.1rem; color:var(--text); }
-    .post .body{ margin:0 0 8px; color:#dfe6ee; line-height:1.6; }
-    .post .actions{ display:flex; gap:8px; flex-wrap:wrap; }
-    .chip{ font-size:.75rem; padding:3px 8px; border:1px solid var(--border); border-radius:999px; color:var(--muted); }
-
-    .replies{ margin-top:10px; border-left:2px solid #1f2433; padding-left:12px; display:grid; gap:8px; }
-    .reply{
-      background:#101420; border:1px solid var(--border); border-radius:10px; padding:10px 12px;
-    }
-    .reply .meta{ color:var(--muted); font-size:.8rem; margin-bottom:4px; }
-    .reply .body{ margin:0; }
-
-    .reply-form{ display:none; margin-top:10px; }
-    .reply-form textarea{
-      width:100%; background:#0f121a; border:1px solid var(--border); border-radius:10px; padding:10px; color:var(--text);
+    .forum-container {
+      max-width: 900px;
+      margin: 80px auto;
+      background: var(--card);
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
     }
 
-    .empty{ text-align:center; color:var(--muted); padding:24px 8px; }
+    .forum-header {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
 
-    /* Modal */
-    .modal-backdrop{
-      position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:60;
+    .forum-header h1 {
+      font-family: "Playfair Display", serif;
+      font-size: 2.2rem;
+      margin-bottom: 0.3rem;
+      color: var(--text);
     }
-    .modal{
-      width:min(92vw, 680px);
-      background:linear-gradient(180deg,#121624 0%,#0f121a 100%);
-      border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow);
-      padding:16px;
+
+    .forum-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 20px 0;
+      flex-wrap: wrap;
     }
-    .modal h3{ margin:4px 0 10px; font-size:1.15rem; }
-    .modal .row{ display:grid; gap:10px; margin:10px 0; }
-    .modal input, .modal textarea, .modal select{
-      width:100%; background:#0f121a; border:1px solid var(--border); border-radius:12px; padding:12px; color:var(--text);
+
+    .forum-tab {
+      background: #121624;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s, transform 0.2s;
     }
-    .modal .actions{ display:flex; gap:10px; justify-content:flex-end; }
+
+    .forum-tab.active,
+    .forum-tab:hover {
+      background: var(--mint-2);
+      color: #0b1311;
+      transform: scale(1.05);
+    }
+
+    .new-post-btn {
+      display: block;
+      margin: 0 auto 20px;
+      background: var(--mint);
+      color: #0b1311;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: filter 0.2s;
+    }
+
+    .new-post-btn:hover {
+      filter: brightness(1.1);
+    }
+
+    .post {
+      background: #101420;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .post .meta {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .post h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--mint);
+    }
+
+    .post p {
+      margin-top: 6px;
+      color: var(--text);
+    }
+
+    .reply-btn {
+      background: transparent;
+      border: none;
+      color: var(--mint);
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
+
+    .reply-form {
+      margin-top: 8px;
+      display: none;
+    }
+
+    .reply-form textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0f1218;
+      color: var(--text);
+      padding: 8px;
+      resize: vertical;
+    }
+
+    .reply-form button {
+      background: var(--mint);
+      color: #0b1311;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    .replies {
+      margin-top: 8px;
+      margin-left: 20px;
+      border-left: 2px solid var(--border);
+      padding-left: 10px;
+    }
+
+    /* Popup Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: var(--shadow);
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+      font-family: "Playfair Display", serif;
+    }
+
+    .modal-content textarea {
+      width: 100%;
+      height: 100px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0f1218;
+      color: var(--text);
+      padding: 10px;
+      margin-top: 10px;
+      resize: vertical;
+    }
+
+    .modal-content button {
+      margin-top: 10px;
+      padding: 10px 16px;
+      background: var(--mint);
+      color: #0b1311;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .close-btn {
+      float: right;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: var(--muted);
+    }
   </style>
 </head>
+
 <body>
   <header></header>
 
-  <main class="section">
-    <div class="forum-hero">
+  <main class="forum-container">
+    <div class="forum-header">
       <h1>Family Forum</h1>
-      <p>Chat, share memories, and plan the reunion together.</p>
+      <p>Discuss plans, share memories, and stay connected ✨</p>
     </div>
 
-    <!-- Tabs -->
-    <div class="forum-tabs" role="tablist" aria-label="Forum boards">
-      <button class="forum-tab active" data-board="general" aria-selected="true">General</button>
+    <div class="forum-tabs">
+      <button class="forum-tab active" data-board="general">General</button>
       <button class="forum-tab" data-board="memories">Memories</button>
       <button class="forum-tab" data-board="planning">Planning</button>
     </div>
 
-    <div class="toolbar">
-      <button class="btn mint" id="newPostBtn">➕ New Post</button>
-    </div>
+    <button class="new-post-btn">+ New Post</button>
 
-    <!-- Posts -->
-    <section class="posts" id="posts"></section>
+    <section id="posts"></section>
   </main>
 
-  <footer></footer>
-
-  <!-- New Post Modal -->
-  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="newPostTitle">
-      <h3 id="newPostTitle">Create a post</h3>
-      <div class="row">
-        <label>Board</label>
-        <select id="npBoard">
-          <option value="general" selected>General</option>
-          <option value="memories">Memories</option>
-          <option value="planning">Planning</option>
-        </select>
-      </div>
-      <div class="row">
-        <label>Title</label>
-        <input id="npTitle" placeholder="Give your post a title…" />
-      </div>
-      <div class="row">
-        <label>Message</label>
-        <textarea id="npBody" rows="6" placeholder="Write something for the family…"></textarea>
-      </div>
-      <div class="actions">
-        <button class="btn ghost" id="cancelPost">Cancel</button>
-        <button class="btn mint" id="submitPost">Post</button>
-      </div>
+  <!-- Popup for new post -->
+  <div id="newPostModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2>Create a New Post</h2>
+      <textarea id="postText" placeholder="Write your post..."></textarea>
+      <button id="submitPost">Post</button>
     </div>
   </div>
 
-  <!-- Forum logic -->
-  <script type="module">
-    import { loadNavbar, enableLogout, requireAuth } from './nav.js';
-    import { auth, db } from './firebase-init.js';
-    import {
-      collection, doc, addDoc, getDoc, onSnapshot,
-      query, orderBy, serverTimestamp, setDoc
-    } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+  <footer></footer>
 
-    // Navbar + auth guard
-    document.addEventListener('DOMContentLoaded', () => {
-      loadNavbar();
-      enableLogout();
-    });
-    // Redirect to login if not signed in
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        window.location.href = 'login.html';
-        return;
-      }
-    });
-
-    // ----- UI refs -----
-    const postsEl = document.getElementById('posts');
-    const tabs = Array.from(document.querySelectorAll('.forum-tab'));
-    const newPostBtn = document.getElementById('newPostBtn');
-    const modalBackdrop = document.getElementById('modalBackdrop');
-    const npBoard = document.getElementById('npBoard');
-    const npTitle = document.getElementById('npTitle');
-    const npBody = document.getElementById('npBody');
-    const cancelPost = document.getElementById('cancelPost');
-    const submitPost = document.getElementById('submitPost');
-
-    let currentBoard = 'general';
-    let unsub = null; // listener cleanup
-
-    const boardToCollection = (b) => {
-      if (b === 'memories') return 'forum_memories';
-      if (b === 'planning') return 'forum_planning';
-      return 'forum_general';
-    };
-
-    // ----- Render helpers -----
-    function fmt(ts) {
-      if (!ts) return 'just now';
-      const d = ts.toDate ? ts.toDate() : new Date(ts);
-      return d.toLocaleString();
-    }
-
-    function postCard(board, id, data) {
-      const by = data.by || 'Anonymous';
-      const created = fmt(data.createdAt);
-
-      const el = document.createElement('article');
-      el.className = 'post';
-      el.innerHTML = `
-        <div class="meta">
-          <span class="chip" style="text-transform:capitalize">${board}</span>
-          <span>by <strong>${by}</strong></span>
-          <span>• ${created}</span>
-        </div>
-        <h3 class="title">${data.title || '(no title)'}</h3>
-        <p class="body">${(data.body || '').replace(/\n/g,'<br>')}</p>
-        <div class="actions">
-          <button class="btn ghost toggle-replies">💬 Replies</button>
-          <button class="btn ghost add-reply">➕ Reply</button>
-        </div>
-        <div class="reply-form">
-          <textarea rows="3" placeholder="Write a reply…"></textarea>
-          <div style="display:flex; gap:8px; margin-top:8px; justify-content:flex-end">
-            <button class="btn ghost cancel-reply">Cancel</button>
-            <button class="btn mint submit-reply">Post Reply</button>
-          </div>
-        </div>
-        <div class="replies" data-replies></div>
-      `;
-
-      // Wire actions
-      const repliesWrap = el.querySelector('[data-replies]');
-      const toggleBtn = el.querySelector('.toggle-replies');
-      const addReplyBtn = el.querySelector('.add-reply');
-      const formWrap = el.querySelector('.reply-form');
-      const cancelReplyBtn = el.querySelector('.cancel-reply');
-      const submitReplyBtn = el.querySelector('.submit-reply');
-      const textarea = el.querySelector('textarea');
-
-      let repliesOpen = false;
-      let repliesUnsub = null;
-
-      toggleBtn.addEventListener('click', () => {
-        repliesOpen = !repliesOpen;
-        toggleBtn.textContent = repliesOpen ? '🔽 Hide Replies' : '💬 Replies';
-        if (repliesOpen) {
-          // live replies listener
-          const coll = collection(db, boardToCollection(board), id, 'replies');
-          const q = query(coll, orderBy('createdAt','asc'));
-          repliesUnsub = onSnapshot(q, (snap) => {
-            repliesWrap.innerHTML = '';
-            if (snap.empty) {
-              repliesWrap.innerHTML = `<div class="empty" style="text-align:left">No replies yet.</div>`;
-              return;
-            }
-            snap.forEach(docSnap => {
-              const r = docSnap.data();
-              const rEl = document.createElement('div');
-              rEl.className = 'reply';
-              rEl.innerHTML = `
-                <div class="meta">${r.by || 'Anonymous'} • ${fmt(r.createdAt)}</div>
-                <p class="body">${(r.body || '').replace(/\n/g,'<br>')}</p>
-              `;
-              repliesWrap.appendChild(rEl);
-            });
-          });
-        } else {
-          repliesWrap.innerHTML = '';
-          if (repliesUnsub) repliesUnsub();
-          repliesUnsub = null;
-        }
-      });
-
-      addReplyBtn.addEventListener('click', () => {
-        formWrap.style.display = formWrap.style.display === 'grid' ? 'none' : 'grid';
-        textarea.focus();
-      });
-      cancelReplyBtn.addEventListener('click', () => {
-        formWrap.style.display = 'none';
-        textarea.value = '';
-      });
-      submitReplyBtn.addEventListener('click', async () => {
-        const text = textarea.value.trim();
-        if (!text) return;
-        const user = auth.currentUser;
-        if (!user) { window.location.href = 'login.html'; return; }
-        const rColl = collection(db, boardToCollection(board), id, 'replies');
-        await addDoc(rColl, {
-          body: text,
-          by: user.email || 'Anonymous',
-          uid: user.uid,
-          createdAt: serverTimestamp()
-        });
-        textarea.value = '';
-        formWrap.style.display = 'none';
-        // ensure replies are open to show the newly added one
-        if (!repliesOpen) toggleBtn.click();
-      });
-
-      return el;
-    }
-
-    function renderEmpty() {
-      postsEl.innerHTML = `<div class="empty">No posts yet. Be the first to start a conversation!</div>`;
-    }
-
-    function attachBoardListener(board) {
-      if (unsub) { unsub(); unsub = null; }
-      postsEl.innerHTML = ''; // skeleton could go here
-
-      const coll = collection(db, boardToCollection(board));
-      const q = query(coll, orderBy('createdAt','desc'));
-      unsub = onSnapshot(q, (snap) => {
-        postsEl.innerHTML = '';
-        if (snap.empty) { renderEmpty(); return; }
-        snap.forEach(docSnap => {
-          const data = docSnap.data();
-          postsEl.appendChild(postCard(board, docSnap.id, data));
-        });
-      });
-    }
-
-    // Tabs
-    tabs.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabs.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentBoard = btn.dataset.board;
-        attachBoardListener(currentBoard);
-      });
-    });
-
-    // New Post modal
-    function openModal() {
-      npBoard.value = currentBoard;
-      npTitle.value = '';
-      npBody.value = '';
-      modalBackdrop.style.display = 'flex';
-      npTitle.focus();
-    }
-    function closeModal() { modalBackdrop.style.display = 'none'; }
-
-    newPostBtn.addEventListener('click', openModal);
-    cancelPost.addEventListener('click', closeModal);
-    modalBackdrop.addEventListener('click', (e) => {
-      if (e.target === modalBackdrop) closeModal();
-    });
-
-    // Submit post
-    submitPost.addEventListener('click', async () => {
-      const board = npBoard.value;
-      const title = npTitle.value.trim();
-      const body = npBody.value.trim();
-      if (!title || !body) return;
-
-      const user = auth.currentUser;
-      if (!user) { window.location.href = 'login.html'; return; }
-
-      await addDoc(collection(db, boardToCollection(board)), {
-        title, body,
-        by: user.email || 'Anonymous',
-        uid: user.uid,
-        createdAt: serverTimestamp()
-      });
-
-      closeModal();
-      // if posting to a different board, switch to it so user sees the post
-      if (board !== currentBoard) {
-        document.querySelector(`.forum-tab[data-board="${board}"]`).click();
-      }
-    });
-
-    // Initial load
-    attachBoardListener(currentBoard);
-  </script>
+  <!-- Firebase + Forum Script -->
+  <script type="module" src="./forum.js"></script>
 </body>
 </html>
+
