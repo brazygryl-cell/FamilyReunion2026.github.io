@@ -1,8 +1,11 @@
-// netlify/functions/forum-add.js
 import admin from "firebase-admin";
+import { readFileSync } from "fs";
 
 if (!admin.apps.length) {
-  const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
+  const serviceAccount = JSON.parse(
+    readFileSync("netlify/functions/service-account.json", "utf8")
+  );
+
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
@@ -10,26 +13,27 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
-export default async (req, res) => {
+export const handler = async (event) => {
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: "Method Not Allowed" };
+  }
+
   try {
-    const { board, title, body, by } = JSON.parse(req.body);
+    const { board, body } = JSON.parse(event.body);
+    if (!body) return { statusCode: 400, body: "No post body provided" };
 
-    if (!body || !board)
-      return res.status(400).json({ error: "Missing required fields." });
-
-    const newPost = {
-      title: title || "Untitled",
+    const docRef = await db.collection(`forum_${board}`).add({
       body,
-      by: by || "Anonymous",
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: new Date().toISOString(),
+    });
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ success: true, id: docRef.id }),
     };
-
-    const ref = await db.collection(`forum_${board}`).add(newPost);
-
-    res.status(200).json({ success: true, id: ref.id });
-  } catch (error) {
-    console.error("Error adding post:", error);
-    res.status(500).json({ error: "Failed to add post." });
+  } catch (err) {
+    console.error("Error adding post:", err);
+    return { statusCode: 500, body: `Error: ${err.message}` };
   }
 };
 
