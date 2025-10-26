@@ -7,49 +7,28 @@
 
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
-  <style>
-    /* --- Forum Specific Styling --- */
-    .forum-header { text-align:center; margin-bottom:1.2rem; }
-    .forum-tabs { display:flex; gap:10px; justify-content:center; margin:1rem 0; flex-wrap:wrap; }
-    .forum-tab { border:1px solid var(--border); background:#121520; color:var(--text); border-radius:999px; padding:8px 16px; cursor:pointer; font-weight:600; transition:.2s; }
-    .forum-tab.active, .forum-tab:hover { background:var(--mint-2); color:#0a1310; }
-    .composer { max-width:800px; margin:1rem auto; border:1px solid var(--border); border-radius:12px; background:#0f1218; padding:1rem; box-shadow:var(--shadow); }
-    .composer textarea { width:100%; border-radius:8px; border:1px solid var(--border); padding:10px; color:var(--text); background:#121520; resize:vertical; min-height:80px; }
-    .composer .row { display:flex; justify-content:space-between; margin-top:.8rem; gap:.6rem; flex-wrap:wrap; }
-    .posts { display:flex; flex-direction:column; gap:1.2rem; max-width:850px; margin:1.5rem auto; }
-    .post { background:linear-gradient(180deg,#121624 0%,#0f121a 100%); border:1px solid var(--border); border-radius:14px; padding:1rem 1.2rem; box-shadow:var(--shadow); }
-    .meta { font-size:.9rem; color:var(--muted); margin-bottom:6px; }
-    .reply-section { margin-top:.8rem; border-left:2px solid var(--border); padding-left:1rem; }
-    .reply { background:rgba(255,255,255,0.03); padding:.6rem .8rem; margin:.5rem 0; border-radius:8px; font-size:.95rem; }
-    .reply-btn, .send-reply { background:transparent; border:1px solid var(--border); color:var(--text); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:.9rem; transition:.2s; }
-    .reply-btn:hover, .send-reply:hover { background:var(--mint-2); color:#0b1311; }
-    .reply-box { margin-top:.5rem; }
-    .reply-box textarea { width:100%; border-radius:8px; border:1px solid var(--border); background:#0f1218; color:var(--text); padding:8px; resize:vertical; min-height:60px; }
-    .hidden { display:none; }
-  </style>
 </head>
 
 <body>
   <header></header>
 
-  <main class="section forum-container">
-    <div class="forum-header">
+  <main class="section">
+    <div class="forum-hero">
       <h1>Family Forum</h1>
-      <p>Share memories, make plans, and connect with family before the reunion.</p>
+      <p>Chat, share memories, and plan the reunion together.</p>
     </div>
 
-    <!-- Tabs -->
+    <!-- Forum Tabs -->
     <div class="forum-tabs">
-      <button class="forum-tab active" data-board="general">💬 General</button>
-      <button class="forum-tab" data-board="memories">📸 Memories</button>
-      <button class="forum-tab" data-board="planning">📅 Planning</button>
+      <button class="forum-tab active" data-board="general">General</button>
+      <button class="forum-tab" data-board="memories">Memories</button>
+      <button class="forum-tab" data-board="planning">Planning</button>
     </div>
 
-    <!-- Composer -->
-    <div class="composer">
-      <h3>Create a Post</h3>
-      <textarea id="postBody" placeholder="Write something for the family…"></textarea>
+    <!-- Post Composer -->
+    <div class="composer card pad">
+      <h3>Share something</h3>
+      <textarea id="postBody" placeholder="Write your message here..." rows="3"></textarea>
       <div class="row">
         <select id="postBoard">
           <option value="general" selected>General</option>
@@ -60,152 +39,97 @@
       </div>
     </div>
 
+    <!-- Posts Container -->
     <section id="posts" class="posts"></section>
   </main>
 
   <footer></footer>
 
-  <!-- All Logic Inline -->
+  <!-- Scripts -->
+  <script type="module" src="./firebase-init.js"></script>
+  <script type="module" src="./nav.js"></script>
+
   <script type="module">
-    /* ---------------- Firebase Setup ---------------- */
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+    import { db, auth } from "./firebase-init.js";
+    import { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } 
+      from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+    import { loadNavbar, loadFooter } from "./nav.js";
 
-    const firebaseConfig = {
-  apiKey: import.meta.env.FIREBASE_API_KEY,
-  authDomain: import.meta.env.FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.FIREBASE_APP_ID
-};
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    console.log("✅ Firebase initialized");
+    // Load navbar/footer after DOM ready
+    window.addEventListener("DOMContentLoaded", () => {
+      loadNavbar();
+      loadFooter();
+      initForum();
+    });
 
-    /* ---------------- Navbar + Footer ---------------- */
-    document.querySelector("header").innerHTML = `
-      <nav class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="event-details.html">Event Details</a>
-        <a href="lodging-travel.html">Lodging</a>
-        <a href="forum.html" class="active">Forum</a>
-        <a href="photo-gallery.html">Photo Gallery</a>
-        <a href="family-history.html">Family History</a>
-      </nav>`;
-    document.querySelector("footer").innerHTML = `
-      <p>Made with ❤️ by <a href="mailto:taylor.clarkjones25@gmail.com">Taylor Clark Jones</a></p>
-      <p>Art by Andre Clark</p>`;
+    function initForum() {
+      const postsEl = document.getElementById("posts");
+      const tabs = document.querySelectorAll(".forum-tab");
+      const textarea = document.getElementById("postBody");
+      const postBtn = document.getElementById("submitPost");
+      const boardSelect = document.getElementById("postBoard");
+      let currentBoard = "general";
 
-    /* ---------------- Forum Logic ---------------- */
-    const postsEl = document.getElementById("posts");
-    const tabs = document.querySelectorAll(".forum-tab");
-    const textarea = document.getElementById("postBody");
-    const boardSelect = document.getElementById("postBoard");
-    const postBtn = document.getElementById("submitPost");
-    let currentBoard = "general";
+      // Render posts
+      function renderPosts(board) {
+        postsEl.innerHTML = `<p style="text-align:center;color:#aaa;">Loading ${board}...</p>`;
+        const ref = collection(db, `forum_${board}`);
+        const q = query(ref, orderBy("createdAt", "desc"));
 
-    function renderPosts(board) {
-      postsEl.innerHTML = `<p style="text-align:center;color:#aaa">Loading ${board}...</p>`;
-      const ref = collection(db, `forum_${board}`);
-      const q = query(ref, orderBy("createdAt", "desc"));
-      onSnapshot(q, (snapshot) => {
-        postsEl.innerHTML = "";
-        if (snapshot.empty) {
-          postsEl.innerHTML = `<div class="empty">No posts yet in ${board}.</div>`;
-          return;
-        }
+        onSnapshot(q, (snapshot) => {
+          postsEl.innerHTML = "";
+          if (snapshot.empty) {
+            postsEl.innerHTML = `<div class="empty">No posts yet in ${board}.</div>`;
+            return;
+          }
 
-        snapshot.forEach((docSnap) => {
-          const p = docSnap.data();
-          const postCard = document.createElement("div");
-          postCard.className = "post";
-          postCard.innerHTML = `
-            <div class="meta">${p.by || "Anonymous"} • ${p.createdAt?.toDate().toLocaleString() || ""}</div>
-            <p class="body">${p.body}</p>
-            <button class="reply-btn">💬 View Replies</button>
-            <div class="reply-section hidden">
-              <div class="reply-box">
-                <textarea class="reply-input" placeholder="Write a reply..."></textarea>
-                <button class="send-reply">Send</button>
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const div = document.createElement("div");
+            div.className = "post card pad";
+            div.innerHTML = `
+              <div class="meta">${data.by || "Anonymous"} • 
+                ${data.createdAt?.toDate().toLocaleString() || ""}
               </div>
-              <div class="replies"></div>
-            </div>
-          `;
-          postsEl.appendChild(postCard);
-
-          const replySection = postCard.querySelector(".reply-section");
-          const toggleBtn = postCard.querySelector(".reply-btn");
-          const sendBtn = postCard.querySelector(".send-reply");
-          const replyInput = postCard.querySelector(".reply-input");
-          const repliesContainer = postCard.querySelector(".replies");
-
-          toggleBtn.addEventListener("click", () => {
-            replySection.classList.toggle("hidden");
-            toggleBtn.textContent = replySection.classList.contains("hidden") ? "💬 View Replies" : "▲ Hide Replies";
-          });
-
-          sendBtn.addEventListener("click", async () => {
-            const text = replyInput.value.trim();
-            if (!text) return;
-            const repliesRef = collection(db, `forum_${board}/${docSnap.id}/replies`);
-            await addDoc(repliesRef, {
-              body: text,
-              by: auth.currentUser?.email || "Anonymous",
-              createdAt: serverTimestamp(),
-            });
-            replyInput.value = "";
-          });
-
-          const repliesRef = collection(db, `forum_${board}/${docSnap.id}/replies`);
-          onSnapshot(query(repliesRef, orderBy("createdAt", "asc")), (replySnap) => {
-            repliesContainer.innerHTML = "";
-            replySnap.forEach((r) => {
-              const reply = r.data();
-              const replyEl = document.createElement("div");
-              replyEl.className = "reply";
-              replyEl.innerHTML = `
-                <div class="meta small">${reply.by || "Anonymous"} • ${reply.createdAt?.toDate().toLocaleString() || ""}</div>
-                <p>${reply.body}</p>
-              `;
-              repliesContainer.appendChild(replyEl);
-            });
+              <p>${data.body}</p>
+            `;
+            postsEl.appendChild(div);
           });
         });
-      });
-    }
-
-    tabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        tabs.forEach((t) => t.classList.remove("active"));
-        tab.classList.add("active");
-        currentBoard = tab.dataset.board;
-        boardSelect.value = currentBoard;
-        renderPosts(currentBoard);
-      });
-    });
-
-    postBtn.addEventListener("click", async () => {
-      const text = textarea.value.trim();
-      if (!text) return alert("Write something first!");
-      try {
-        const ref = collection(db, `forum_${boardSelect.value}`);
-        await addDoc(ref, {
-          body: text,
-          by: auth.currentUser?.email || "Anonymous",
-          createdAt: serverTimestamp(),
-        });
-        textarea.value = "";
-        renderPosts(boardSelect.value);
-      } catch (err) {
-        console.error("Error posting:", err);
-        alert("Could not post right now. Try again.");
       }
-    });
 
-    renderPosts(currentBoard);
+      // Switch tabs
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          tabs.forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+          currentBoard = tab.dataset.board;
+          boardSelect.value = currentBoard;
+          renderPosts(currentBoard);
+        });
+      });
+
+      // Create new post
+      postBtn.addEventListener("click", async () => {
+        const text = textarea.value.trim();
+        if (!text) return alert("Write something first!");
+        try {
+          const ref = collection(db, `forum_${boardSelect.value}`);
+          await addDoc(ref, {
+            body: text,
+            by: auth.currentUser?.email || "Anonymous",
+            createdAt: serverTimestamp()
+          });
+          textarea.value = "";
+          renderPosts(boardSelect.value);
+        } catch (err) {
+          console.error(err);
+          alert("Could not post — try again.");
+        }
+      });
+
+      renderPosts(currentBoard);
+    }
   </script>
 </body>
 </html>
