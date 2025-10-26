@@ -5,6 +5,10 @@ firebase-debug.log
 firebase.json
 firebase-config.js
 
+
+firebase-init.js
+
+
 # Local-only configs
 firebase-config.local.js
 .env
