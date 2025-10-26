@@ -1,17 +1,13 @@
 // netlify/functions/forum-get.js
-import { initializeApp, applicationDefault } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
+import admin from "firebase-admin";
 
-let app;
-try {
-  app = initializeApp({
-    credential: applicationDefault(),
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.applicationDefault(),
   });
-} catch (e) {
-  // Ignore error if app already initialized
 }
 
-const db = getFirestore();
+const db = admin.firestore();
 
 export const handler = async (event) => {
   const { board } = event.queryStringParameters || {};
@@ -44,8 +40,7 @@ export const handler = async (event) => {
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Firestore query failed" }),
+      body: JSON.stringify({ error: "Firestore query failed", details: error.message }),
     };
   }
 };
-
