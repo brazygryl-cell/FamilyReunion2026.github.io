@@ -1,20 +1,23 @@
-// forum-get.js — compatible with Netlify’s Node runtime (CommonJS)
+// forum-get.js
 import admin from "firebase-admin";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
+// Safe path resolution for Netlify runtime
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
+const servicePath = path.join(__dirname, "service-account.json");
+
 let serviceAccount;
-
 try {
-  // Safe path resolution — handles both local and Netlify deployments
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-
-  const servicePath = path.join(__dirname, "service-account.json");
+  if (!existsSync(servicePath)) {
+    throw new Error(`service-account.json not found at ${servicePath}`);
+  }
   serviceAccount = JSON.parse(readFileSync(servicePath, "utf8"));
+  console.log("✅ service-account.json loaded");
 } catch (err) {
-  console.error("🔥 Could not read service-account.json:", err);
+  console.error("🔥 Failed to read service-account.json:", err);
 }
 
 if (!admin.apps.length) {
@@ -22,9 +25,9 @@ if (!admin.apps.length) {
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
     });
-    console.log("✅ Firebase Admin initialized in forum-get.js");
+    console.log("✅ Firebase Admin initialized");
   } catch (err) {
-    console.error("🔥 Failed to initialize Firebase Admin:", err);
+    console.error("🔥 Firebase Admin init error:", err);
   }
 }
 
@@ -37,18 +40,13 @@ export const handler = async (event) => {
 
   try {
     const board = event.queryStringParameters?.board || "general";
-    console.log(`📥 Fetching posts from board: ${board}`);
-
     const snapshot = await db
       .collection(`forum_${board}`)
       .orderBy("createdAt", "desc")
       .limit(50)
       .get();
 
-    const posts = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const posts = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
     return {
       statusCode: 200,
@@ -59,10 +57,11 @@ export const handler = async (event) => {
       body: JSON.stringify(posts),
     };
   } catch (err) {
-    console.error("🔥 Error fetching posts:", err);
+    console.error("🔥 Firestore fetch error:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message }),
     };
   }
 };
+
