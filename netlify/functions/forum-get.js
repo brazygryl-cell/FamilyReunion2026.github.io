@@ -1,14 +1,20 @@
-// netlify/functions/forum-get.js
 import admin from "firebase-admin";
+import { readFileSync } from "fs";
 
+// ✅ Initialize Firebase Admin using your local JSON file
 if (!admin.apps.length) {
+  const serviceAccount = JSON.parse(
+    readFileSync("netlify/functions/service-account.json", "utf8")
+  );
+
   admin.initializeApp({
-    credential: admin.credential.applicationDefault(),
+    credential: admin.credential.cert(serviceAccount),
   });
 }
 
 const db = admin.firestore();
 
+// ✅ Actual Function Logic
 export const handler = async (event) => {
   const { board } = event.queryStringParameters || {};
 
@@ -40,7 +46,10 @@ export const handler = async (event) => {
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Firestore query failed", details: error.message }),
+      body: JSON.stringify({
+        error: "Firestore query failed",
+        details: error.message,
+      }),
     };
   }
 };
