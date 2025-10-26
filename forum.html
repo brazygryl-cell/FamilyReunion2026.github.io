@@ -1,176 +1,340 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Family Forum — Williams Family Reunion</title>
 
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
+  <!-- Navbar + utilities -->
+  <script type="module" src="nav.js"></script>
+
   <!-- Netlify Identity (login) -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-  <!-- Firebase core -->
-  <script type="module" src="./firebase-init.js"></script>
-
   <style>
-    .forum-container { max-width: 950px; margin: 2rem auto; padding: 0 16px; }
-    .forum-header { text-align: center; margin-bottom: 1.8rem; }
-    .forum-header h1 { font-family: "Playfair Display", serif; font-size: 2.3rem; margin: 0; }
-    .forum-header p { color: var(--muted); margin-top: 0.4rem; }
+    /* ---------- Page polish (kept local so it won’t fight style.css) ---------- */
 
-    .forum-tabs { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 1rem; }
-    .forum-tab { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border); background: #101420; color: var(--text); cursor: pointer; transition: 0.25s; font-weight: 600; }
-    .forum-tab.active { background: var(--mint); color: #0a1310; border-color: var(--mint-2); box-shadow: 0 0 12px rgba(126,224,194,0.25); }
+    .forum-hero{ text-align:center; padding:28px 16px; }
+    .forum-hero h1{ font-family:'Playfair Display',serif; font-size: clamp(26px,3.4vw,40px); margin:0 0 6px; }
+    .forum-hero p{ color:var(--muted); margin:0; }
 
-    .composer { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 1.6rem; }
-    .composer h3 { margin-top: 0; font-size: 1.2rem; }
-    .composer textarea { width: 100%; min-height: 90px; border-radius: 10px; border: 1px solid var(--border); background: #0f121a; color: var(--text); padding: 10px; resize: vertical; }
-    .composer .row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 10px; }
-    .composer button { background: var(--mint); border: none; border-radius: 10px; padding: 8px 14px; font-weight: 600; cursor: pointer; color: #0b1311; transition: 0.3s; }
-    .composer button:hover { filter: brightness(0.95); }
+    /* Tabs */
+    .forum-tabs{ display:flex; gap:10px; justify-content:center; margin:18px auto 10px; flex-wrap:wrap; }
+    .forum-tab{ padding:10px 14px; border-radius:999px; border:1px solid var(--border); background:#0f121a; color:var(--text); cursor:pointer; font-weight:600; }
+    .forum-tab.active{ background:linear-gradient(180deg,var(--mint) 0%, var(--mint-2) 100%); color:#0b1311; border-color:transparent; }
 
-    .post-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 1rem; box-shadow: var(--shadow); }
-    .post-meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 6px; }
-    .post-title { font-weight: 700; margin: 0 0 8px; font-size: 1.1rem; }
-    .post-body { margin: 0; line-height: 1.55; }
+    /* Posts list (Reddit-ish cards) */
+    .posts{ max-width:980px; margin:16px auto 80px; display:grid; gap:12px; }
+    .post-card{ background:linear-gradient(180deg,#121624 0%,#0f121a 100%); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); padding:14px 16px; }
+    .post-head{ display:flex; gap:10px; align-items:center; color:var(--muted); font-size:.92rem; }
+    .pill{ border:1px solid var(--border); border-radius:999px; padding:2px 8px; font-size:.75rem; }
+    .post-title{ font-weight:700; margin:8px 0 6px; font-size:1.1rem; }
+    .post-body{ margin:0 0 10px; color:#cfd6de; line-height:1.6; }
 
-    .reply-section { margin-top: 10px; padding-left: 20px; border-left: 1px solid var(--border); }
-    .reply-card { background: #111620; padding: 10px 12px; border-radius: 10px; margin-top: 8px; border: 1px solid var(--border); }
-    .reply-meta { font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
+    /* Reply area */
+    .reply-bar{ display:flex; gap:10px; align-items:center; }
+    .reply-btn{ border:1px solid var(--border); background:#121520; color:var(--text); padding:6px 10px; border-radius:10px; cursor:pointer; }
+    .reply-btn:hover{ border-color:#2a3145; }
 
-    .reply-toggle { color: var(--mint); font-size: 0.9rem; cursor: pointer; margin-top: 6px; display: inline-block; }
-    .empty { text-align: center; color: var(--muted); padding: 24px 0; }
+    .replies{ margin-top:10px; padding-left:12px; border-left:2px dashed var(--border); display:none; }
+    .replies.show{ display:block; }
+    .reply-card{ background:#101420; border:1px solid var(--border); border-radius:12px; padding:10px 12px; margin:8px 0; }
+    .reply-meta{ color:var(--muted); font-size:.85rem; margin-bottom:4px; }
+
+    /* Floating “New Post” FAB */
+    .fab{
+      position:fixed; right:22px; bottom:22px; z-index:60;
+      padding:12px 16px; border-radius:14px;
+      background:linear-gradient(180deg,var(--mint) 0%, var(--mint-2) 100%);
+      color:#0b1311; font-weight:800; border:none; cursor:pointer;
+      box-shadow:0 12px 30px rgba(0,0,0,.45);
+      transform:translateZ(0);
+    }
+    .fab:hover{ filter:brightness(.98); }
+
+    /* Glass modal */
+    .modal-backdrop{
+      position:fixed; inset:0; display:none; place-items:center; z-index:70;
+      background:rgba(0,0,0,.45); backdrop-filter: blur(10px);
+    }
+    .modal{ width:min(560px,92vw); background:rgba(18,22,36,.9); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); padding:18px; }
+    .modal h3{ margin:0 0 10px; font-size:1.15rem; }
+    .modal .row{ display:grid; gap:10px; margin-top:8px; }
+    .modal .actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
+    .modal .cancel{ background:transparent; border:1px solid var(--border); color:var(--text); border-radius:10px; padding:8px 12px; cursor:pointer; }
+    .modal .save{ background:linear-gradient(180deg,var(--mint) 0%, var(--mint-2) 100%); color:#0b1311; border:none; border-radius:10px; padding:8px 14px; cursor:pointer; font-weight:700; }
+
+    .empty{ text-align:center; color:#8b94a0; padding:26px 8px; }
   </style>
 </head>
-
 <body>
   <header></header>
 
-  <main class="forum-container">
-    <div class="forum-header">
+  <main class="section">
+    <div class="forum-hero">
       <h1>Family Forum</h1>
-      <p>Chat, share memories, and plan together for the reunion.</p>
+      <p>Share plans, memories, and updates with the whole crew.</p>
     </div>
 
     <!-- Tabs -->
-    <div class="forum-tabs" role="tablist">
-      <button class="forum-tab active" data-board="general">General</button>
+    <div class="forum-tabs" role="tablist" aria-label="Forum boards">
+      <button class="forum-tab active" data-board="general" aria-selected="true">General</button>
       <button class="forum-tab" data-board="memories">Memories</button>
       <button class="forum-tab" data-board="planning">Planning</button>
     </div>
 
-    <!-- Composer -->
-    <div class="composer">
-      <h3>Create a Post</h3>
-      <textarea id="postBody" placeholder="Write something for the family…"></textarea>
-      <div class="row">
-        <select id="postBoard">
-          <option value="general">General</option>
-          <option value="memories">Memories</option>
-          <option value="planning">Planning</option>
-        </select>
-        <button id="submitPost">Post</button>
-      </div>
-    </div>
-
     <!-- Posts -->
-    <section id="posts"></section>
+    <section id="posts" class="posts" aria-live="polite"></section>
   </main>
 
   <footer></footer>
 
-  <!-- Forum Logic -->
+  <!-- New Post FAB -->
+  <button class="fab" id="openComposer">+ New Post</button>
+
+  <!-- Glass Modal: New Post -->
+  <div class="modal-backdrop" id="composerBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="composerTitle">
+      <h3 id="composerTitle">Create a Post</h3>
+      <div class="row">
+        <label>
+          Board
+          <select id="postBoard">
+            <option value="general" selected>General</option>
+            <option value="memories">Memories</option>
+            <option value="planning">Planning</option>
+          </select>
+        </label>
+        <label>
+          Title
+          <input id="postTitle" type="text" placeholder="Add a short, clear title" />
+        </label>
+        <label>
+          Message
+          <textarea id="postBody" rows="6" placeholder="Write your post…"></textarea>
+        </label>
+      </div>
+      <div class="actions">
+        <button class="cancel" id="cancelComposer">Cancel</button>
+        <button class="save" id="savePost">Post</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Identity gating + Forum logic -->
   <script type="module">
-    import { db } from "./firebase-init.js";
+    // Navbar + auth gating
+    import { loadNavbar, enableLogout, requireAuth } from './nav.js';
+    import { app, auth, db } from './firebase-init.js';
     import {
-      collection, addDoc, serverTimestamp,
-      onSnapshot, query, orderBy
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+      collection, addDoc, serverTimestamp, query, orderBy, onSnapshot,
+      doc, getDocs, setDoc
+    } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
 
-    const tabs = document.querySelectorAll(".forum-tab");
-    const postsEl = document.getElementById("posts");
-    const postBodyEl = document.getElementById("postBody");
-    const postBoardEl = document.getElementById("postBoard");
-    const submitBtn = document.getElementById("submitPost");
+    document.addEventListener('DOMContentLoaded', () => {
+      loadNavbar(); enableLogout(); requireAuth();
+    });
 
-    const BOARD_COLLECTIONS = {
-      general: "forum_general",
-      memories: "forum_memories",
-      planning: "forum_planning"
+    // ---------- Helpers ----------
+    const boardToCollection = (board) => {
+      if (board === 'memories') return 'forum_memories';
+      if (board === 'planning') return 'forum_planning';
+      return 'forum_general';
     };
 
-    let currentBoard = "general";
-    let unsubscribe = null;
+    const postsEl = document.getElementById('posts');
+    const tabs = Array.from(document.querySelectorAll('.forum-tab'));
+    let activeBoard = 'general';
+    let unsub = null; // snapshot unsubscribe
 
-    function renderPost(id, data) {
-      const div = document.createElement("div");
-      div.className = "post-card";
-      div.innerHTML = `
-        <div class="post-meta">${data.by || "Anonymous"} • ${new Date(data.createdAt?.seconds * 1000 || Date.now()).toLocaleString()}</div>
-        <h3 class="post-title">${data.title || "New Post"}</h3>
-        <p class="post-body">${data.body}</p>
-        <div class="reply-toggle" data-id="${id}">💬 Reply</div>
-        <div class="reply-section" id="replies-${id}"></div>
+    // ---------- Render ----------
+    function skeleton() {
+      postsEl.innerHTML = `
+        <div class="post-card"><div class="post-head">Loading…</div></div>
+        <div class="post-card"><div class="post-head">Loading…</div></div>
+        <div class="post-card"><div class="post-head">Loading…</div></div>
       `;
-      return div;
     }
 
-    async function subscribePosts(board) {
-      if (unsubscribe) unsubscribe();
-      postsEl.innerHTML = '<div class="empty">Loading posts...</div>';
+    function renderPosts(snapshot) {
+      if (snapshot.empty) {
+        postsEl.innerHTML = '<div class="empty">No posts yet. Be the first to start the conversation!</div>';
+        return;
+      }
 
-      const q = query(collection(db, BOARD_COLLECTIONS[board]), orderBy("createdAt", "desc"));
-      unsubscribe = onSnapshot(q, snapshot => {
-        postsEl.innerHTML = "";
-        if (snapshot.empty) {
-          postsEl.innerHTML = '<div class="empty">No posts yet. Be the first!</div>';
-          return;
-        }
-        snapshot.forEach(docSnap => {
-          const postDiv = renderPost(docSnap.id, docSnap.data());
-          postsEl.appendChild(postDiv);
+      postsEl.innerHTML = '';
+      snapshot.forEach(docSnap => {
+        const p = docSnap.data();
+        const id = docSnap.id;
+        const when = p.createdAt?.toDate ? p.createdAt.toDate().toLocaleString() : '';
+        const email = p.userEmail || 'Someone';
+
+        const card = document.createElement('article');
+        card.className = 'post-card';
+        card.innerHTML = `
+          <div class="post-head">
+            <span class="pill" title="${email}">${(email.split('@')[0] || 'user')}</span>
+            <span aria-hidden="true">•</span>
+            <span>${when}</span>
+            <span aria-hidden="true">•</span>
+            <span class="pill" style="text-transform:capitalize">${activeBoard}</span>
+          </div>
+          <h3 class="post-title">${escapeHTML(p.title || '')}</h3>
+          <p class="post-body">${escapeHTML(p.body || '')}</p>
+
+          <div class="reply-bar">
+            <button class="reply-btn" data-act="toggle" data-id="${id}">Show replies</button>
+            <button class="reply-btn" data-act="reply" data-id="${id}">Reply</button>
+          </div>
+
+          <div class="replies" id="replies-${id}" aria-live="polite"></div>
+        `;
+        postsEl.appendChild(card);
+
+        loadReplies(id);
+      });
+    }
+
+    // ---------- Load replies for a post ----------
+    async function loadReplies(postId) {
+      const colName = boardToCollection(activeBoard);
+      const repliesQ = query(
+        collection(db, `${colName}/${postId}/replies`),
+        orderBy('createdAt', 'asc')
+      );
+      const repliesEl = document.getElementById(`replies-${postId}`);
+      // live subcollection
+      onSnapshot(repliesQ, snap => {
+        repliesEl.innerHTML = '';
+        snap.forEach(r => {
+          const d = r.data();
+          const when = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleString() : '';
+          const item = document.createElement('div');
+          item.className = 'reply-card';
+          item.innerHTML = `
+            <div class="reply-meta">${escapeHTML(d.userEmail || 'Someone')} • ${when}</div>
+            <div>${escapeHTML(d.body || '')}</div>
+          `;
+          repliesEl.appendChild(item);
         });
       });
     }
 
-    submitBtn.addEventListener("click", async () => {
-      const text = postBodyEl.value.trim();
-      const board = postBoardEl.value;
-      if (!text) return;
-      await addDoc(collection(db, BOARD_COLLECTIONS[board]), {
-        title: null,
-        body: text,
-        by: window.netlifyIdentity?.currentUser()?.email || "Guest",
+    // ---------- Switch board ----------
+    function listenToBoard(board) {
+      if (unsub) unsub();
+      activeBoard = board;
+      tabs.forEach(b => b.classList.toggle('active', b.dataset.board === board));
+      skeleton();
+
+      const colName = boardToCollection(board);
+      const q = query(collection(db, colName), orderBy('createdAt','desc'));
+      unsub = onSnapshot(q, (snap) => renderPosts(snap));
+    }
+
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => listenToBoard(btn.dataset.board));
+    });
+
+    // initial
+    listenToBoard('general');
+
+    // ---------- Replies interactions ----------
+    postsEl.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button.reply-btn');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      const act = btn.dataset.act;
+      const replies = document.getElementById(`replies-${id}`);
+
+      if (act === 'toggle') {
+        const showing = replies.classList.toggle('show');
+        btn.textContent = showing ? 'Hide replies' : 'Show replies';
+        return;
+      }
+
+      if (act === 'reply') {
+        const text = prompt('Write your reply:');
+        if (!text || !text.trim()) return;
+
+        const user = window.netlifyIdentity?.currentUser();
+        const email = user?.email || 'anonymous@guest';
+        const colName = boardToCollection(activeBoard);
+        await addDoc(collection(db, `${colName}/${id}/replies`), {
+          body: text.trim(),
+          userEmail: email,
+          createdAt: serverTimestamp()
+        });
+        replies.classList.add('show');
+        const toggleBtn = btn.parentElement.querySelector('[data-act="toggle"]');
+        if (toggleBtn) toggleBtn.textContent = 'Hide replies';
+      }
+    });
+
+    // ---------- Composer modal ----------
+    const openBtn = document.getElementById('openComposer');
+    const backdrop = document.getElementById('composerBackdrop');
+    const cancelBtn = document.getElementById('cancelComposer');
+    const saveBtn = document.getElementById('savePost');
+    const postBoard = document.getElementById('postBoard');
+    const postTitle = document.getElementById('postTitle');
+    const postBody = document.getElementById('postBody');
+
+    function openModal() {
+      backdrop.style.display = 'grid';
+      postBoard.value = activeBoard;
+      setTimeout(() => postTitle.focus(), 80);
+    }
+    function closeModal() {
+      backdrop.style.display = 'none';
+      postTitle.value = ''; postBody.value = '';
+    }
+
+    openBtn.addEventListener('click', openModal);
+    cancelBtn.addEventListener('click', closeModal);
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) closeModal();
+    });
+
+    saveBtn.addEventListener('click', async () => {
+      const title = postTitle.value.trim();
+      const body = postBody.value.trim();
+      if (!title || !body) return;
+
+      const user = window.netlifyIdentity?.currentUser();
+      if (!user) { window.netlifyIdentity?.open('login'); return; }
+
+      const email = user.email;
+      const colName = boardToCollection(postBoard.value);
+      await addDoc(collection(db, colName), {
+        title, body,
+        userEmail: email,
         createdAt: serverTimestamp()
       });
-      postBodyEl.value = "";
+      closeModal();
+
+      // If posted to another board, switch to it so the user sees it
+      if (postBoard.value !== activeBoard) {
+        listenToBoard(postBoard.value);
+      }
     });
 
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        tabs.forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        currentBoard = tab.dataset.board;
-        postBoardEl.value = currentBoard;
-        subscribePosts(currentBoard);
-      });
-    });
+    // ---------- Identity gate (modal if logged out) ----------
+    (function gateWithIdentity(){
+      if (!window.netlifyIdentity) return;
+      window.netlifyIdentity.on('init', user => { if (!user) window.netlifyIdentity.open('login'); });
+      window.netlifyIdentity.on('logout', () => { window.location.href = 'login.html'; });
+    })();
 
-    subscribePosts(currentBoard);
-  </script>
-
-  <!-- Nav & Footer -->
-  <script type="module">
-    import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-    document.addEventListener("DOMContentLoaded", () => {
-      loadNavbar();
-      enableLogout();
-      requireAuth();
-    });
+    // ---------- tiny util ----------
+    function escapeHTML(str=''){
+      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    }
   </script>
 </body>
 </html>
+
 
 
