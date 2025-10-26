@@ -1,252 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Family Forum — Williams Family Reunion</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Family Forum — Williams Family Reunion</title>
 
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
-  <!-- Navbar -->
-  <script type="module" src="nav.js"></script>
+<script type="module" src="nav.js"></script>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-  <!-- Netlify Identity -->
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<style>
+/* 🗨️ Forum Layout */
+.forum-container {
+  max-width: 850px;
+  margin: 3rem auto;
+  padding: 1rem;
+}
 
-  <style>
-    .forum-hero {
-      text-align: center;
-      padding: 28px 16px;
-    }
-    .forum-hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.2rem;
-      margin: 0 0 6px;
-    }
-    .forum-hero p {
-      color: #aaa;
-      margin: 0;
-    }
+/* Header */
+.forum-hero {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+.forum-hero h1 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin: 0 0 10px;
+}
+.forum-hero p {
+  color: var(--muted);
+  margin: 0;
+}
 
-    .forum-tabs {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin: 18px auto 10px;
-      flex-wrap: wrap;
-    }
-    .forum-tab {
-      border: 1px solid #555;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: #222;
-      color: #ddd;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background .2s, color .2s, border-color .2s;
-    }
-    .forum-tab.active {
-      background: #ffd700;
-      color: #000;
-      border-color: #ffd700;
-    }
+/* Composer */
+.composer {
+  background: linear-gradient(180deg,#121624 0%,#0f121a 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin-bottom: 2rem;
+}
+.composer textarea {
+  width: 100%;
+  min-height: 100px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  color: var(--text);
+  background: #0f1218;
+  font-family: "Poppins", sans-serif;
+  resize: vertical;
+}
+.composer button {
+  background: linear-gradient(180deg, var(--mint) 0%, var(--mint-2) 100%);
+  border: none;
+  border-radius: 10px;
+  color: #0a1310;
+  font-weight: 600;
+  padding: 10px 18px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: filter 0.3s ease;
+}
+.composer button:hover { filter: brightness(1.1); }
 
-    .composer {
-      max-width: 820px;
-      margin: 16px auto;
-      background: #1c1c1c;
-      border: 1px solid #333;
-      border-radius: 12px;
-      padding: 14px;
-      color: #eee;
-    }
-    .composer textarea {
-      width: 100%;
-      min-height: 90px;
-      border: 1px solid #444;
-      border-radius: 10px;
-      padding: 10px 12px;
-      background: #111;
-      color: #fff;
-      resize: vertical;
-    }
-    .composer select, .composer button {
-      border: 1px solid #444;
-      border-radius: 10px;
-      padding: 8px 12px;
-      background: #222;
-      color: #fff;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .composer button {
-      background: #ffd700; color: #000; border-color: #ffd700;
-    }
+/* Posts */
+.posts {
+  display: grid;
+  gap: 16px;
+}
+.post {
+  background: linear-gradient(180deg,#121624 0%,#0f121a 100%);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.post .meta {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.post .body {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: var(--text);
+}
 
-    .posts {
-      max-width: 900px;
-      margin: 10px auto 40px;
-      display: grid;
-      gap: 12px;
-    }
-    .post {
-      background: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 14px;
-      padding: 14px 16px;
-      color: #eee;
-    }
-    .post .meta {
-      font-size: .85rem; color: #999; margin-bottom: 6px;
-    }
-    .post .body {
-      margin: 0; line-height: 1.55;
-    }
-    .reply-section {
-      margin-top: 10px; border-top: 1px solid #333; padding-top: 10px;
-    }
-    .reply-input {
-      width: 100%; border-radius: 8px; padding: 8px; border: 1px solid #444;
-      background: #111; color: #fff; margin-bottom: 6px;
-    }
-    .reply-btn {
-      background: #444; border: none; color: #fff; padding: 6px 10px;
-      border-radius: 8px; cursor: pointer;
-    }
-    .reply {
-      font-size: 0.9rem; color: #ccc; margin-top: 6px;
-      border-left: 3px solid #444; padding-left: 8px;
-    }
-    .empty { text-align: center; color: #777; padding: 24px 8px; }
-  </style>
+/* Comments */
+.comments {
+  margin-left: 1rem;
+  border-left: 2px solid var(--border);
+  padding-left: 1rem;
+}
+.comment {
+  background: rgba(255,255,255,0.03);
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+.comment small {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.comment p {
+  margin: 4px 0;
+  color: var(--text);
+}
+
+/* Reply box */
+.reply-box {
+  margin-top: 8px;
+}
+.reply-box textarea {
+  width: 100%;
+  min-height: 60px;
+  background: #0f1218;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 8px;
+  resize: vertical;
+}
+.reply-box button {
+  margin-top: 6px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background: var(--mint);
+  color: #0a1310;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.3s ease;
+}
+.reply-box button:hover { filter: brightness(1.1); }
+</style>
 </head>
 
 <body>
-  <header></header>
+<header></header>
 
-  <main class="section">
-    <div class="forum-hero">
-      <h1>Family Forum</h1>
-      <p>Chat, share memories, and plan the reunion together.</p>
-    </div>
+<main class="forum-container">
+  <div class="forum-hero">
+    <h1>Family Forum</h1>
+    <p>Chat, share memories, and plan the reunion together 💬</p>
+  </div>
 
-    <div class="forum-tabs" role="tablist" aria-label="Forum boards">
-      <button class="forum-tab active" data-board="general" aria-selected="true">General</button>
-      <button class="forum-tab" data-board="memories">Memories</button>
-      <button class="forum-tab" data-board="planning">Planning</button>
-    </div>
+  <!-- Post Composer -->
+  <div class="composer">
+    <textarea id="newPost" placeholder="What's on your mind, cousin?"></textarea>
+    <button id="postBtn">Post</button>
+  </div>
 
-    <div class="composer">
-      <h3>Create a post</h3>
-      <textarea id="postBody" placeholder="Write something for the family…"></textarea>
-      <div class="row" style="display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:10px;">
-        <select id="postBoard" aria-label="Select board">
-          <option value="general" selected>General</option>
-          <option value="memories">Memories</option>
-          <option value="planning">Planning</option>
-        </select>
-        <button id="submitPost">Post</button>
+  <!-- Posts Feed -->
+  <section class="posts" id="posts"></section>
+</main>
+
+<footer></footer>
+
+<!-- 💬 Forum Logic -->
+<script>
+const postsEl = document.getElementById('posts');
+const postBtn = document.getElementById('postBtn');
+const newPost = document.getElementById('newPost');
+
+let posts = [
+  {
+    author: "Aunt Mia",
+    text: "Who's bringing the potato salad this year? 👀",
+    comments: [
+      { author: "Uncle Ray", text: "Not me, last time it disappeared fast!" },
+      { author: "Taylor", text: "I'll make one batch early and hide it 😆" }
+    ]
+  },
+  {
+    author: "Jay",
+    text: "Anyone flying out of Atlanta? Maybe we can carpool to the airport.",
+    comments: []
+  }
+];
+
+// Render Posts
+function renderPosts() {
+  postsEl.innerHTML = '';
+  posts.forEach((p, i) => {
+    const postDiv = document.createElement('div');
+    postDiv.className = 'post';
+    postDiv.innerHTML = `
+      <div class="meta">${p.author}</div>
+      <p class="body">${p.text}</p>
+      <div class="comments" id="comments-${i}">
+        ${p.comments.map(c => `
+          <div class="comment"><small>${c.author}</small><p>${c.text}</p></div>
+        `).join('')}
       </div>
-    </div>
+      <div class="reply-box">
+        <textarea id="reply-${i}" placeholder="Reply..."></textarea>
+        <button onclick="addReply(${i})">Reply</button>
+      </div>
+    `;
+    postsEl.appendChild(postDiv);
+  });
+}
 
-    <section class="posts" id="posts"></section>
-  </main>
+function addReply(postIndex) {
+  const input = document.getElementById(`reply-${postIndex}`);
+  const text = input.value.trim();
+  if (!text) return;
+  const user = window.netlifyIdentity?.currentUser()?.email || "You";
+  posts[postIndex].comments.push({ author: user, text });
+  renderPosts();
+}
 
-  <footer></footer>
+postBtn.addEventListener('click', () => {
+  const text = newPost.value.trim();
+  if (!text) return;
+  const user = window.netlifyIdentity?.currentUser()?.email || "You";
+  posts.unshift({ author: user, text, comments: [] });
+  newPost.value = '';
+  renderPosts();
+});
 
-  <!-- 🔐 Firestore Forum Logic -->
-  <script type="module">
-    import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-    import { auth, db } from "./firebase-init.js";
-    import {
-      collection, addDoc, getDocs, query, orderBy, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+renderPosts();
+</script>
 
-    document.addEventListener("DOMContentLoaded", () => {
-      loadNavbar();
-      enableLogout();
-      requireAuth();
-    });
-
-    const postsEl = document.getElementById("posts");
-    const bodyEl = document.getElementById("postBody");
-    const boardEl = document.getElementById("postBoard");
-    const submitBtn = document.getElementById("submitPost");
-    const tabs = document.querySelectorAll(".forum-tab");
-    let currentBoard = "general";
-
-    async function loadPosts(board) {
-      postsEl.innerHTML = "<div class='empty'>Loading posts...</div>";
-      const q = query(collection(db, "forum_" + board), orderBy("createdAt", "desc"));
-      const snapshot = await getDocs(q);
-      postsEl.innerHTML = "";
-      if (snapshot.empty) {
-        postsEl.innerHTML = "<div class='empty'>No posts yet. Be the first to start a conversation!</div>";
-        return;
-      }
-      snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const postId = docSnap.id;
-        const post = document.createElement("article");
-        post.className = "post";
-        post.innerHTML = `
-          <div class="meta">${data.by || "Anonymous"} • 
-            ${data.createdAt ? new Date(data.createdAt.toDate()).toLocaleString() : "just now"} •
-            <span style="text-transform:capitalize">${board}</span>
-          </div>
-          <p class="body">${data.body || ""}</p>
-          <div class="reply-section" id="replies-${postId}">
-            <input class="reply-input" type="text" placeholder="Reply…" id="input-${postId}">
-            <button class="reply-btn" onclick="addReply('${board}', '${postId}')">Reply</button>
-          </div>
-        `;
-        postsEl.appendChild(post);
-      });
-    }
-
-    // Add a new post
-    submitBtn.addEventListener("click", async () => {
-      const user = auth.currentUser;
-      const text = bodyEl.value.trim();
-      const board = boardEl.value;
-      if (!text) return;
-      await addDoc(collection(db, "forum_" + board), {
-        body: text,
-        by: user ? user.email : "Guest",
-        createdAt: serverTimestamp()
-      });
-      bodyEl.value = "";
-      loadPosts(board);
-    });
-
-    // Add a reply (threaded)
-    window.addReply = async function(board, postId) {
-      const user = auth.currentUser;
-      const input = document.getElementById(`input-${postId}`);
-      const reply = input.value.trim();
-      if (!reply) return;
-      await addDoc(collection(db, `forum_${board}/${postId}/replies`), {
-        body: reply,
-        by: user ? user.email : "Guest",
-        createdAt: serverTimestamp()
-      });
-      input.value = "";
-      alert("Reply added!");
-    };
-
-    // Switch boards
-    tabs.forEach(btn => {
-      btn.addEventListener("click", () => {
-        tabs.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentBoard = btn.dataset.board;
-        boardEl.value = currentBoard;
-        loadPosts(currentBoard);
-      });
-    });
-
-    loadPosts(currentBoard);
-  </script>
+<script type="module">
+import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+document.addEventListener("DOMContentLoaded", () => {
+  loadNavbar();
+  enableLogout();
+  requireAuth();
+});
+</script>
 </body>
 </html>
-
