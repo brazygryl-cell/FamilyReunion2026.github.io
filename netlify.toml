@@ -1,2 +1,3 @@
-# [[plugins]]
-#  package = "@netlify/plugin-identity"
+[functions]
+  directory = "netlify/functions"
+
