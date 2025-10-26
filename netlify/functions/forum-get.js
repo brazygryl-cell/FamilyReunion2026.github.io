@@ -1,21 +1,27 @@
+// forum-get.js — compatible with Netlify’s Node runtime (CommonJS)
 import admin from "firebase-admin";
 import { readFileSync } from "fs";
-import { fileURLToPath } from "url";
 import path from "path";
+import { fileURLToPath } from "url";
 
-// ✅ Fix path resolution for Netlify runtime
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+let serviceAccount;
+
+try {
+  // Safe path resolution — handles both local and Netlify deployments
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+
+  const servicePath = path.join(__dirname, "service-account.json");
+  serviceAccount = JSON.parse(readFileSync(servicePath, "utf8"));
+} catch (err) {
+  console.error("🔥 Could not read service-account.json:", err);
+}
 
 if (!admin.apps.length) {
   try {
-    const serviceAccountPath = path.join(__dirname, "service-account.json");
-    const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, "utf8"));
-
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
     });
-
     console.log("✅ Firebase Admin initialized in forum-get.js");
   } catch (err) {
     console.error("🔥 Failed to initialize Firebase Admin:", err);
@@ -43,8 +49,6 @@ export const handler = async (event) => {
       id: doc.id,
       ...doc.data(),
     }));
-
-    console.log(`✅ Retrieved ${posts.length} posts from ${board}`);
 
     return {
       statusCode: 200,
