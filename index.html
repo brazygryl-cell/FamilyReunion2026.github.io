@@ -1,112 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Williams Family Reunion — Home</title>
-<link rel="stylesheet" href="style.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Williams Family Reunion 2026</title>
+
+<link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script type="module" src="nav.js"></script>
+
+<style>
+/* 🧭 Fix for hero slideshow and countdown centering */
+#hero-slideshow {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+#hero-slideshow .slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: scale(1.05);
+  transition: opacity 2s ease-in-out, transform 6s ease-in-out;
+}
+#hero-slideshow .slide.active {
+  opacity: 1;
+  transform: scale(1);
+}
+#hero-slideshow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1;
+}
+
+#hero-slideshow .overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: var(--text);
+  z-index: 2;
+  width: 90%;
+  max-width: 900px;
+}
+
+#hero-slideshow h1 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(2rem, 5vw, 4rem);
+  margin-bottom: 0.5rem;
+}
+#hero-slideshow p {
+  font-size: 1.3rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+}
+
+/* 💫 Countdown layout */
+.countdown {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.count-chip {
+  background: rgba(18, 22, 30, 0.85);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  min-width: 120px;
+  padding: 18px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+.count-chip .n {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--mint);
+}
+.count-chip .l {
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+#hero-slideshow .btn {
+  display: inline-block;
+  background: linear-gradient(180deg, var(--mint) 0%, var(--mint-2) 100%);
+  color: #0a1310;
+  border-radius: 10px;
+  padding: 0.9rem 1.8rem;
+  text-decoration: none;
+  font-weight: 600;
+  transition: filter 0.3s ease;
+}
+#hero-slideshow .btn:hover { filter: brightness(1.1); }
+</style>
 </head>
 
 <body>
-<!-- Navbar -->
 <header></header>
 
-<!-- Hero Slideshow with Countdown -->
 <section id="hero-slideshow">
-<div class="slide active" style="background-image: url('images/family1.jpg')"></div>
-<div class="slide" style="background-image: url('images/family2.jpg')"></div>
-<div class="slide" style="background-image: url('images/family3.jpg')"></div>
+  <!-- 🖼️ Make sure these images exist inside your /images folder -->
+  <div class="slide active" style="background-image:url('images/family1.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family2.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family3.jpg')"></div>
 
-<div class="overlay">
-<h1>Williams Family Reunion 2026</h1>
-<p>July 26 - August 1 • Orlando, FL</p>
+  <div class="overlay">
+    <h1>Williams Family Reunion 2026</h1>
+    <p>July 26 – August 1, 2026 • Orlando, Florida</p>
 
-<!-- ✨ Countdown integrated into hero -->
-<div class="countdown-timer">
-<span id="d">0</span>d :
-<span id="h">0</span>h :
-<span id="m">0</span>m :
-<span id="s">0</span>s
-</div>
+    <div class="countdown">
+      <div class="count-chip"><div class="n" id="days">00</div><div class="l">Days</div></div>
+      <div class="count-chip"><div class="n" id="hours">00</div><div class="l">Hours</div></div>
+      <div class="count-chip"><div class="n" id="minutes">00</div><div class="l">Minutes</div></div>
+      <div class="count-chip"><div class="n" id="seconds">00</div><div class="l">Seconds</div></div>
+    </div>
 
-<a href="event-details.html" class="btn">View Schedule</a>
-</div>
+    <a href="events.html" class="btn">View Itinerary</a>
+  </div>
 </section>
 
 <footer></footer>
 
-<!-- JS Imports -->
-<script type="module" src="./nav.js"></script>
-<script type="module">
-import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-document.addEventListener("DOMContentLoaded", () => {
-loadNavbar();
-enableLogout();
-requireAuth();
-});
-</script>
+<!-- ⭐ Starfield script (already included sitewide via CSS) -->
 
-<!-- Countdown Timer Script -->
+<!-- 🎞️ Slideshow rotation -->
 <script>
-const target = new Date("July 26, 2026 12:00:00").getTime();
-const dEl = document.getElementById("d");
-const hEl = document.getElementById("h");
-const mEl = document.getElementById("m");
-const sEl = document.getElementById("s");
-
+const slides = document.querySelectorAll('#hero-slideshow .slide');
+let current = 0;
 setInterval(() => {
-const now = Date.now();
-const diff = target - now;
-if (diff <= 0) {
-dEl.textContent = hEl.textContent = mEl.textContent = sEl.textContent = "0";
-return;
-}
-const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-const secs = Math.floor((diff % (1000 * 60)) / 1000);
-dEl.textContent = days;
-hEl.textContent = hours;
-mEl.textContent = mins;
-sEl.textContent = secs;
+  slides[current].classList.remove('active');
+  current = (current + 1) % slides.length;
+  slides[current].classList.add('active');
+}, 8000);
+
+// 🕒 Countdown Timer
+const targetDate = new Date("July 26, 2026 00:00:00").getTime();
+const timer = setInterval(() => {
+  const now = new Date().getTime();
+  const distance = targetDate - now;
+  if (distance < 0) return clearInterval(timer);
+  document.getElementById("days").innerText = Math.floor(distance / (1000 * 60 * 60 * 24));
+  document.getElementById("hours").innerText = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
+  document.getElementById("minutes").innerText = Math.floor((distance % (1000*60*60)) / (1000*60));
+  document.getElementById("seconds").innerText = Math.floor((distance % (1000*60)) / 1000);
 }, 1000);
 </script>
 
-<!-- Hero Slideshow Script -->
-<script>
-const slides = document.querySelectorAll("#hero-slideshow .slide");
-let currentSlide = 0;
-
-function nextSlide() {
-slides[currentSlide].classList.remove("active");
-currentSlide = (currentSlide + 1) % slides.length;
-slides[currentSlide].classList.add("active");
-}
-
-setInterval(nextSlide, 5000);
+<!-- 🔐 Netlify Identity + Navbar/Footer loader -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script type="module">
+  import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+  document.addEventListener("DOMContentLoaded", () => {
+    loadNavbar();
+    enableLogout();
+    requireAuth();
+  });
 </script>
-  <script>
-const header = document.querySelector("header");
-let lastScrollTop = 0;
-
-window.addEventListener("scroll", () => {
-const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-if (scrollTop > lastScrollTop + 50) {
-// Scrolling down — hide navbar
-header.classList.add("hidden");
-} else if (scrollTop < lastScrollTop - 50) {
-// Scrolling up — show navbar again
-header.classList.remove("hidden");
-header.classList.add("scrolled");
-}
-
-lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Prevent negative values
-});
-</script>
-
 </body>
 </html>
-
