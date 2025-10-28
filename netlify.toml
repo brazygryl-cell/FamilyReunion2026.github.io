@@ -4,8 +4,4 @@
 
 [functions]
   node_bundler = "esbuild"
-
-# 👇 IMPORTANT — this forces the service key to be packaged
-[[functions]]
-  path = "netlify/functions"
   included_files = ["netlify/functions/service-account.json"]
