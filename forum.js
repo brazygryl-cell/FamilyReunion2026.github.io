@@ -1,95 +1,61 @@
-// forum.js
-import { db, auth } from "./firebase-init.js";
-import {
-  collection, addDoc, onSnapshot, query, orderBy, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import admin from "firebase-admin";
+import fs from "fs";
 
-import { loadNavbar, loadFooter } from "./nav.js";
+// ✅ Resolve service-account.json safely on Netlify
+const serviceURL = new URL("./service-account.json", import.meta.url);
+// Convert file URL → real file path & decode any % escapes
+const servicePath = decodeURIComponent(serviceURL.pathname);
 
-// Wait until header/footer exist before injecting nav
-function waitForHeader() {
-  const header = document.querySelector("header");
-  const footer = document.querySelector("footer");
-  if (header && footer) {
-    loadNavbar();
-    loadFooter();
-    console.log("✅ Navbar + footer loaded");
-    setupForum();
-  } else {
-    console.log("⏳ Waiting for header/footer...");
-    setTimeout(waitForHeader, 100);
+console.log("📄 Loading service-account.json from:", servicePath);
+
+let serviceAccount;
+try {
+  serviceAccount = JSON.parse(fs.readFileSync(servicePath, "utf8"));
+  console.log("✅ Parsed service account:", serviceAccount.project_id);
+} catch (err) {
+  console.error("❌ Could not read service-account.json:", err);
+}
+
+// ✅ Initialize Firebase Admin cleanly
+if (!admin.apps.length) {
+  try {
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      projectId: serviceAccount.project_id,
+    });
+    console.log("✅ Firebase Admin initialized");
+  } catch (err) {
+    console.error("🔥 Error initializing Firebase Admin:", err);
   }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  console.log("✅ DOM loaded — now building navbar & forum");
-  waitForHeader();
-});
+const db = admin.firestore();
 
-function setupForum() {
-  const postsEl = document.getElementById("posts");
-  const tabs = document.querySelectorAll(".forum-tab");
-  const textarea = document.getElementById("postBody");
-  const boardSelect = document.getElementById("postBoard");
-  const postBtn = document.getElementById("submitPost");
+// ✅ Function Handler
+export const handler = async (event) => {
+  try {
+    const params = new URLSearchParams(event.rawQuery || "");
+    const board = params.get("board") || "general";
 
-  let currentBoard = "general";
+    console.log("📥 Fetching posts for:", `forum_${board}`);
 
-  // Render posts from Firestore
-  function renderPosts(board) {
-    postsEl.innerHTML = `<p style="text-align:center;color:#aaa">Loading ${board}...</p>`;
-    const ref = collection(db, `forum_${board}`);
-    const q = query(ref, orderBy("createdAt", "desc"));
-    onSnapshot(q, (snapshot) => {
-      postsEl.innerHTML = "";
-      if (snapshot.empty) {
-        postsEl.innerHTML = `<div class="empty">No posts yet in ${board}.</div>`;
-        return;
-      }
-      snapshot.forEach((doc) => {
-        const p = doc.data();
-        const card = document.createElement("div");
-        card.className = "post";
-        card.innerHTML = `
-          <div class="meta">${p.by || "Unknown"} • ${p.createdAt?.toDate().toLocaleString() || ""}</div>
-          <div class="title">${p.title || "(untitled)"}</div>
-          <p class="body">${p.body}</p>
-        `;
-        postsEl.appendChild(card);
-      });
-    });
+    const ref = db.collection(`forum_${board}`).orderBy("createdAt", "desc");
+    const snapshot = await ref.get();
+
+    const posts = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(posts),
+    };
+  } catch (err) {
+    console.error("🔥 FETCH ERROR:", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message }),
+    };
   }
-
-  // Tab switching
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      tabs.forEach((t) => t.classList.remove("active"));
-      tab.classList.add("active");
-      currentBoard = tab.dataset.board;
-      boardSelect.value = currentBoard;
-      renderPosts(currentBoard);
-    });
-  });
-
-  // Post new message
-  postBtn.addEventListener("click", async () => {
-    const text = textarea.value.trim();
-    if (!text) return alert("Write something first!");
-    try {
-      const ref = collection(db, `forum_${boardSelect.value}`);
-      await addDoc(ref, {
-        title: "New Post",
-        body: text,
-        by: auth.currentUser?.email || "Anonymous",
-        createdAt: serverTimestamp()
-      });
-      textarea.value = "";
-      renderPosts(boardSelect.value);
-    } catch (err) {
-      console.error("Error posting:", err);
-      alert("Could not post right now. Try again.");
-    }
-  });
-
-  renderPosts(currentBoard);
-}
+};
