@@ -1,31 +1,27 @@
-import admin from "firebase-admin";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-// Convert module URL → usable filesystem path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// ✅ Absolute path to credentials file
-const servicePath = path.join(__dirname, "service-account.json");
-
-console.log("📄 Looking for:", servicePath);
+const admin = require("firebase-admin");
+const path = require("path");
+const fs = require("fs");
 
 let serviceAccount;
+
 try {
-  serviceAccount = JSON.parse(fs.readFileSync(servicePath, "utf8"));
-  console.log("✅ Loaded service-account.json");
+  const servicePath = path.join(__dirname, "service-account.json");
+  console.log("📂 Loading service-account.json from:", servicePath);
+
+  const raw = fs.readFileSync(servicePath, "utf8");
+  serviceAccount = JSON.parse(raw);
+
 } catch (err) {
-  console.error("❌ Failed to read service-account.json:", err);
+  console.error("❌ Unable to read service-account.json:", err);
 }
 
-// ✅ Initialize Firebase Admin correctly
 if (!admin.apps.length && serviceAccount) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
   console.log("✅ Firebase Admin initialized");
+} else {
+  console.log("⚠️ Firebase Admin NOT initialized (missing service-account.json)");
 }
 
 const db = admin.firestore();
