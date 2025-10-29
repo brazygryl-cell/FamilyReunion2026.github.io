@@ -7,4 +7,4 @@
   included_files = ["netlify/functions/service-account.json"]
 
 [build.environment]
-SECRETS_SCAN_DISABLED = "true"
+SECRETS_SCAN_SMART_DETECTION_ENABLED = "true"
