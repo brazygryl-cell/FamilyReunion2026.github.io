@@ -164,17 +164,24 @@ const timer = setInterval(() => {
 </script>
 
 <!-- 🔐 Netlify Identity + Navbar/Footer loader -->
+<!-- 🔐 Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
 <script type="module">
   import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+
+  // 🚨 Require login BEFORE anything displays
+  requireAuth();
+
+  // ✅ After user is confirmed logged in, load UI
   document.addEventListener("DOMContentLoaded", () => {
     loadNavbar();
     enableLogout();
-    requireAuth();
   });
 </script>
 </body>
 </html>
+
 
 
 
