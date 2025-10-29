@@ -74,6 +74,22 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+import { signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+
+// Sync Netlify Identity → Firebase Auth
+if (window.netlifyIdentity) {
+  window.netlifyIdentity.on("login", async (user) => {
+    const token = await user.jwt(true);
+    const res = await fetch("/.netlify/functions/firebase-token", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const { customToken } = await res.json();
+    await signInWithCustomToken(auth, customToken);
+  });
+}
+
+
 // ---- UI elements ----
 const postsEl = document.getElementById("posts");
 const tabs = document.querySelectorAll(".forum-tab");
