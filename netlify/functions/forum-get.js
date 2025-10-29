@@ -1,14 +1,11 @@
 const admin = require("firebase-admin");
-const fs = require("fs");
 const path = require("path");
+const fs = require("fs");
 
-// ✅ Ensure Firebase Admin is initialized ONCE
+// ✅ Ensure Firestore Admin is initialized once and always with service-account.json
 if (!admin.apps.length) {
   const serviceAccountPath = path.join(__dirname, "service-account.json");
-
-  const serviceAccount = JSON.parse(
-    fs.readFileSync(serviceAccountPath, "utf8")
-  );
+  const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
 
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -17,7 +14,6 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
-// ✅ Cloud Function Handler
 exports.handler = async (event) => {
   try {
     const board = event.queryStringParameters?.board || "general";
@@ -27,7 +23,7 @@ exports.handler = async (event) => {
       .orderBy("createdAt", "desc")
       .get();
 
-    const posts = snapshot.docs.map((doc) => ({
+    const posts = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
     }));
@@ -35,18 +31,12 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       body: JSON.stringify(posts),
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
     };
   } catch (err) {
     console.error("🔥 Server Function Error:", err);
-
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message }),
-      headers: { "Content-Type": "application/json" },
     };
   }
 };
