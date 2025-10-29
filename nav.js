@@ -94,26 +94,33 @@ export function enableLogout() {
 
 // Require Login (used on protected pages)
 export function requireAuth() {
- if (!window.netlifyIdentity) {
- console.warn("Netlify Identity widget not loaded yet.");
- return;
- }
+  if (!window.netlifyIdentity) {
+    console.warn("Netlify Identity widget not loaded yet.");
+    return;
+  }
 
- window.netlifyIdentity.on("init", (user) => {
- if (!user) {
- window.netlifyIdentity.open("login");
- }
- });
+  window.netlifyIdentity.on("init", (user) => {
+    if (!user) {
+      // Open login prompt immediately
+      window.netlifyIdentity.open("login");
 
- window.netlifyIdentity.on("login", () => {
- console.log(" Logged in!");
- });
+      // If user closes it without logging in → force redirect
+      const guard = setInterval(() => {
+        const current = window.netlifyIdentity.currentUser();
+        if (current) {
+          clearInterval(guard);
+        } else {
+          window.location.href = "login.html";
+        }
+      }, 800);
+    }
+  });
 
- window.netlifyIdentity.on("logout", () => {
- console.log(" Logged out");
- window.location.href = "login.html";
- });
+  window.netlifyIdentity.on("logout", () => {
+    window.location.href = "login.html";
+  });
 }
+
 
 // Optional helper for pages that just want to reload the footer
 export function loadFooter() {
