@@ -1,25 +1,26 @@
 const admin = require("firebase-admin");
-const { getFirestore } = require("firebase-admin/firestore");
 const fs = require("fs");
 const path = require("path");
 
-// Load service account properly
-const servicePath = path.join(__dirname, "service-account.json");
-const serviceAccount = JSON.parse(fs.readFileSync(servicePath, "utf8"));
-
-// Initialize Admin SDK only once
+// ✅ Ensure Firebase Admin is initialized ONCE
 if (!admin.apps.length) {
+  const serviceAccountPath = path.join(__dirname, "service-account.json");
+
+  const serviceAccount = JSON.parse(
+    fs.readFileSync(serviceAccountPath, "utf8")
+  );
+
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    projectId: serviceAccount.project_id, // ✅ important fix
   });
 }
 
-const db = getFirestore();
+const db = admin.firestore();
 
+// ✅ Cloud Function Handler
 exports.handler = async (event) => {
   try {
-    const board = event.queryStringParameters.board || "general";
+    const board = event.queryStringParameters?.board || "general";
 
     const snapshot = await db
       .collection(`forum_${board}`)
@@ -34,14 +35,18 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       body: JSON.stringify(posts),
-      headers: { "Content-Type": "application/json" }
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
     };
-
   } catch (err) {
-    console.error("🔥 Error fetching posts:", err);
+    console.error("🔥 Server Function Error:", err);
+
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message }),
+      headers: { "Content-Type": "application/json" },
     };
   }
 };
