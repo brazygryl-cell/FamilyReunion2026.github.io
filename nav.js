@@ -9,14 +9,14 @@ export function loadNavbar() {
   // Navbar
   if (header) {
     header.innerHTML = `
-    <nav class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="event-details.html">Event Details</a>
-      <a href="lodging-travel.html">Lodging</a>
-      <a href="forum.html">Forum</a>
-      <a href="photo-gallery.html">Photo Gallery</a>
-      <a href="#" id="logoutBtn" style="color:#c33;font-weight:600">Logout</a>
-    </nav>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="event-details.html">Event Details</a>
+        <a href="lodging-travel.html">Lodging</a>
+        <a href="forum.html">Forum</a>
+        <a href="photo-gallery.html">Photo Gallery</a>
+        <a href="#" id="logoutBtn" style="color:#c33;font-weight:600">Logout</a>
+      </nav>
     `;
   }
 
@@ -63,14 +63,16 @@ export function loadNavbar() {
   }
 }
 
-// Enable Logout
+// Logout Button
 export function enableLogout() {
   const logoutBtn = document.getElementById("logoutBtn");
-  if (!logoutBtn || !window.netlifyIdentity) return;
+  if (!logoutBtn) return;
 
   logoutBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    window.netlifyIdentity.logout();
+    if (window.netlifyIdentity.currentUser()) {
+      window.netlifyIdentity.logout();
+    }
   });
 
   window.netlifyIdentity.on("logout", () => {
@@ -78,39 +80,20 @@ export function enableLogout() {
   });
 }
 
-// ✅ Require Login (no infinite reload — stable version)
+// Require Login (but do NOT loop)
 export function requireAuth() {
   if (!window.netlifyIdentity) return;
 
+  // If user is not logged in when identity initializes → go to login page
   window.netlifyIdentity.on("init", (user) => {
-    if (!user) {
-      // Show login popup
-      window.netlifyIdentity.open("login");
-
-      // If user closes popup → redirect to login page
-      window.netlifyIdentity.on("close", () => {
-        if (!window.netlifyIdentity.currentUser()) {
-          window.location.href = "login.html";
-        }
-      });
+    if (!user && !window.location.pathname.includes("login.html")) {
+      window.location.href = "login.html";
     }
   });
 
-  // If the user logs in → reload ONCE to attach auth token
+  // After login, reload once to activate Firestore token
   window.netlifyIdentity.on("login", () => {
-    window.location.reload();
+    location.reload();
   });
-}
-
-// Optional footer-only loader
-export function loadFooter() {
-  const footer = document.querySelector("footer");
-  if (!footer) return;
-  footer.innerHTML = `
-    <p>Made with ❤️ by 
-      <a href="#" id="emailLink">Taylor Clark Jones</a>
-    </p>
-    <p>Art by Andre Clark</p>
-  `;
 }
 
