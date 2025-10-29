@@ -9,279 +9,327 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
   <style>
-    /* ===== Discord-style forum UI (Mint + Midnight) ===== */
-    :root {
-      --bg: #0f131a;
-      --panel: #121826;
-      --panel-2: #0e1522;
-      --border: rgba(255,255,255,0.06);
-      --text: #e8edf2;
-      --muted: #aab3bf;
-      --mint: #86ffd9;
-      --mint-2: #5ee6c9;
-      --chip: rgba(134,255,217,0.1);
-      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+    /* ========== Mint + Midnight Discord-Style Forum ========== */
+    :root{
+      --bg:#0e1117;
+      --surface:#121624;
+      --surface-2:#0f121a;
+      --border:#1f2637;
+      --text:#e7eefb;
+      --muted:#9fb0d0;
+      --mint:#79f8c7;
+      --mint-2:#5be0b1;
+      --danger:#ff6b6b;
+      --shadow: 0 10px 30px rgba(0,0,0,0.45);
     }
 
     body { background: var(--bg); color: var(--text); }
 
-    .forum-hero {
-      padding: 2.2rem 1rem 1rem;
+    /* Header is filled by nav.js */
+
+    .forum-hero{
+      max-width: 960px;
+      margin: 2rem auto 1rem;
+      padding: 1.25rem 1.5rem;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
       text-align: center;
-      background: linear-gradient(180deg, #0f141d 0%, #0b1018 100%);
-      border-bottom: 1px solid var(--border);
     }
-    .forum-hero h1 {
+    .forum-hero h1{
       font-family: "Playfair Display", serif;
-      font-size: clamp(1.8rem, 3.5vw, 2.4rem);
-      margin: 0 0 .4rem;
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      margin: 0 0 .3rem;
     }
-    .forum-hero p { color: var(--muted); margin: 0; }
+    .forum-hero p{ color: var(--muted); margin: 0; }
 
-    /* Tabs */
-    .forum-tabs {
-      display: flex; gap: 10px; justify-content: center; padding: 12px 10px 0;
-      position: sticky; top: 0; z-index: 5;
-      background: linear-gradient(180deg, #0f131a 0%, rgba(15,19,26,0.8) 100%);
-      backdrop-filter: blur(6px);
-      border-bottom: 1px solid var(--border);
+    .forum-tabs{
+      max-width: 960px;
+      margin: 1rem auto;
+      display: flex;
+      gap: 8px;
+      padding: 0 .5rem;
+      flex-wrap: wrap;
     }
-    .forum-tab {
-      padding: .55rem .9rem; border-radius: 10px; cursor: pointer;
-      background: var(--panel); border: 1px solid var(--border); color: var(--text);
+    .forum-tab{
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      border-radius: 10px;
+      padding: .55rem .9rem;
       font-weight: 600;
+      cursor: pointer;
     }
-    .forum-tab.active { outline: 2px solid var(--mint); background: var(--panel-2); }
-
-    /* Posts area */
-    .forum-wrap {
-      max-width: 900px; margin: 0 auto; padding: 1rem .8rem 6.2rem;
-    }
-    .empty {
-      color: var(--muted); text-align: center; margin: 2rem 0;
-      border: 1px dashed var(--border); padding: 1.2rem; border-radius: 12px;
-      background: rgba(255,255,255,0.02);
-    }
-    .post {
-      background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
-      padding: .9rem 1rem; margin: .8rem 0; box-shadow: var(--shadow);
-    }
-    .meta {
-      font-size: .9rem; color: var(--muted); margin-bottom: .45rem;
-      display: flex; gap: 8px; align-items: center;
-    }
-    .badge {
-      display:inline-block; font-size:.75rem; padding:.15rem .5rem; border-radius:999px;
-      background: var(--chip); color: var(--mint); border: 1px solid var(--mint-2);
-    }
-    .title { font-weight: 700; margin-bottom: .25rem; }
-    .body { margin: 0; line-height: 1.6; color: var(--text); }
-
-    /* Composer fixed bottom */
-    .composer {
-      position: fixed; left: 0; right: 0; bottom: 0; z-index: 9;
-      background: linear-gradient(180deg, rgba(15,19,26,0.6), #0b1018 60%);
-      backdrop-filter: blur(8px);
-      border-top: 1px solid var(--border);
-    }
-    .composer-inner {
-      max-width: 900px; margin: 0 auto; padding: .8rem .8rem;
-      display: grid; grid-template-columns: 1fr auto; gap: .6rem; align-items: end;
-    }
-    .composer textarea {
-      width: 100%; min-height: 70px; resize: vertical;
-      border-radius: 12px; border: 1px solid var(--border);
-      background: var(--panel-2); color: var(--text); padding: .75rem .9rem;
-    }
-    .composer .row { display: flex; gap: .5rem; }
-    select, button {
-      border-radius: 10px; border: 1px solid var(--border); background: var(--panel);
-      color: var(--text); padding: .6rem .8rem; font-weight: 600;
-    }
-    button.mint {
+    .forum-tab.active{
       background: linear-gradient(180deg, var(--mint) 0%, var(--mint-2) 100%);
-      color: #071710; border: none;
+      color: #0a1310;
+      border-color: transparent;
     }
 
-    /* Subtle loading shimmer */
-    .shimmer {
-      height: 80px; border-radius: 14px; margin: .8rem 0;
-      background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.08), rgba(255,255,255,.04));
-      background-size: 300% 100%; animation: shimmer 1.2s infinite;
+    /* Composer (Discord-like bottom bar) */
+    .composer-wrap{
+      position: sticky;
+      bottom: 0;
+      z-index: 3;
+      background: linear-gradient(180deg, rgba(14,17,23,0) 0%, rgba(14,17,23,.95) 40%);
+      padding: 1rem 0;
+      backdrop-filter: blur(6px);
     }
-    @keyframes shimmer { 0% { background-position: 0% 0; } 100% { background-position: 100% 0; } }
+    .composer{
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      gap: .6rem;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      padding: 0 1rem;
+    }
+    .composer textarea{
+      min-height: 60px;
+      max-height: 200px;
+      resize: vertical;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      padding: .85rem 1rem;
+      outline: none;
+    }
+    .composer .controls{
+      display: grid;
+      gap: .5rem;
+      grid-template-columns: auto;
+      align-content: end;
+    }
+    .composer select{
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      padding: .55rem .7rem;
+      outline: none;
+    }
+    .btn{
+      display: inline-block;
+      border-radius: 10px;
+      padding: .7rem 1rem;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--mint) 0%, var(--mint-2) 100%);
+      color: #0a1310;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; }
+
+    /* Posts List */
+    .posts{
+      max-width: 960px;
+      margin: 1rem auto 9rem; /* leave space for sticky composer */
+      padding: 0 1rem;
+      display: grid;
+      gap: .75rem;
+    }
+    .post{
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, #0f121a 0%, #0c0f15 100%);
+      border-radius: 12px;
+      padding: .9rem 1rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,.35);
+    }
+    .post .meta{
+      font-size: .85rem;
+      color: var(--muted);
+      margin-bottom: .35rem;
+    }
+    .empty, .error{
+      text-align: center;
+      color: var(--muted);
+      padding: 1rem;
+    }
+    .error{ color: var(--danger); }
+    .shimmer{
+      height: 70px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: linear-gradient(90deg, #111520 25%, #151b2a 50%, #111520 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer{
+      0%{ background-position: 200% 0; }
+      100%{ background-position: -200% 0; }
+    }
   </style>
 </head>
-
 <body>
   <header></header>
 
   <main>
-    <div class="forum-hero">
+    <section class="forum-hero">
       <h1>Family Forum</h1>
-      <p>Chat, share memories, and plan the reunion together.</p>
-    </div>
+      <p>Share memories, make plans, and keep everyone in the loop.</p>
+    </section>
 
+    <!-- Tabs -->
     <div class="forum-tabs" role="tablist" aria-label="Forum boards">
-      <button class="forum-tab active" data-board="general">General</button>
-      <button class="forum-tab" data-board="memories">Memories</button>
-      <button class="forum-tab" data-board="planning">Planning</button>
+      <button class="forum-tab active" data-board="general"># General</button>
+      <button class="forum-tab" data-board="memories"># Memories</button>
+      <button class="forum-tab" data-board="planning"># Planning</button>
     </div>
 
-    <section class="forum-wrap">
-      <div id="posts">
-        <div class="shimmer"></div>
-        <div class="shimmer"></div>
-        <div class="shimmer"></div>
-      </div>
+    <!-- Posts -->
+    <section id="posts" class="posts" aria-live="polite">
+      <div class="shimmer"></div>
+      <div class="shimmer"></div>
+      <div class="shimmer"></div>
     </section>
   </main>
 
-  <!-- Composer -->
-  <div class="composer">
-    <div class="composer-inner">
+  <!-- Composer (sticky like Discord message bar) -->
+  <div class="composer-wrap">
+    <div class="composer">
       <textarea id="postBody" placeholder="Write a message to the family…"></textarea>
-      <div class="row">
+      <div class="controls">
         <select id="postBoard" aria-label="Choose board">
           <option value="general" selected>General</option>
           <option value="memories">Memories</option>
           <option value="planning">Planning</option>
         </select>
-        <button id="submitPost" class="mint">Post</button>
+        <button id="submitPost" class="btn">Post</button>
       </div>
     </div>
   </div>
 
   <footer></footer>
 
-  <!-- 🔐 Netlify Identity -->
+  <!-- 🔐 Netlify Identity (site-wide auth) -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-  <!-- Firebase SDKs -->
   <script type="module">
     import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 
-    // 🚪 Gate the page behind Netlify Identity
+    // Require login as early as possible
     requireAuth();
 
+    // After DOM is ready, wire up UI and data
     document.addEventListener("DOMContentLoaded", () => {
       loadNavbar();
       enableLogout();
+      setupForum();
     });
-  </script>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-    import { 
-      getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
-    } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+    function setupForum(){
+      const postsEl = document.getElementById("posts");
+      const tabs = document.querySelectorAll(".forum-tab");
+      const textarea = document.getElementById("postBody");
+      const boardSelect = document.getElementById("postBoard");
+      const postBtn = document.getElementById("submitPost");
 
-    // --- Netlify secret scan note ---
-    // Firebase Web API keys are public by design. We split the string below
-    // only to prevent Netlify's generic "likely secret" scanner from blocking builds.
-    // This does not hide the key from users (nor should it).
-    // Docs: https://firebase.google.com/docs/projects/api-keys
-    const API_PARTS = ["AI","zaSyAldYSp37LZO31XkGc4F1xhnQ9bpBXLU6Q"];
-    const firebaseConfig = {
-      apiKey: API_PARTS.join(""),
-      authDomain: "williams-reunion.firebaseapp.com",
-      projectId: "williams-reunion"
-    };
+      let currentBoard = "general";
+      let loading = false;
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    // Always ensure we have a Firebase Auth user (anonymous is fine for Firestore rules)
-    signInAnonymously(auth).catch(() => { /* ignore if already signed in */ });
-
-    // Elements
-    const postsEl   = document.getElementById("posts");
-    const tabs      = document.querySelectorAll(".forum-tab");
-    const textarea  = document.getElementById("postBody");
-    const boardSel  = document.getElementById("postBoard");
-    const postBtn   = document.getElementById("submitPost");
-    let currentBoard = "general";
-    let unsubscribe = null;
-
-    // Get Netlify Identity email (for display only)
-    function netlifyEmail() {
-      try {
-        const u = window.netlifyIdentity && window.netlifyIdentity.currentUser();
-        return u?.email || null;
-      } catch { return null; }
-    }
-
-    function renderSnapshot(snapshot) {
-      postsEl.innerHTML = "";
-      if (snapshot.empty) {
-        postsEl.innerHTML = `<div class="empty">No posts yet in <strong>${currentBoard}</strong>.</div>`;
-        return;
+      // ----- Fetch & Render -----
+      async function fetchPosts(board){
+        try {
+          postsEl.innerHTML = `<div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div>`;
+          const res = await fetch(`/.netlify/functions/forum-get?board=${encodeURIComponent(board)}`, {
+            credentials: "include",
+          });
+          if(!res.ok){
+            const txt = await res.text().catch(()=> "");
+            throw new Error(`GET ${res.status}: ${txt || res.statusText}`);
+          }
+          const data = await res.json();
+          renderPosts(data);
+        } catch(err){
+          console.error("Fetch posts failed:", err);
+          postsEl.innerHTML = `<div class="error">Couldn’t load posts. Please try again.</div>`;
+        }
       }
-      snapshot.forEach((doc) => {
-        const p = doc.data();
-        const when = p.createdAt?.toDate ? p.createdAt.toDate().toLocaleString() : "";
-        const by   = p.by || "Anonymous";
-        const el = document.createElement("div");
-        el.className = "post";
-        el.innerHTML = `
-          <div class="meta">
-            <span class="badge">${currentBoard}</span>
-            <span>${by}</span> • <span>${when}</span>
-          </div>
-          <p class="body">${(p.body || "").replace(/\n/g, "<br>")}</p>
-        `;
-        postsEl.appendChild(el);
-      });
-    }
 
-    function loadPosts(board) {
-      if (unsubscribe) { unsubscribe(); unsubscribe = null; }
-      postsEl.innerHTML = `<div class="shimmer"></div><div class="shimmer"></div>`;
-      const ref = collection(db, `forum_${board}`);
-      const q = query(ref, orderBy("createdAt", "desc"));
-      unsubscribe = onSnapshot(q, renderSnapshot, (err) => {
-        console.error("onSnapshot error:", err);
-        postsEl.innerHTML = `<div class="empty">Couldn’t load posts. Try again.</div>`;
-      });
-    }
+      function renderPosts(list){
+        if(!Array.isArray(list) || list.length === 0){
+          postsEl.innerHTML = `<div class="empty">No posts yet. Be the first to say hello!</div>`;
+          return;
+        }
+        postsEl.innerHTML = "";
+        for(const p of list){
+          const when = p.createdAt?.seconds
+              ? new Date(p.createdAt.seconds * 1000)
+              : (p.createdAt ? new Date(p.createdAt) : null);
+          const timeText = when ? when.toLocaleString() : "";
+          const card = document.createElement("div");
+          card.className = "post";
+          card.innerHTML = `
+            <div class="meta">${p.by || "Anonymous"} • ${timeText}</div>
+            <div class="body">${(p.body || "").replace(/\n/g, "<br>")}</div>
+          `;
+          postsEl.appendChild(card);
+        }
+        // auto-scroll newest into view
+        const last = postsEl.lastElementChild;
+        if(last) last.scrollIntoView({ behavior: "smooth", block: "end" });
+      }
 
-    tabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        tabs.forEach((t) => t.classList.remove("active"));
-        tab.classList.add("active");
-        currentBoard = tab.dataset.board;
-        boardSel.value = currentBoard;
-        loadPosts(currentBoard);
-      });
-    });
+      // ----- Post creation -----
+      async function addPost(){
+        const text = textarea.value.trim();
+        if(!text) return;
+        if(loading) return;
+        loading = true;
+        postBtn.disabled = true;
 
-    postBtn.addEventListener("click", async () => {
-      const text = (textarea.value || "").trim();
-      if (!text) return;
+        try{
+          const payload = {
+            board: boardSelect.value,
+            body: text
+          };
+          const res = await fetch("/.netlify/functions/forum-add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(payload)
+          });
+          if(!res.ok){
+            const txt = await res.text().catch(()=> "");
+            throw new Error(`POST ${res.status}: ${txt || res.statusText}`);
+          }
+          textarea.value = "";
+          await fetchPosts(boardSelect.value);
+        }catch(err){
+          console.error("Add post failed:", err);
+          alert("Could not post right now. Please try again.");
+        }finally{
+          loading = false;
+          postBtn.disabled = false;
+        }
+      }
 
-      // display name from Netlify Identity (email); auth user is anonymous
-      const by = netlifyEmail() || "Family Member";
-
-      try {
-        const ref = collection(db, `forum_${boardSel.value}`);
-        await addDoc(ref, {
-          body: text,
-          by,
-          createdAt: serverTimestamp()
+      // ----- Events -----
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          tabs.forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+          currentBoard = tab.dataset.board;
+          boardSelect.value = currentBoard;
+          fetchPosts(currentBoard);
         });
-        textarea.value = "";
-      } catch (err) {
-        console.error("Error posting:", err);
-        alert("Could not post right now. Please try again.");
-      }
-    });
+      });
 
-    // Start
-    onAuthStateChanged(auth, () => loadPosts(currentBoard));
+      postBtn.addEventListener("click", addPost);
+      textarea.addEventListener("keydown", (e) => {
+        if(e.key === "Enter" && !e.shiftKey){
+          e.preventDefault();
+          addPost();
+        }
+      });
+
+      // Initial load
+      fetchPosts(currentBoard);
+    }
   </script>
 </body>
 </html>
-
-
