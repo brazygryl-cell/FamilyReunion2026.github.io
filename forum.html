@@ -1,335 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Family Forum — Williams Family Reunion</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Family Forum — Williams Reunion 2026</title>
 
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-  <style>
-    /* ========== Mint + Midnight Discord-Style Forum ========== */
-    :root{
-      --bg:#0e1117;
-      --surface:#121624;
-      --surface-2:#0f121a;
-      --border:#1f2637;
-      --text:#e7eefb;
-      --muted:#9fb0d0;
-      --mint:#79f8c7;
-      --mint-2:#5be0b1;
-      --danger:#ff6b6b;
-      --shadow: 0 10px 30px rgba(0,0,0,0.45);
-    }
-
-    body { background: var(--bg); color: var(--text); }
-
-    /* Header is filled by nav.js */
-
-    .forum-hero{
-      max-width: 960px;
-      margin: 2rem auto 1rem;
-      padding: 1.25rem 1.5rem;
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      text-align: center;
-    }
-    .forum-hero h1{
-      font-family: "Playfair Display", serif;
-      font-size: clamp(1.8rem, 3vw, 2.4rem);
-      margin: 0 0 .3rem;
-    }
-    .forum-hero p{ color: var(--muted); margin: 0; }
-
-    .forum-tabs{
-      max-width: 960px;
-      margin: 1rem auto;
-      display: flex;
-      gap: 8px;
-      padding: 0 .5rem;
-      flex-wrap: wrap;
-    }
-    .forum-tab{
-      appearance: none;
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: var(--text);
-      border-radius: 10px;
-      padding: .55rem .9rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .forum-tab.active{
-      background: linear-gradient(180deg, var(--mint) 0%, var(--mint-2) 100%);
-      color: #0a1310;
-      border-color: transparent;
-    }
-
-    /* Composer (Discord-like bottom bar) */
-    .composer-wrap{
-      position: sticky;
-      bottom: 0;
-      z-index: 3;
-      background: linear-gradient(180deg, rgba(14,17,23,0) 0%, rgba(14,17,23,.95) 40%);
-      padding: 1rem 0;
-      backdrop-filter: blur(6px);
-    }
-    .composer{
-      max-width: 960px;
-      margin: 0 auto;
-      display: grid;
-      gap: .6rem;
-      grid-template-columns: 1fr auto;
-      align-items: end;
-      padding: 0 1rem;
-    }
-    .composer textarea{
-      min-height: 60px;
-      max-height: 200px;
-      resize: vertical;
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: var(--text);
-      padding: .85rem 1rem;
-      outline: none;
-    }
-    .composer .controls{
-      display: grid;
-      gap: .5rem;
-      grid-template-columns: auto;
-      align-content: end;
-    }
-    .composer select{
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      padding: .55rem .7rem;
-      outline: none;
-    }
-    .btn{
-      display: inline-block;
-      border-radius: 10px;
-      padding: .7rem 1rem;
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, var(--mint) 0%, var(--mint-2) 100%);
-      color: #0a1310;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .btn:disabled{ opacity:.6; cursor:not-allowed; }
-
-    /* Posts List */
-    .posts{
-      max-width: 960px;
-      margin: 1rem auto 9rem; /* leave space for sticky composer */
-      padding: 0 1rem;
-      display: grid;
-      gap: .75rem;
-    }
-    .post{
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, #0f121a 0%, #0c0f15 100%);
-      border-radius: 12px;
-      padding: .9rem 1rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,.35);
-    }
-    .post .meta{
-      font-size: .85rem;
-      color: var(--muted);
-      margin-bottom: .35rem;
-    }
-    .empty, .error{
-      text-align: center;
-      color: var(--muted);
-      padding: 1rem;
-    }
-    .error{ color: var(--danger); }
-    .shimmer{
-      height: 70px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: linear-gradient(90deg, #111520 25%, #151b2a 50%, #111520 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-    }
-    @keyframes shimmer{
-      0%{ background-position: 200% 0; }
-      100%{ background-position: -200% 0; }
-    }
-  </style>
+<style>
+/* ----- Layout ----- */
+.forum-container {
+  max-width: 850px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+.forum-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+.forum-tab {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #1c1f29;
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+.forum-tab.active {
+  background: var(--mint);
+  color: #0d1412;
+  font-weight: 600;
+}
+.post {
+  background: #14171f;
+  border: 1px solid var(--border);
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+.meta {
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.new-post-box {
+  margin-top: 2rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background: #11141b;
+}
+textarea {
+  width: 100%;
+  min-height: 90px;
+  resize: vertical;
+  padding: 10px;
+  border-radius: 8px;
+  background: #0f1218;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background: var(--mint);
+  color: #07100d;
+  border-radius: 8px;
+  font-weight: 600;
+}
+</style>
 </head>
+
 <body>
-  <header></header>
+<header></header>
 
-  <main>
-    <section class="forum-hero">
-      <h1>Family Forum</h1>
-      <p>Share memories, make plans, and keep everyone in the loop.</p>
-    </section>
+<div class="forum-container">
+  <h1>Family Forum</h1>
+  <p style="color:var(--muted)">Share announcements, questions, and love 💚</p>
 
-    <!-- Tabs -->
-    <div class="forum-tabs" role="tablist" aria-label="Forum boards">
-      <button class="forum-tab active" data-board="general"># General</button>
-      <button class="forum-tab" data-board="memories"># Memories</button>
-      <button class="forum-tab" data-board="planning"># Planning</button>
-    </div>
-
-    <!-- Posts -->
-    <section id="posts" class="posts" aria-live="polite">
-      <div class="shimmer"></div>
-      <div class="shimmer"></div>
-      <div class="shimmer"></div>
-    </section>
-  </main>
-
-  <!-- Composer (sticky like Discord message bar) -->
-  <div class="composer-wrap">
-    <div class="composer">
-      <textarea id="postBody" placeholder="Write a message to the family…"></textarea>
-      <div class="controls">
-        <select id="postBoard" aria-label="Choose board">
-          <option value="general" selected>General</option>
-          <option value="memories">Memories</option>
-          <option value="planning">Planning</option>
-        </select>
-        <button id="submitPost" class="btn">Post</button>
-      </div>
-    </div>
+  <!-- TABS -->
+  <div class="forum-tabs">
+    <div class="forum-tab active" data-board="general">General</div>
+    <div class="forum-tab" data-board="travel">Travel</div>
+    <div class="forum-tab" data-board="lodging">Lodging</div>
   </div>
 
-  <footer></footer>
+  <!-- Posts -->
+  <div id="posts"></div>
 
-  <!-- 🔐 Netlify Identity (site-wide auth) -->
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Create Post -->
+  <div class="new-post-box">
+    <select id="postBoard">
+      <option value="general">General</option>
+      <option value="travel">Travel</option>
+      <option value="lodging">Lodging</option>
+    </select>
 
-  <script type="module">
-    import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+    <textarea id="postBody" placeholder="Write a message…"></textarea>
+    <button id="submitPost">Post</button>
+  </div>
+</div>
 
-    // Require login as early as possible
-    requireAuth();
+<footer></footer>
 
-    // After DOM is ready, wire up UI and data
-    document.addEventListener("DOMContentLoaded", () => {
-      loadNavbar();
-      enableLogout();
-      setupForum();
+<!-- 🔐 Netlify Identity -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { 
+  getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { 
+  getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider 
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+
+import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+
+/* netlify-scan: ignore */
+const firebaseConfig = {
+  apiKey: "AIzaSyAldYSp37LZO31XkGc4F1xhnQ9bpBXLU6Q",
+  authDomain: "williams-reunion.firebaseapp.com",
+  projectId: "williams-reunion"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+requireAuth();
+document.addEventListener("DOMContentLoaded", () => {
+  loadNavbar();
+  enableLogout();
+});
+
+// Wait until user is logged in before loading forum
+onAuthStateChanged(auth, (user) => {
+  if (!user) return;
+  loadPosts("general");
+});
+
+const postsEl = document.getElementById("posts");
+const tabs = document.querySelectorAll(".forum-tab");
+const textarea = document.getElementById("postBody");
+const boardSelect = document.getElementById("postBoard");
+const postBtn = document.getElementById("submitPost");
+
+let currentBoard = "general";
+
+function loadPosts(board) {
+  postsEl.innerHTML = "<p style='color:#888;'>Loading…</p>";
+
+  const ref = collection(db, `forum_${board}`);
+  const q = query(ref, orderBy("createdAt", "desc"));
+
+  onSnapshot(q, (snapshot) => {
+    postsEl.innerHTML = "";
+    if (snapshot.empty) return postsEl.innerHTML = "<p style='color:#666;'>No posts yet.</p>";
+
+    snapshot.forEach((doc) => {
+      const p = doc.data();
+      postsEl.innerHTML += `
+        <div class="post">
+          <div class="meta">${p.by || "Unknown"} • ${p.createdAt?.toDate().toLocaleString() || ""}</div>
+          <p>${p.body}</p>
+        </div>`;
     });
+  });
+}
 
-    function setupForum(){
-      const postsEl = document.getElementById("posts");
-      const tabs = document.querySelectorAll(".forum-tab");
-      const textarea = document.getElementById("postBody");
-      const boardSelect = document.getElementById("postBoard");
-      const postBtn = document.getElementById("submitPost");
+tabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    tabs.forEach((x) => x.classList.remove("active"));
+    tab.classList.add("active");
+    currentBoard = tab.dataset.board;
+    boardSelect.value = currentBoard;
+    loadPosts(currentBoard);
+  });
+});
 
-      let currentBoard = "general";
-      let loading = false;
+postBtn.addEventListener("click", async () => {
+  const text = textarea.value.trim();
+  const user = auth.currentUser;
+  if (!text) return;
+  if (!user) return alert("Login required.");
 
-      // ----- Fetch & Render -----
-      async function fetchPosts(board){
-        try {
-          postsEl.innerHTML = `<div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div>`;
-          const res = await fetch(`/.netlify/functions/forum-get?board=${encodeURIComponent(board)}`, {
-            credentials: "include",
-          });
-          if(!res.ok){
-            const txt = await res.text().catch(()=> "");
-            throw new Error(`GET ${res.status}: ${txt || res.statusText}`);
-          }
-          const data = await res.json();
-          renderPosts(data);
-        } catch(err){
-          console.error("Fetch posts failed:", err);
-          postsEl.innerHTML = `<div class="error">Couldn’t load posts. Please try again.</div>`;
-        }
-      }
+  await addDoc(collection(db, `forum_${currentBoard}`), {
+    body: text,
+    by: user.email,
+    createdAt: serverTimestamp(),
+  });
 
-      function renderPosts(list){
-        if(!Array.isArray(list) || list.length === 0){
-          postsEl.innerHTML = `<div class="empty">No posts yet. Be the first to say hello!</div>`;
-          return;
-        }
-        postsEl.innerHTML = "";
-        for(const p of list){
-          const when = p.createdAt?.seconds
-              ? new Date(p.createdAt.seconds * 1000)
-              : (p.createdAt ? new Date(p.createdAt) : null);
-          const timeText = when ? when.toLocaleString() : "";
-          const card = document.createElement("div");
-          card.className = "post";
-          card.innerHTML = `
-            <div class="meta">${p.by || "Anonymous"} • ${timeText}</div>
-            <div class="body">${(p.body || "").replace(/\n/g, "<br>")}</div>
-          `;
-          postsEl.appendChild(card);
-        }
-        // auto-scroll newest into view
-        const last = postsEl.lastElementChild;
-        if(last) last.scrollIntoView({ behavior: "smooth", block: "end" });
-      }
+  textarea.value = "";
+});
+</script>
 
-      // ----- Post creation -----
-      async function addPost(){
-        const text = textarea.value.trim();
-        if(!text) return;
-        if(loading) return;
-        loading = true;
-        postBtn.disabled = true;
-
-        try{
-          const payload = {
-            board: boardSelect.value,
-            body: text
-          };
-          const res = await fetch("/.netlify/functions/forum-add", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(payload)
-          });
-          if(!res.ok){
-            const txt = await res.text().catch(()=> "");
-            throw new Error(`POST ${res.status}: ${txt || res.statusText}`);
-          }
-          textarea.value = "";
-          await fetchPosts(boardSelect.value);
-        }catch(err){
-          console.error("Add post failed:", err);
-          alert("Could not post right now. Please try again.");
-        }finally{
-          loading = false;
-          postBtn.disabled = false;
-        }
-      }
-
-      // ----- Events -----
-      tabs.forEach((tab) => {
-        tab.addEventListener("click", () => {
-          tabs.forEach(t => t.classList.remove("active"));
-          tab.classList.add("active");
-          currentBoard = tab.dataset.board;
-          boardSelect.value = currentBoard;
-          fetchPosts(currentBoard);
-        });
-      });
-
-      postBtn.addEventListener("click", addPost);
-      textarea.addEventListener("keydown", (e) => {
-        if(e.key === "Enter" && !e.shiftKey){
-          e.preventDefault();
-          addPost();
-        }
-      });
-
-      // Initial load
-      fetchPosts(currentBoard);
-    }
-  </script>
 </body>
 </html>
+
