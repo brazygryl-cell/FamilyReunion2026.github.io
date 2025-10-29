@@ -8,9 +8,6 @@ firebase-config.js
 
 firebase-init.js
 
-# Firebase service account 
-netlify/functions/service-accounts.json
-
 # Local-only configs
 firebase-config.local.js
 .env
