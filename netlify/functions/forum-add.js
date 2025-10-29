@@ -2,9 +2,10 @@ const admin = require("firebase-admin");
 const path = require("path");
 const fs = require("fs");
 
+// ✅ Ensure Firestore Admin is initialized once
 if (!admin.apps.length) {
-  const servicePath = path.join(__dirname, "service-account.json");
-  const serviceAccount = JSON.parse(fs.readFileSync(servicePath, "utf8"));
+  const serviceAccountPath = path.join(__dirname, "service-account.json");
+  const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
 
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -14,22 +15,26 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 exports.handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
-  }
-
   try {
-    const { board, body, user } = JSON.parse(event.body);
+    const body = JSON.parse(event.body);
+    const { board, text, user } = body;
+
+    if (!board || !text || !user) {
+      return { statusCode: 400, body: "Missing fields" };
+    }
 
     await db.collection(`forum_${board}`).add({
-      body,
-      by: user || "Anonymous",
+      body: text,
+      by: user,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
     return { statusCode: 200, body: JSON.stringify({ success: true }) };
   } catch (err) {
-    console.error("🔥 Error:", err);
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+    console.error("🔥 Add Post Error:", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message }),
+    };
   }
 };
