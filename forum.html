@@ -1,96 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Family Forum — Williams Reunion</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family Forum — Williams Family Reunion</title>
 
-<!-- netlify-vite --> <!-- ✅ Enables env variable loading -->
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="style.css" />
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+/* 🌙 Discord-Inspired Forum Styling */
+.tabs-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.forum-tab {
+  padding: 8px 16px;
+  background: #232428;
+  border: 1px solid #3a3c42;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #cfcfcf;
+  font-weight: 500;
+  transition: 0.2s;
+}
+.forum-tab.active, .forum-tab:hover {
+  background: #5865F2;
+  border-color: #5865F2;
+  color: white;
+}
+
+#posts {
+  max-width: 750px;
+  margin: 1rem auto;
+  padding: 1rem;
+}
+
+.post {
+  background: #2b2d31;
+  border: 1px solid #3a3c42;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 14px;
+}
+.post:hover { border-color: #5865F2; }
+
+.meta {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+.meta-name { font-weight: 600; color: #e1e1e1; }
+.meta-time { font-size: 0.75rem; color: #8b8b8b; }
+
+.post p { color: #dcdcdc; margin: 0; }
+
+#postBox {
+  max-width: 750px;
+  margin: 2rem auto;
+  padding: 1rem;
+  background: #1e1f22;
+  border: 1px solid #3a3c42;
+  border-radius: 12px;
+}
+#postBody {
+  width: 100%; background: #2b2d31; border: 1px solid #3a3c42;
+  padding: 12px; color: white; min-height: 80px; border-radius: 8px; resize: vertical;
+}
+#submitPost {
+  width: 100%; background: #5865F2; border: none; padding: 12px;
+  color: white; cursor: pointer; border-radius: 8px; margin-top: 8px; font-weight: 600;
+}
+#submitPost:hover { background: #4752C4; }
+</style>
 </head>
 
 <body>
 <header></header>
 
-<section class="forum container">
-  <h2 style="text-align:center;">Family Forum</h2>
+<h2 style="text-align:center;margin-top:1.5rem;">Family Forum 💬</h2>
 
-  <!-- Tabs -->
-  <div class="forum-tabs">
-    <button class="forum-tab active" data-board="general">General</button>
-    <button class="forum-tab" data-board="memories">Memories</button>
-    <button class="forum-tab" data-board="planning">Planning</button>
-  </div>
+<div class="tabs-container">
+  <div class="forum-tab active" data-board="general">General</div>
+  <div class="forum-tab" data-board="travel">Travel</div>
+  <div class="forum-tab" data-board="housing">Housing</div>
+</div>
 
-  <!-- Posts -->
-  <div id="posts" class="posts"></div>
+<div id="posts"></div>
 
-  <!-- Post Box -->
-  <div class="post-box">
-    <select id="postBoard">
-      <option value="general">General</option>
-      <option value="memories">Memories</option>
-      <option value="planning">Planning</option>
-    </select>
-
-    <textarea id="postBody" placeholder="Write something to your family..."></textarea>
-    <button id="submitPost" class="btn mint">Post</button>
-  </div>
-</section>
+<div id="postBox">
+  <select id="postBoard">
+    <option value="general">General</option>
+    <option value="travel">Travel</option>
+    <option value="housing">Housing</option>
+  </select>
+  <textarea id="postBody" placeholder="Say something..."></textarea>
+  <button id="submitPost">Post</button>
+</div>
 
 <footer></footer>
 
-<!-- 🔐 Netlify Identity -->
+<!-- ✅ Netlify Auth -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
+<!-- ✅ Firebase + Forum Logic -->
 <script type="module">
-  import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+import { firebaseConfig } from "./firebase-config.js";
 
-  document.addEventListener("DOMContentLoaded", () => {
-    loadNavbar();
-    enableLogout();
-    requireAuth();
-  });
-</script>
-
-<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { 
   getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { 
-  getAuth, onAuthStateChanged 
-} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,   // ✅ Secure — key comes from Netlify
-  authDomain: "williams-reunion.firebaseapp.com",
-  projectId: "williams-reunion"
-};
+document.addEventListener("DOMContentLoaded", () => {
+  loadNavbar();
+  enableLogout();
+  requireAuth();
+});
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-import { signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-
-// Sync Netlify Identity → Firebase Auth
-if (window.netlifyIdentity) {
-  window.netlifyIdentity.on("login", async (user) => {
-    const token = await user.jwt(true);
-    const res = await fetch("/.netlify/functions/firebase-token", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const { customToken } = await res.json();
-    await signInWithCustomToken(auth, customToken);
-  });
-}
-
-
-// ---- UI elements ----
+// UI
 const postsEl = document.getElementById("posts");
 const tabs = document.querySelectorAll(".forum-tab");
 const textarea = document.getElementById("postBody");
@@ -99,33 +138,34 @@ const postBtn = document.getElementById("submitPost");
 
 let currentBoard = "general";
 
-// ✅ Load posts from Firestore (live)
+// Load posts Live
 function loadPosts(board) {
-  postsEl.innerHTML = `<p style="color:#aaa;text-align:center;">Loading...</p>`;
-
+  postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
   const ref = collection(db, `forum_${board}`);
   const q = query(ref, orderBy("createdAt", "desc"));
-
   onSnapshot(q, (snapshot) => {
     postsEl.innerHTML = "";
-    if (snapshot.empty) return postsEl.innerHTML = `<p>No posts yet.</p>`;
-
+    if (snapshot.empty) return postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
     snapshot.forEach((doc) => {
       const p = doc.data();
       postsEl.innerHTML += `
         <div class="post">
-          <div class="meta">${p.by || "Unknown"} • ${p.createdAt?.toDate().toLocaleString() || ""}</div>
+          <div class="meta">
+            <span class="meta-name">${p.by || "Someone"}</span>
+            <span class="meta-time">${p.createdAt?.toDate().toLocaleString() || ""}</span>
+          </div>
           <p>${p.body}</p>
-        </div>
-      `;
+        </div>`;
     });
   });
 }
 
-// ✅ Switch tabs
-tabs.forEach((tab) => {
+loadPosts("general");
+
+// Tabs
+tabs.forEach(tab => {
   tab.addEventListener("click", () => {
-    tabs.forEach((t) => t.classList.remove("active"));
+    tabs.forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
     currentBoard = tab.dataset.board;
     boardSelect.value = currentBoard;
@@ -133,12 +173,12 @@ tabs.forEach((tab) => {
   });
 });
 
-// ✅ Create post
+// Posting
 postBtn.addEventListener("click", async () => {
   const text = textarea.value.trim();
   const user = auth.currentUser;
-  if (!user) return alert("Please log in.");
   if (!text) return;
+  if (!user) return alert("You must be logged in.");
 
   await addDoc(collection(db, `forum_${boardSelect.value}`), {
     body: text,
@@ -148,13 +188,7 @@ postBtn.addEventListener("click", async () => {
 
   textarea.value = "";
 });
-
-// ✅ Wait for login before loading posts
-onAuthStateChanged(auth, (user) => {
-  if (user) loadPosts(currentBoard);
-});
 </script>
 
 </body>
 </html>
-
