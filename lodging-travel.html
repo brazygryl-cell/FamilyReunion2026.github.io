@@ -4,103 +4,141 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lodging & Travel — Williams Family Reunion</title>
+
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <script type="module" src="nav.js"></script>
+
+<style>
+#villa-slideshow {
+  position: relative;
+  height: 60vh;
+  border-radius: 0 0 40px 40px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+#villa-slideshow .slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: scale(1.05);
+  transition: opacity 2s ease-in-out, transform 6s ease-in-out;
+}
+#villa-slideshow .slide.active { opacity: 1; transform: scale(1); }
+#villa-slideshow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1;
+}
+#villa-slideshow .overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  z-index: 2;
+  max-width: 700px;
+  padding: 1rem;
+}
+.lodging-grid {
+  display: grid;
+  gap: 1.8rem;
+  margin: 2.5rem 0;
+}
+.map-frame iframe {
+  width: 100%;
+  height: 230px;
+  border-radius: 14px;
+  border: none;
+}
+</style>
 </head>
 
 <body>
 <header></header>
 
 <section class="section container">
- <div id="villa-slideshow">
- <div class="slide active" style="background-image:url('images/villa1.jpg')"></div>
- <div class="slide" style="background-image:url('images/villa2.jpg')"></div>
- <div class="slide" style="background-image:url('images/villa3.jpg')"></div>
- <div class="overlay">
- <h2>Villatel Orlando Resort</h2>
- <p>Elegant family villas with private pools and game rooms — the perfect home base for our 2026 reunion.</p>
- </div>
- </div>
+  <div id="villa-slideshow">
+    <div class="slide active" style="background-image:url('images/villa1.jpg')"></div>
+    <div class="slide" style="background-image:url('images/villa2.jpg')"></div>
+    <div class="slide" style="background-image:url('images/villa3.jpg')"></div>
 
- <div class="lodging-grid">
- <div class="card pad">
- <h3>Where We'll Stay</h3>
- <p><strong>Villatel Orlando Resort</strong> offers private family villas (4–9 bedrooms), each with a pool, game room, and kitchen — designed for togetherness and comfort.</p>
- <ul>
- <li>Private spa pools, game rooms, and full kitchens.</li>
- <li>Spacious family layouts with modern amenities.</li>
- <li>Villa assignments shared after final payments.</li>
- </ul>
- <div class="travel-links">
- <a class="btn mint" href="https://villatel.com/villatel-orlando-resort" target="_blank">Visit Villatel</a>
- <a class="btn ghost" href="https://flymco.com" target="_blank">Orlando Intl (MCO)</a>
- </div>
- </div>
+    <div class="overlay">
+      <h2>Villatel Orlando Resort</h2>
+      <p>Luxury family villas with private pools — the perfect home base for our reunion.</p>
+    </div>
+  </div>
 
- <div class="card pad">
- <h3>Getting There</h3>
- <ul>
- <li><strong>Orlando Intl (MCO):</strong> 25–35 min drive to resort.</li>
- <li><strong>Sanford (SFB):</strong> Smaller airport (~1 hr drive).</li>
- <li><strong>Shuttles:</strong> Mears Connect & van services available.</li>
- <li><strong>Car Rentals:</strong> Best for flexible family travel.</li>
- </ul>
- <div class="map-frame">
- <iframe src="https://www.google.com/maps?q=Villatel+Orlando+Resort&output=embed" allowfullscreen loading="lazy"></iframe>
- </div>
- </div>
- </div>
+  <div class="lodging-grid">
+    <div class="card pad">
+      <h3>Where We'll Stay</h3>
+      <p><strong>Villatel Orlando Resort</strong> provides spacious family villas (4–9 bedrooms), each with private pools and modern amenities.</p>
+      <ul>
+        <li>Private pools & game rooms</li>
+        <li>Spacious layouts for families</li>
+        <li>Villa assignments shared after final payments</li>
+      </ul>
+      <div class="travel-links">
+        <a class="btn mint" href="https://villatel.com/villatel-orlando-resort" target="_blank">Visit Villatel</a>
+        <a class="btn ghost" href="https://flymco.com" target="_blank">Orlando Intl (MCO)</a>
+      </div>
+    </div>
 
- <div class="card pad" style="margin-top:2rem;">
- <h3>Before You Travel</h3>
- <ul>
- <li> Bring a <strong>Real ID</strong> or passport for TSA check-in.</li>
- <li> Share your flight info for shuttle coordination.</li>
- <li> Book private vans early for large family groups.</li>
- </ul>
- <p>Questions? Email our <a href="mailto:familyreunionwilliams2026@gmail.com?subject=Williams%20Family%20Reunion%20Inquiry">Lead Coordinator: ShaSha Clark</a></p>
- </div>
+    <div class="card pad">
+      <h3>Getting There</h3>
+      <ul>
+        <li><strong>Orlando Intl (MCO):</strong> ~30 min to resort</li>
+        <li><strong>Sanford (SFB):</strong> ~1 hr to resort</li>
+        <li>Shuttle & van services available</li>
+        <li>Car rentals recommended for flexibility</li>
+      </ul>
+      <div class="map-frame">
+        <iframe src="https://www.google.com/maps?q=Villatel+Orlando+Resort&output=embed" loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div class="card pad" style="margin-top:2rem;">
+    <h3>Before You Travel</h3>
+    <ul>
+      <li>Bring a <strong>Real ID</strong> or passport for TSA</li>
+      <li>Share flight details for shuttle planning</li>
+      <li>Reserve group vans early</li>
+    </ul>
+    <p>Questions? Email our <a href="mailto:familyreunionwilliams2026@gmail.com">Lead Coordinator: ShaSha Clark</a></p>
+  </div>
 </section>
 
 <footer></footer>
 
- <!-- JS Imports -->
-<script type="module" src="./nav.js"></script>
-<script type="module">
-import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-document.addEventListener("DOMContentLoaded", () => {
-loadNavbar();
-enableLogout();
-requireAuth();
-});
-</script>
- 
+<!-- 🎞️ Slideshow -->
 <script>
 const slides = document.querySelectorAll('#villa-slideshow .slide');
 let current = 0;
 setInterval(() => {
- slides[current].classList.remove('active');
- current = (current + 1) % slides.length;
- slides[current].classList.add('active');
+  slides[current].classList.remove('active');
+  current = (current + 1) % slides.length;
+  slides[current].classList.add('active');
 }, 8000);
 </script>
- <!-- 🔐 Netlify Identity -->
+
+<!-- 🔐 Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
 <script type="module">
   import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 
-  // 🚨 Require login BEFORE anything displays
-  requireAuth();
-
-  // ✅ After user is confirmed logged in, load UI
   document.addEventListener("DOMContentLoaded", () => {
     loadNavbar();
     enableLogout();
+    requireAuth();  // ✅ Only require auth AFTER nav loads
   });
 </script>
-</body>
-</html>
+
 </body>
 </html>
