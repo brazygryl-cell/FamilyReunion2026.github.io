@@ -36,15 +36,21 @@
 
   <footer></footer>
 
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <script type="module">
-    import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-    document.addEventListener("DOMContentLoaded", () => {
-      loadNavbar();
-      enableLogout();
-      requireAuth();
-    });
-  </script>
+  <!-- 🔐 Netlify Identity -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+<script type="module">
+  import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+
+  // 🚨 Require login BEFORE anything displays
+  requireAuth();
+
+  // ✅ After user is confirmed logged in, load UI
+  document.addEventListener("DOMContentLoaded", () => {
+    loadNavbar();
+    enableLogout();
+  });
+</script>
   <script>
 const header = document.querySelector("header");
 let lastScrollTop = 0;
