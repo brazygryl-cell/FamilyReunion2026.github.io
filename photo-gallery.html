@@ -1,73 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Event Details — Williams Family Reunion</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-</head>
-<body>
-  <header></header>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Photo Gallery — Williams Family Reunion</title>
 
-  <section class="section">
-    <div class="container">
-      <h2>Event Details</h2>
-      <div class="grid cols-2">
-        <div class="card pad">
-          <h3>Itinerary</h3>
-          <table class="table">
-            <tr><th>Day</th><th>Plan</th></tr>
-            <tr><td>Sun</td><td>Arrival &amp; Welcome Dinner</td></tr>
-            <tr><td>Mon</td><td>Theme Park Day</td></tr>
-            <tr><td>Tue</td><td>Pool + BBQ</td></tr>
-          </table>
-        </div>
-        <div class="card pad">
-          <h3>Dress Code &amp; Packing</h3>
-          <ul>
-            <li><span class="badge">Casual</span> Shorts, tees, sandals</li>
-            <li><span class="badge">Pool</span> Swimwear, sunscreen</li>
-            <li><span class="badge">Dinner</span> White &amp; Mint Theme</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
+<link rel="stylesheet" href="style.css" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script type="module" src="nav.js"></script>
 
-  <footer></footer>
-
-  <!-- 🔐 Netlify Identity -->
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
-<script type="module">
-  import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-
-  // 🚨 Require login BEFORE anything displays
-  requireAuth();
-
-  // ✅ After user is confirmed logged in, load UI
-  document.addEventListener("DOMContentLoaded", () => {
-    loadNavbar();
-    enableLogout();
-  });
-</script>
-  <script>
-const header = document.querySelector("header");
-let lastScrollTop = 0;
-
-window.addEventListener("scroll", () => {
-const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-if (scrollTop > lastScrollTop + 50) {
-// Scrolling down — hide navbar
-header.classList.add("hidden");
-} else if (scrollTop < lastScrollTop - 50) {
-// Scrolling up — show navbar again
-header.classList.remove("hidden");
-header.classList.add("scrolled");
+<style>
+.gallery-title {
+  text-align: center;
+  margin: 2rem 0 1rem;
+  font-family: "Playfair Display", serif;
+  font-size: 2.4rem;
 }
 
-lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Prevent negative values
+.gallery-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  padding: 0 1.5rem 2.5rem;
+}
+
+.gallery-grid img {
+  width: 100%;
+  border-radius: 14px;
+  object-fit: cover;
+  height: 200px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .3s ease;
+}
+
+.gallery-grid img:hover {
+  transform: scale(1.04);
+}
+
+/* Lightbox */
+#lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  place-items: center;
+  z-index: 999;
+}
+
+#lightbox img {
+  max-width: 90%;
+  max-height: 90vh;
+  border-radius: 14px;
+  box-shadow: 0 0 20px rgba(255,255,255,0.3);
+}
+</style>
+</head>
+
+<body>
+<header></header>
+
+<h2 class="gallery-title">Family Photo Gallery</h2>
+
+<section class="gallery-grid">
+  <!-- ✅ Replace filenames with your actual images -->
+  <img src="images/gallery/img1.jpg" alt="">
+  <img src="images/gallery/img2.jpg" alt="">
+  <img src="images/gallery/img3.jpg" alt="">
+  <img src="images/gallery/img4.jpg" alt="">
+  <img src="images/gallery/img5.jpg" alt="">
+  <img src="images/gallery/img6.jpg" alt="">
+</section>
+
+<div id="lightbox"><img src=""></div>
+
+<footer></footer>
+
+<!-- Lightbox JS -->
+<script>
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = lightbox.querySelector("img");
+
+document.querySelectorAll(".gallery-grid img").forEach(img => {
+  img.addEventListener("click", () => {
+    lightboxImg.src = img.src;
+    lightbox.style.display = "grid";
+  });
+});
+
+lightbox.addEventListener("click", () => {
+  lightbox.style.display = "none";
+});
+</script>
+
+<!-- 🔐 Netlify Identity -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+<!-- ✅ Correct Auth Flow -->
+<script type="module">
+import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadNavbar();
+  enableLogout();
+  requireAuth();   // ✅ No flicker, no infinite reload
 });
 </script>
 
