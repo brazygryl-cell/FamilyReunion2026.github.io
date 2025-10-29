@@ -1,30 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Family Forum — Williams Family Reunion</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<header></header>
+
+<main class="section">
+
+  <div class="forum-hero">
+    <h1>Family Forum</h1>
+    <p>Chat, share memories, and plan the reunion together.</p>
+  </div>
+
+  <!-- Forum Boards -->
+  <div class="forum-tabs" role="tablist">
+    <button class="forum-tab active" data-board="general">General</button>
+    <button class="forum-tab" data-board="memories">Memories</button>
+    <button class="forum-tab" data-board="planning">Planning</button>
+  </div>
+
+  <!-- Composer -->
+  <div class="composer">
+    <h3>Create a post</h3>
+    <textarea id="postBody" placeholder="Write something for the family…"></textarea>
+    <div class="row">
+      <select id="postBoard">
+        <option value="general" selected>General</option>
+        <option value="memories">Memories</option>
+        <option value="planning">Planning</option>
+      </select>
+      <button id="submitPost">Post</button>
+    </div>
+  </div>
+
+  <section id="posts" class="posts"></section>
+
+</main>
+
+<footer></footer>
+
+<!-- ✅ Load Netlify Identity BEFORE the forum script -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
 <script type="module">
+import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+
+// 🚨 Require login BEFORE loading content
+requireAuth();
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadNavbar();
+  enableLogout();
+});
+
+// ✅ Firebase Web SDK (client-side)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { 
   getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-import { loadNavbar, enableLogout, ensureLoggedIn } from "./nav.js";
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadNavbar();
-  enableLogout();
-  ensureLoggedIn();
-});
-
-// ✅ Use front-end Firebase keys (safe, public keys are meant to be public)
+// ✅ Replace with YOUR Web API Key (safe to expose)
 const firebaseConfig = {
- apiKey: "YOUR_WEB_API_KEY",
- authDomain: "williams-reunion.firebaseapp.com",
- projectId: "williams-reunion",
+  apiKey: "AIzaSyAldYSp37LZO31XkGc4F1xhnQ9bpBXLU6Q",
+  authDomain: "williams-reunion.firebaseapp.com",
+  projectId: "williams-reunion",
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// ---- UI elements ----
 const postsEl = document.getElementById("posts");
 const tabs = document.querySelectorAll(".forum-tab");
 const textarea = document.getElementById("postBody");
@@ -33,7 +86,7 @@ const postBtn = document.getElementById("submitPost");
 
 let currentBoard = "general";
 
-// ✅ Load posts live from Firestore
+// ✅ Load posts live
 function loadPosts(board) {
   postsEl.innerHTML = `<p style="color:#aaa;text-align:center;">Loading...</p>`;
 
@@ -42,19 +95,24 @@ function loadPosts(board) {
 
   onSnapshot(q, (snapshot) => {
     postsEl.innerHTML = "";
-    if (snapshot.empty) return (postsEl.innerHTML = `<p>No posts yet.</p>`);
+    if (snapshot.empty) {
+      postsEl.innerHTML = `<p style="text-align:center;color:#aaa;">No posts yet.</p>`;
+      return;
+    }
 
     snapshot.forEach((doc) => {
       const p = doc.data();
       postsEl.innerHTML += `
         <div class="post">
-          <div class="meta">${p.by || "Someone"} • ${p.createdAt?.toDate().toLocaleString() || ""}</div>
+          <div class="meta">${p.by || "Unknown"} • ${p.createdAt?.toDate().toLocaleString() || ""}</div>
           <p>${p.body}</p>
         </div>
       `;
     });
   });
 }
+
+loadPosts(currentBoard);
 
 // ✅ Switch tabs
 tabs.forEach((tab) => {
@@ -67,16 +125,15 @@ tabs.forEach((tab) => {
   });
 });
 
-// ✅ Create post
+// ✅ Post content
 postBtn.addEventListener("click", async () => {
   const text = textarea.value.trim();
   const user = auth.currentUser;
+
   if (!text) return;
-  if (!user) return alert("Login required.");
+  if (!user) return alert("You must be logged in.");
 
-  const ref = collection(db, `forum_${boardSelect.value}`);
-
-  await addDoc(ref, {
+  await addDoc(collection(db, `forum_${boardSelect.value}`), {
     body: text,
     by: user.email,
     createdAt: serverTimestamp(),
@@ -84,6 +141,7 @@ postBtn.addEventListener("click", async () => {
 
   textarea.value = "";
 });
-
-loadPosts(currentBoard);
 </script>
+</body>
+</html>
+
