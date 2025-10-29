@@ -92,28 +92,35 @@ export function enableLogout() {
  });
 }
 
-// Require Login (simplified for Firestore client auth)
 export function requireAuth() {
   if (!window.netlifyIdentity) return;
 
+  // Wait for identity to finish initializing
   window.netlifyIdentity.on("init", (user) => {
     if (!user) {
       // Open login popup
       window.netlifyIdentity.open("login");
+
+      // If user closes it without logging in → send to login page
+      window.netlifyIdentity.on("close", () => {
+        const current = window.netlifyIdentity.currentUser();
+        if (!current) {
+          window.location.href = "login.html";
+        }
+      });
     }
   });
 
+  // After login → reload so auth token is usable
   window.netlifyIdentity.on("login", () => {
-    // Refresh page once logged in so Firestore auth token is active
     location.reload();
   });
 
+  // After logout → send to login page
   window.netlifyIdentity.on("logout", () => {
-    // Send users back to login page when they log out
     window.location.href = "login.html";
   });
 }
-
 
 // Optional helper for pages that just want to reload the footer
 export function loadFooter() {
