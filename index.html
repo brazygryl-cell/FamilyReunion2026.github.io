@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Williams Family Reunion 2026</title>
 
-<link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<script type="module" src="nav.js"></script>
+<link rel="stylesheet" href="style.css" />
+<link
+  href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap"
+  rel="stylesheet"
+/>
 
 <style>
 /* 🧭 Fix for hero slideshow and countdown centering */
@@ -99,7 +101,9 @@
   font-weight: 600;
   transition: filter 0.3s ease;
 }
-#hero-slideshow .btn:hover { filter: brightness(1.1); }
+#hero-slideshow .btn:hover {
+  filter: brightness(1.1);
+}
 </style>
 </head>
 
@@ -111,16 +115,16 @@
   <div class="slide active" style="background-image:url('images/family1.jpg')"></div>
   <div class="slide" style="background-image:url('images/family2.jpg')"></div>
   <div class="slide" style="background-image:url('images/family3.jpg')"></div>
-   <div class="slide" style="background-image:url('images/family4.jpg')"></div>
- <div class="slide" style="background-image:url('images/family5.jpg')"></div>
-   <div class="slide" style="background-image:url('images/family6.jpg')"></div>
- <div class="slide" style="background-image:url('images/family7.jpg')"></div>
-   <div class="slide" style="background-image:url('images/family8.jpg')"></div>
- <div class="slide" style="background-image:url('images/family9.jpg')"></div>
-   <div class="slide" style="background-image:url('images/family10.jpg')"></div>
-   <div class="slide" style="background-image:url('images/family11.jpg')"></div>
-   <div class="slide" style="background-image:url('images/family12.jpg')"></div>
-  
+  <div class="slide" style="background-image:url('images/family4.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family5.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family6.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family7.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family8.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family9.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family10.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family11.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family12.jpg')"></div>
+
   <div class="overlay">
     <h1>Williams Family Reunion 2026</h1>
     <p>July 26 – August 1, 2026 • Orlando, Florida</p>
@@ -138,8 +142,6 @@
 
 <footer></footer>
 
-<!-- ⭐ Starfield script (already included sitewide via CSS) -->
-
 <!-- 🎞️ Slideshow rotation -->
 <script>
 const slides = document.querySelectorAll('#hero-slideshow .slide');
@@ -152,10 +154,11 @@ setInterval(() => {
 
 // 🕒 Countdown Timer
 const targetDate = new Date("July 26, 2026 00:00:00").getTime();
-const timer = setInterval(() => {
+setInterval(() => {
   const now = new Date().getTime();
   const distance = targetDate - now;
-  if (distance < 0) return clearInterval(timer);
+  if (distance < 0) return;
+
   document.getElementById("days").innerText = Math.floor(distance / (1000 * 60 * 60 * 24));
   document.getElementById("hours").innerText = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
   document.getElementById("minutes").innerText = Math.floor((distance % (1000*60*60)) / (1000*60));
@@ -163,27 +166,20 @@ const timer = setInterval(() => {
 }, 1000);
 </script>
 
-<!-- 🔐 Netlify Identity + Navbar/Footer loader -->
 <!-- 🔐 Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
 <script type="module">
   import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 
-  // 🚨 Require login BEFORE anything displays
-  requireAuth();
-
-  // ✅ After user is confirmed logged in, load UI
   document.addEventListener("DOMContentLoaded", () => {
     loadNavbar();
     enableLogout();
+    if (!window.location.pathname.includes("login.html")) {
+      requireAuth();
+    }
   });
 </script>
+
 </body>
 </html>
-
-
-
-
-
-
