@@ -60,6 +60,15 @@ document.addEventListener("DOMContentLoaded", () => {
   enableLogout();
 });
 
+// NOTE: Firebase Web API keys are public and safe to expose:
+// https://firebase.google.com/docs/projects/api-keys
+// netlify-scan: ignore
+const firebaseConfig = {
+  apiKey: "AIzaSyAldYSp37LZO31XkGc4F1xhnQ9bpBXLU6Q",
+  authDomain: "williams-reunion.firebaseapp.com",
+  projectId: "williams-reunion",
+};
+
 // ✅ Firebase Web SDK (client-side)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { 
