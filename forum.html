@@ -105,25 +105,19 @@
 
 <footer></footer>
 
-<!-- ✅ Netlify Auth -->
+<!-- ✅ Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
+<!-- ✅ Forum Logic -->
 <script type="module">
 import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+import getFirebaseConfig from "./firebase-config.public.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { 
   getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadNavbar();
-  enableLogout();
-  requireAuth();
-});
-
-import getFirebaseConfig from "./firebase-config.public.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   loadNavbar();
@@ -135,68 +129,65 @@ document.addEventListener("DOMContentLoaded", async () => {
   const db = getFirestore(app);
   const auth = getAuth(app);
 
-// UI Elements
-const postsEl = document.getElementById("posts");
-const tabs = document.querySelectorAll(".forum-tab");
-const textarea = document.getElementById("postBody");
-const boardSelect = document.getElementById("postBoard");
-const postBtn = document.getElementById("submitPost");
+  const postsEl = document.getElementById("posts");
+  const tabs = document.querySelectorAll(".forum-tab");
+  const textarea = document.getElementById("postBody");
+  const boardSelect = document.getElementById("postBoard");
+  const postBtn = document.getElementById("submitPost");
 
-let currentBoard = "general";
+  let currentBoard = "general";
 
-// Load posts live
-function loadPosts(board) {
-  postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
-  const q = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
+  function loadPosts(board) {
+    postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
+    const q = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
 
-  onSnapshot(q, (snapshot) => {
-    postsEl.innerHTML = "";
-    if (snapshot.empty) {
-      postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
-      return;
-    }
+    onSnapshot(q, (snapshot) => {
+      postsEl.innerHTML = "";
+      if (snapshot.empty) {
+        postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
+        return;
+      }
 
-    snapshot.forEach((doc) => {
-      const p = doc.data();
-      postsEl.innerHTML += `
-        <div class="post">
-          <div class="meta">
-            <span class="meta-name">${p.by || "Someone"}</span>
-            <span class="meta-time">${p.createdAt?.toDate().toLocaleString() || ""}</span>
-          </div>
-          <p>${p.body}</p>
-        </div>`;
+      snapshot.forEach((doc) => {
+        const p = doc.data();
+        postsEl.innerHTML += `
+          <div class="post">
+            <div class="meta">
+              <span class="meta-name">${p.by || "Someone"}</span>
+              <span class="meta-time">${p.createdAt?.toDate().toLocaleString() || ""}</span>
+            </div>
+            <p>${p.body}</p>
+          </div>`;
+      });
+    });
+  }
+
+  loadPosts("general");
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      currentBoard = tab.dataset.board;
+      boardSelect.value = currentBoard;
+      loadPosts(currentBoard);
     });
   });
-}
 
-loadPosts("general");
+  postBtn.addEventListener("click", async () => {
+    const text = textarea.value.trim();
+    const user = auth.currentUser;
+    if (!text) return;
+    if (!user) return alert("You must be logged in.");
 
-// Switch tabs
-tabs.forEach(tab => {
-  tab.addEventListener("click", () => {
-    tabs.forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-    currentBoard = tab.dataset.board;
-    boardSelect.value = currentBoard;
-    loadPosts(currentBoard);
+    await addDoc(collection(db, `forum_${boardSelect.value}`), {
+      body: text,
+      by: user.email,
+      createdAt: serverTimestamp(),
+    });
+
+    textarea.value = "";
   });
-});
-
-// Create post
-postBtn.addEventListener("click", async () => {
-  const text = textarea.value.trim();
-  const user = auth.currentUser;
-  if (!text) return;
-  if (!user) return alert("You must be logged in.");
-
-  await addDoc(collection(db, `forum_${boardSelect.value}`), {
-    body: text,
-    by: user.email,
-    createdAt: serverTimestamp(),
-  });
-
-  textarea.value = "";
 });
 </script>
 
