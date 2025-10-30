@@ -108,10 +108,8 @@
 <!-- ✅ Netlify Auth -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-<!-- ✅ Firebase + Forum Logic -->
 <script type="module">
 import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-import { firebaseConfig } from "./firebase-config.public.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { 
@@ -125,11 +123,15 @@ document.addEventListener("DOMContentLoaded", () => {
   requireAuth();
 });
 
+// ✅ Fetch Firebase config securely from Netlify Function
+const res = await fetch("/.netlify/functions/firebase-config");
+const firebaseConfig = await res.json();
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// UI
+// UI Elements
 const postsEl = document.getElementById("posts");
 const tabs = document.querySelectorAll(".forum-tab");
 const textarea = document.getElementById("postBody");
@@ -138,14 +140,18 @@ const postBtn = document.getElementById("submitPost");
 
 let currentBoard = "general";
 
-// Load posts Live
+// Load posts live
 function loadPosts(board) {
   postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
-  const ref = collection(db, `forum_${board}`);
-  const q = query(ref, orderBy("createdAt", "desc"));
+  const q = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
+
   onSnapshot(q, (snapshot) => {
     postsEl.innerHTML = "";
-    if (snapshot.empty) return postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
+    if (snapshot.empty) {
+      postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
+      return;
+    }
+
     snapshot.forEach((doc) => {
       const p = doc.data();
       postsEl.innerHTML += `
@@ -162,7 +168,7 @@ function loadPosts(board) {
 
 loadPosts("general");
 
-// Tabs
+// Switch tabs
 tabs.forEach(tab => {
   tab.addEventListener("click", () => {
     tabs.forEach(t => t.classList.remove("active"));
@@ -173,7 +179,7 @@ tabs.forEach(tab => {
   });
 });
 
-// Posting
+// Create post
 postBtn.addEventListener("click", async () => {
   const text = textarea.value.trim();
   const user = auth.currentUser;
