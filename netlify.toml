@@ -1,10 +1,7 @@
 [build]
   publish = "."
-  functions = "netlify/functions"
-
-[functions]
-  node_bundler = "esbuild"
-  included_files = ["netlify/functions/service-account.json"]
+  command = "echo \"window._env_ = { FIREBASE_API_KEY: '$FIREBASE_API_KEY' };\" > env.js"
 
 [build.environment]
-SECRETS_SCAN_SMART_DETECTION_ENABLED = "true"
+  FIREBASE_API_KEY = "${FIREBASE_API_KEY}"
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "true"
