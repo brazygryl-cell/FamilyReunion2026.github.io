@@ -123,13 +123,17 @@ document.addEventListener("DOMContentLoaded", () => {
   requireAuth();
 });
 
-// ✅ Fetch Firebase config securely from Netlify Function
-const res = await fetch("/.netlify/functions/firebase-config");
-const firebaseConfig = await res.json();
+import getFirebaseConfig from "./firebase-config.public.js";
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+document.addEventListener("DOMContentLoaded", async () => {
+  loadNavbar();
+  enableLogout();
+  requireAuth();
+
+  const firebaseConfig = await getFirebaseConfig();
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
 
 // UI Elements
 const postsEl = document.getElementById("posts");
