@@ -1,13 +1,11 @@
 // firebase-config.public.js
-
 export default function getFirebaseConfig() {
-  // ✅ Fallback to literal strings if env.js hasn't loaded yet
-  const API_KEY = window._env_?.FIREBASE_API_KEY || "";
-  const AUTH_DOMAIN = window._env_?.FIREBASE_AUTH_DOMAIN || "williams-reunion.firebaseapp.com";
-  const PROJECT_ID = window._env_?.FIREBASE_PROJECT_ID || "williams-reunion";
+  const API_KEY = window.ENV?.FIREBASE_API_KEY || "";
+  const AUTH_DOMAIN = window.ENV?.FIREBASE_AUTH_DOMAIN || "williams-reunion.firebaseapp.com";
+  const PROJECT_ID = window.ENV?.FIREBASE_PROJECT_ID || "williams-reunion";
 
   if (!API_KEY) {
-    console.warn("⚠️ FIREBASE_API_KEY is missing. Check env.js or your Netlify environment variables.");
+    console.warn("⚠️ FIREBASE_API_KEY missing — check env.js");
   }
 
   return {
