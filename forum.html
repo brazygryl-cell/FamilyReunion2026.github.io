@@ -135,18 +135,20 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
+// ✅ Initialize Firebase FIRST
+const firebaseConfig = getFirebaseConfig();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// ✅ THEN load navbar + auth UI
 document.addEventListener("DOMContentLoaded", () => {
   loadNavbar();
   enableLogout();
   requireAuth();
 });
 
-const firebaseConfig = getFirebaseConfig();
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-// Elements
+// UI Elements
 const postsEl = document.getElementById("posts");
 const tabs = document.querySelectorAll(".forum-tab");
 const textarea = document.getElementById("postBody");
@@ -190,35 +192,27 @@ tabs.forEach(tab => {
   });
 });
 
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-
+// ✅ Posting with auth check
 postBtn.addEventListener("click", async () => {
   const text = textarea.value.trim();
   if (!text) return;
 
-  // Wait for Firebase auth to fully load the user
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       alert("You must be logged in.");
-      window.netlifyIdentity.open("login"); // auto-open login popup
+      window.netlifyIdentity.open("login");
       return;
     }
 
-    try {
-      await addDoc(collection(db, `forum_${boardSelect.value}`), {
-        body: text,
-        by: user.email || "Anonymous",
-        createdAt: serverTimestamp(),
-      });
+    await addDoc(collection(db, `forum_${boardSelect.value}`), {
+      body: text,
+      by: user.email,
+      createdAt: serverTimestamp(),
+    });
 
-      textarea.value = "";
-    } catch (err) {
-      console.error("Error posting:", err);
-      alert("Could not post message. Try again.");
-    }
+    textarea.value = "";
   });
 });
-
 </script>
 
 </body>
