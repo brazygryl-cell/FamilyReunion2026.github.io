@@ -99,11 +99,19 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { getAuth, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   loadNavbar();
   enableLogout();
   requireAuth();
+
+  // ✅ Sync Netlify Identity → Firebase Auth
+  const netlifyUser = window.netlifyIdentity.currentUser();
+  if (netlifyUser) {
+    const token = await netlifyUser.jwt();
+    await signInWithCustomToken(auth, token).catch(console.error);
+  }
 });
+
 
 const firebaseConfig = getFirebaseConfig();
 const app = initializeApp(firebaseConfig);
