@@ -190,22 +190,35 @@ tabs.forEach(tab => {
   });
 });
 
-// ✅ Create post
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+
 postBtn.addEventListener("click", async () => {
   const text = textarea.value.trim();
-  const user = auth.currentUser;
-
   if (!text) return;
-  if (!user) return alert("You must be logged in.");
 
-  await addDoc(collection(db, `forum_${boardSelect.value}`), {
-    body: text,
-    by: user.email,
-    createdAt: serverTimestamp(),
+  // Wait for Firebase auth to fully load the user
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      alert("You must be logged in.");
+      window.netlifyIdentity.open("login"); // auto-open login popup
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, `forum_${boardSelect.value}`), {
+        body: text,
+        by: user.email || "Anonymous",
+        createdAt: serverTimestamp(),
+      });
+
+      textarea.value = "";
+    } catch (err) {
+      console.error("Error posting:", err);
+      alert("Could not post message. Try again.");
+    }
   });
-
-  textarea.value = "";
 });
+
 </script>
 
 </body>
