@@ -58,8 +58,6 @@
 .meta-name { font-weight: 600; color: #e1e1e1; }
 .meta-time { font-size: 0.75rem; color: #8b8b8b; }
 
-.post p { color: #dcdcdc; margin: 0; }
-
 #postBox {
   max-width: 750px;
   margin: 2rem auto;
@@ -120,11 +118,8 @@
 
 <!-- ✅ Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
-<!-- ✅ Make env.js load FIRST -->
 <script src="env.js"></script>
 
-<!-- ✅ Firebase + Forum Logic -->
 <script type="module">
 import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 import getFirebaseConfig from "./firebase-config.public.js";
@@ -133,34 +128,43 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/fireba
 import { 
   getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { 
+  getAuth, onAuthStateChanged, signInWithCredential, GoogleAuthProvider, signOut 
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-// ✅ Initialize Firebase FIRST
-const firebaseConfig = getFirebaseConfig();
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-// ✅ THEN load navbar + auth UI
+/* ✅ Navbar */
 document.addEventListener("DOMContentLoaded", () => {
   loadNavbar();
   enableLogout();
   requireAuth();
 });
 
-// UI Elements
+/* ✅ Firebase Init */
+const firebaseConfig = getFirebaseConfig();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+/* ✅ Sync Netlify Identity → Firebase Auth */
+window.netlifyIdentity.on("login", async (user) => {
+  const token = user.token.access_token;
+  const credential = GoogleAuthProvider.credential(null, token);
+  await signInWithCredential(auth, credential);
+  console.log("✅ Firebase Auth Linked to Netlify Identity");
+});
+window.netlifyIdentity.on("logout", () => signOut(auth));
+
+/* UI */
 const postsEl = document.getElementById("posts");
 const tabs = document.querySelectorAll(".forum-tab");
 const textarea = document.getElementById("postBody");
 const boardSelect = document.getElementById("postBoard");
 const postBtn = document.getElementById("submitPost");
-
 let currentBoard = "general";
 
-// ✅ Load posts
+/* ✅ Load Posts Live */
 function loadPosts(board) {
   postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
-
   const q = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
   onSnapshot(q, (snapshot) => {
     postsEl.innerHTML = "";
@@ -178,10 +182,9 @@ function loadPosts(board) {
     });
   });
 }
-
 loadPosts("general");
 
-// ✅ Switch tabs
+/* ✅ Switch Tabs */
 tabs.forEach(tab => {
   tab.addEventListener("click", () => {
     tabs.forEach(t => t.classList.remove("active"));
@@ -192,22 +195,18 @@ tabs.forEach(tab => {
   });
 });
 
-// ✅ Posting with auth check
+/* ✅ Create Post */
 postBtn.addEventListener("click", async () => {
   const text = textarea.value.trim();
   if (!text) return;
 
   onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      alert("You must be logged in.");
-      window.netlifyIdentity.open("login");
-      return;
-    }
+    if (!user) return window.netlifyIdentity.open("login");
 
     await addDoc(collection(db, `forum_${boardSelect.value}`), {
       body: text,
       by: user.email,
-      createdAt: serverTimestamp(),
+      createdAt: serverTimestamp()
     });
 
     textarea.value = "";
