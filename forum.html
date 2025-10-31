@@ -97,36 +97,35 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/fireba
 import { 
   getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getAuth, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { 
+  getAuth, signInWithCustomToken, onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
   loadNavbar();
   enableLogout();
   requireAuth();
-
-  // ✅ Wait for Netlify login, then sign Firebase in before loading posts
-  window.netlifyIdentity.on("init", async (user) => {
-    if (user) {
-      const token = await user.jwt();
-      await signInWithCustomToken(auth, token).catch(console.error);
-    }
-    loadPosts(currentBoard); // ✅ ensure posts load **after** auth is synced
-  });
-
-  window.netlifyIdentity.on("login", async (user) => {
-    const token = await user.jwt();
-    await signInWithCustomToken(auth, token).catch(console.error);
-    loadPosts(currentBoard);
-  });
 });
-
 
 const firebaseConfig = getFirebaseConfig();
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// UI Elements
+// ✅ Always sign the Netlify Identity user into Firebase on load
+window.netlifyIdentity.on("login", async (netlifyUser) => {
+  const token = await netlifyUser.jwt();
+  await signInWithCustomToken(auth, token).catch(console.error);
+});
+
+// ✅ Also sign in if already logged in when page loads
+const netUser = window.netlifyIdentity.currentUser();
+if (netUser) {
+  const token = await netUser.jwt();
+  await signInWithCustomToken(auth, token).catch(console.error);
+}
+
+// UI
 const postsEl = document.getElementById("posts");
 const tabs = document.querySelectorAll(".forum-tab");
 const textarea = document.getElementById("postBody");
@@ -137,7 +136,7 @@ let currentBoard = "general";
 
 // ✅ Load posts live
 function loadPosts(board) {
-  postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
+  postsEl.innerHTML = `<p style="color:#aaa;text-align:center;">Loading...</p>`;
   const q = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
   onSnapshot(q, (snapshot) => {
     postsEl.innerHTML = "";
@@ -156,7 +155,7 @@ function loadPosts(board) {
   });
 }
 
-loadPosts("general");
+loadPosts(currentBoard);
 
 // ✅ Switch tabs
 tabs.forEach(tab => {
@@ -169,22 +168,20 @@ tabs.forEach(tab => {
   });
 });
 
-// ✅ Post Messages (with synced auth)
+// ✅ Posting
 postBtn.addEventListener("click", async () => {
   const text = textarea.value.trim();
   if (!text) return;
 
-  const netlifyUser = window.netlifyIdentity.currentUser();
-  if (!netlifyUser) return window.netlifyIdentity.open("login");
+  const user = window.netlifyIdentity.currentUser();
+  if (!user) return window.netlifyIdentity.open("login");
 
-  const token = await netlifyUser.jwt();
+  const token = await user.jwt();
   await signInWithCustomToken(auth, token).catch(console.error);
-
-  await new Promise(r => setTimeout(r, 300)); // <-- ensures Firebase sees auth
 
   await addDoc(collection(db, `forum_${boardSelect.value}`), {
     body: text,
-    by: netlifyUser.email,
+    by: user.email,
     createdAt: serverTimestamp(),
   });
 
