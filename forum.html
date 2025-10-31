@@ -66,6 +66,7 @@
   border: 1px solid #3a3c42;
   border-radius: 12px;
 }
+
 #postBody {
   width: 100%;
   background: #2b2d31;
@@ -76,6 +77,7 @@
   border-radius: 8px;
   resize: vertical;
 }
+
 #submitPost {
   width: 100%;
   background: #5865F2;
@@ -118,8 +120,11 @@
 
 <!-- ✅ Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+<!-- ✅ Environment var loader -->
 <script src="env.js"></script>
 
+<!-- ✅ Main Forum Script -->
 <script type="module">
 import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 import getFirebaseConfig from "./firebase-config.public.js";
@@ -128,41 +133,36 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/fireba
 import { 
   getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { 
-  getAuth, onAuthStateChanged, signInWithCredential, GoogleAuthProvider, signOut 
-} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getAuth, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-/* ✅ Navbar */
 document.addEventListener("DOMContentLoaded", () => {
   loadNavbar();
   enableLogout();
   requireAuth();
 });
 
-/* ✅ Firebase Init */
 const firebaseConfig = getFirebaseConfig();
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-/* ✅ Sync Netlify Identity → Firebase Auth */
+// ✅ Sync Netlify → Firebase
 window.netlifyIdentity.on("login", async (user) => {
-  const token = user.token.access_token;
-  const credential = GoogleAuthProvider.credential(null, token);
-  await signInWithCredential(auth, credential);
-  console.log("✅ Firebase Auth Linked to Netlify Identity");
+  const token = await user.jwt();
+  await signInWithCustomToken(auth, token).catch(console.error);
 });
-window.netlifyIdentity.on("logout", () => signOut(auth));
+window.netlifyIdentity.on("logout", () => auth.signOut());
 
-/* UI */
+// UI Elements
 const postsEl = document.getElementById("posts");
 const tabs = document.querySelectorAll(".forum-tab");
 const textarea = document.getElementById("postBody");
 const boardSelect = document.getElementById("postBoard");
 const postBtn = document.getElementById("submitPost");
+
 let currentBoard = "general";
 
-/* ✅ Load Posts Live */
+// ✅ Load Posts Live
 function loadPosts(board) {
   postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
   const q = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
@@ -182,9 +182,10 @@ function loadPosts(board) {
     });
   });
 }
+
 loadPosts("general");
 
-/* ✅ Switch Tabs */
+// ✅ Switch Tabs
 tabs.forEach(tab => {
   tab.addEventListener("click", () => {
     tabs.forEach(t => t.classList.remove("active"));
@@ -195,25 +196,26 @@ tabs.forEach(tab => {
   });
 });
 
-/* ✅ Create Post */
+// ✅ Create Post
 postBtn.addEventListener("click", async () => {
   const text = textarea.value.trim();
   if (!text) return;
 
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) return window.netlifyIdentity.open("login");
+  const netlifyUser = window.netlifyIdentity.currentUser();
+  if (!netlifyUser) return window.netlifyIdentity.open("login");
 
-    await addDoc(collection(db, `forum_${boardSelect.value}`), {
-      body: text,
-      by: user.email,
-      createdAt: serverTimestamp()
-    });
+  const token = await netlifyUser.jwt();
+  await signInWithCustomToken(auth, token).catch(console.error);
 
-    textarea.value = "";
+  await addDoc(collection(db, `forum_${boardSelect.value}`), {
+    body: text,
+    by: netlifyUser.user_metadata.full_name || netlifyUser.email,
+    createdAt: serverTimestamp(),
   });
+
+  textarea.value = "";
 });
 </script>
 
 </body>
 </html>
-
