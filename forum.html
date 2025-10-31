@@ -115,40 +115,48 @@
 <script src="env.js"></script>
 
 <!-- ✅ Forum Logic -->
+<!-- ✅ Netlify Identity -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+<!-- ✅ Public Firebase Config Loader (must come BEFORE forum.js logic) -->
+<script src="env.js"></script>
+
 <script type="module">
 import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 import getFirebaseConfig from "./firebase-config.public.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import {
-  getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp
+import { 
+  getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-/* ✅ Show navbar + require login */
 document.addEventListener("DOMContentLoaded", () => {
   loadNavbar();
   enableLogout();
   requireAuth();
 });
 
-/* ✅ Firebase init */
-const app = initializeApp(getFirebaseConfig());
+// ✅ Initialize Firebase from env variables
+const firebaseConfig = getFirebaseConfig();
+const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-/* UI Elements */
+// Elements
 const postsEl = document.getElementById("posts");
 const tabs = document.querySelectorAll(".forum-tab");
 const textarea = document.getElementById("postBody");
 const boardSelect = document.getElementById("postBoard");
 const postBtn = document.getElementById("submitPost");
 
+// ✅ Default board
 let currentBoard = "general";
 
-/* ✅ Load Posts Live */
+// ✅ Load Posts (LIVE)
 function loadPosts(board) {
-  postsEl.innerHTML = `<p style="text-align:center;color:#aaa;">Loading...</p>`;
+  postsEl.innerHTML = `<p style="color:#aaa;text-align:center;">Loading...</p>`;
+
   const q = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
   onSnapshot(q, (snapshot) => {
     postsEl.innerHTML = "";
@@ -161,22 +169,22 @@ function loadPosts(board) {
       postsEl.innerHTML += `
         <div class="post">
           <div class="meta">
-            <span>${p.by}</span>
-            <span>${p.createdAt?.toDate().toLocaleString() || ""}</span>
+            <span class="meta-name">${p.by}</span>
+            <span class="meta-time">${p.createdAt?.toDate().toLocaleString() || ""}</span>
           </div>
           <p>${p.body}</p>
-        </div>
-      `;
+        </div>`;
     });
   });
 }
 
-loadPosts("general");
+// ✅ Load first board
+loadPosts(currentBoard);
 
-/* ✅ Tab Switching */
-tabs.forEach(tab => {
+// ✅ Tab switching
+tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
-    tabs.forEach(t => t.classList.remove("active"));
+    tabs.forEach((t) => t.classList.remove("active"));
     tab.classList.add("active");
     currentBoard = tab.dataset.board;
     boardSelect.value = currentBoard;
@@ -184,22 +192,26 @@ tabs.forEach(tab => {
   });
 });
 
-/* ✅ Create Post */
+// ✅ Posting
 postBtn.addEventListener("click", () => {
   const text = textarea.value.trim();
   if (!text) return;
 
   onAuthStateChanged(auth, async (user) => {
-    if (!user) return window.netlifyIdentity.open("login");
+    if (!user) {
+      window.netlifyIdentity.open("login");
+      return;
+    }
+
     await addDoc(collection(db, `forum_${boardSelect.value}`), {
       body: text,
       by: user.email,
       createdAt: serverTimestamp(),
     });
+
     textarea.value = "";
   });
 });
 </script>
-
 </body>
 </html>
