@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
 
 <style>
-/* 🌙 Discord-Inspired Forum UI */
+/* 🌙 Discord-Inspired Forum Styling */
 .tabs-container {
   display: flex;
   gap: 10px;
@@ -31,53 +31,26 @@
   border-color: #5865F2;
   color: white;
 }
-#posts {
-  max-width: 750px;
-  margin: 1.5rem auto;
-  padding: 1rem;
-}
+#posts { max-width: 750px; margin: 1rem auto; padding: 1rem; }
 .post {
-  background: #2b2d31;
-  border: 1px solid #3a3c42;
-  border-radius: 10px;
-  padding: 14px 18px;
-  margin-bottom: 14px;
+  background: #2b2d31; border: 1px solid #3a3c42;
+  border-radius: 10px; padding: 14px 18px; margin-bottom: 14px;
 }
 .meta {
-  font-size: 0.85rem;
-  color: #9ca3af;
-  margin-bottom: 6px;
-  display: flex;
-  justify-content: space-between;
+  font-size: 0.85rem; color: #9ca3af;
+  margin-bottom: 6px; display: flex; justify-content: space-between;
 }
 #postBox {
-  max-width: 750px;
-  margin: 2rem auto;
-  padding: 1rem;
-  background: #1e1f22;
-  border: 1px solid #3a3c42;
-  border-radius: 12px;
+  max-width: 750px; margin: 2rem auto; padding: 1rem;
+  background: #1e1f22; border: 1px solid #3a3c42; border-radius: 12px;
 }
 #postBody {
-  width: 100%;
-  background: #2b2d31;
-  border: 1px solid #3a3c42;
-  padding: 12px;
-  color: white;
-  min-height: 80px;
-  border-radius: 8px;
-  resize: vertical;
+  width: 100%; background: #2b2d31; border: 1px solid #3a3c42;
+  padding: 12px; color: white; min-height: 80px; border-radius: 8px;
 }
 #submitPost {
-  width: 100%;
-  background: #5865F2;
-  border: none;
-  padding: 12px;
-  color: white;
-  cursor: pointer;
-  border-radius: 8px;
-  margin-top: 8px;
-  font-weight: 600;
+  width: 100%; background: #5865F2; border: none; padding: 12px;
+  color: white; cursor: pointer; border-radius: 8px; margin-top: 8px; font-weight: 600;
 }
 #submitPost:hover { background: #4752C4; }
 </style>
@@ -108,19 +81,14 @@
 
 <footer></footer>
 
-<!-- ✅ Netlify Identity Login -->
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
-<!-- ✅ Load environment vars -->
-<script src="env.js"></script>
-
-<!-- ✅ Forum Logic -->
 <!-- ✅ Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-<!-- ✅ Public Firebase Config Loader (must come BEFORE forum.js logic) -->
+<!-- ✅ Public Firebase Config Loader -->
 <script src="env.js"></script>
+<script type="module" src="firebase-config.public.js"></script>
 
+<!-- ✅ Forum Logic -->
 <script type="module">
 import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 import getFirebaseConfig from "./firebase-config.public.js";
@@ -129,7 +97,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/fireba
 import { 
   getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getAuth, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   loadNavbar();
@@ -137,40 +105,34 @@ document.addEventListener("DOMContentLoaded", () => {
   requireAuth();
 });
 
-// ✅ Initialize Firebase from env variables
 const firebaseConfig = getFirebaseConfig();
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Elements
+// UI Elements
 const postsEl = document.getElementById("posts");
 const tabs = document.querySelectorAll(".forum-tab");
 const textarea = document.getElementById("postBody");
 const boardSelect = document.getElementById("postBoard");
 const postBtn = document.getElementById("submitPost");
 
-// ✅ Default board
 let currentBoard = "general";
 
-// ✅ Load Posts (LIVE)
+// ✅ Load posts live
 function loadPosts(board) {
-  postsEl.innerHTML = `<p style="color:#aaa;text-align:center;">Loading...</p>`;
-
+  postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
   const q = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
   onSnapshot(q, (snapshot) => {
     postsEl.innerHTML = "";
-    if (snapshot.empty) {
-      postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
-      return;
-    }
+    if (snapshot.empty) return postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
     snapshot.forEach((doc) => {
       const p = doc.data();
       postsEl.innerHTML += `
         <div class="post">
           <div class="meta">
-            <span class="meta-name">${p.by}</span>
-            <span class="meta-time">${p.createdAt?.toDate().toLocaleString() || ""}</span>
+            <span>${p.by || "Someone"}</span>
+            <span>${p.createdAt?.toDate().toLocaleString() || ""}</span>
           </div>
           <p>${p.body}</p>
         </div>`;
@@ -178,13 +140,12 @@ function loadPosts(board) {
   });
 }
 
-// ✅ Load first board
-loadPosts(currentBoard);
+loadPosts("general");
 
-// ✅ Tab switching
-tabs.forEach((tab) => {
+// ✅ Switch tabs
+tabs.forEach(tab => {
   tab.addEventListener("click", () => {
-    tabs.forEach((t) => t.classList.remove("active"));
+    tabs.forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
     currentBoard = tab.dataset.board;
     boardSelect.value = currentBoard;
@@ -192,26 +153,32 @@ tabs.forEach((tab) => {
   });
 });
 
-// ✅ Posting
-postBtn.addEventListener("click", () => {
+// ✅ Post Messages (with synced auth)
+postBtn.addEventListener("click", async () => {
   const text = textarea.value.trim();
   if (!text) return;
 
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      window.netlifyIdentity.open("login");
-      return;
-    }
+  const netlifyUser = window.netlifyIdentity.currentUser();
+  if (!netlifyUser) return window.netlifyIdentity.open("login");
 
-    await addDoc(collection(db, `forum_${boardSelect.value}`), {
-      body: text,
-      by: user.email,
-      createdAt: serverTimestamp(),
-    });
+  const token = await netlifyUser.jwt();
+  await signInWithCustomToken(auth, token).catch(console.error);
 
-    textarea.value = "";
+  await new Promise(r => setTimeout(r, 300)); // <-- ensures Firebase sees auth
+
+  await addDoc(collection(db, `forum_${boardSelect.value}`), {
+    body: text,
+    by: netlifyUser.email,
+    createdAt: serverTimestamp(),
   });
+
+  textarea.value = "";
 });
 </script>
+
+</body>
+</html>
+
+
 </body>
 </html>
