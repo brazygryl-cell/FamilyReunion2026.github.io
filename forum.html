@@ -104,12 +104,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   enableLogout();
   requireAuth();
 
-  // ✅ Sync Netlify Identity → Firebase Auth
-  const netlifyUser = window.netlifyIdentity.currentUser();
-  if (netlifyUser) {
-    const token = await netlifyUser.jwt();
+  // ✅ Wait for Netlify login, then sign Firebase in before loading posts
+  window.netlifyIdentity.on("init", async (user) => {
+    if (user) {
+      const token = await user.jwt();
+      await signInWithCustomToken(auth, token).catch(console.error);
+    }
+    loadPosts(currentBoard); // ✅ ensure posts load **after** auth is synced
+  });
+
+  window.netlifyIdentity.on("login", async (user) => {
+    const token = await user.jwt();
     await signInWithCustomToken(auth, token).catch(console.error);
-  }
+    loadPosts(currentBoard);
+  });
 });
 
 
