@@ -16,7 +16,6 @@
   justify-content: center;
   margin-top: 1.5rem;
 }
-
 .forum-tab {
   padding: 8px 16px;
   background: #232428;
@@ -32,62 +31,26 @@
   border-color: #5865F2;
   color: white;
 }
-
-#posts {
-  max-width: 750px;
-  margin: 1rem auto;
-  padding: 1rem;
-}
-
+#posts { max-width: 750px; margin: 1rem auto; padding: 1rem; }
 .post {
-  background: #2b2d31;
-  border: 1px solid #3a3c42;
-  border-radius: 10px;
-  padding: 14px 18px;
-  margin-bottom: 14px;
+  background: #2b2d31; border: 1px solid #3a3c42;
+  border-radius: 10px; padding: 14px 18px; margin-bottom: 14px;
 }
-.post:hover { border-color: #5865F2; }
-
 .meta {
-  font-size: 0.85rem;
-  color: #9ca3af;
-  margin-bottom: 6px;
-  display: flex;
-  justify-content: space-between;
+  font-size: 0.85rem; color: #9ca3af;
+  margin-bottom: 6px; display: flex; justify-content: space-between;
 }
-.meta-name { font-weight: 600; color: #e1e1e1; }
-.meta-time { font-size: 0.75rem; color: #8b8b8b; }
-
 #postBox {
-  max-width: 750px;
-  margin: 2rem auto;
-  padding: 1rem;
-  background: #1e1f22;
-  border: 1px solid #3a3c42;
-  border-radius: 12px;
+  max-width: 750px; margin: 2rem auto; padding: 1rem;
+  background: #1e1f22; border: 1px solid #3a3c42; border-radius: 12px;
 }
-
 #postBody {
-  width: 100%;
-  background: #2b2d31;
-  border: 1px solid #3a3c42;
-  padding: 12px;
-  color: white;
-  min-height: 80px;
-  border-radius: 8px;
-  resize: vertical;
+  width: 100%; background: #2b2d31; border: 1px solid #3a3c42;
+  padding: 12px; color: white; min-height: 80px; border-radius: 8px;
 }
-
 #submitPost {
-  width: 100%;
-  background: #5865F2;
-  border: none;
-  padding: 12px;
-  color: white;
-  cursor: pointer;
-  border-radius: 8px;
-  margin-top: 8px;
-  font-weight: 600;
+  width: 100%; background: #5865F2; border: none; padding: 12px;
+  color: white; cursor: pointer; border-radius: 8px; margin-top: 8px; font-weight: 600;
 }
 #submitPost:hover { background: #4752C4; }
 </style>
@@ -121,10 +84,11 @@
 <!-- ✅ Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-<!-- ✅ Environment var loader -->
+<!-- ✅ Public Firebase Config Loader -->
 <script src="env.js"></script>
+<script type="module" src="firebase-config.public.js"></script>
 
-<!-- ✅ Main Forum Script -->
+<!-- ✅ Forum Logic -->
 <script type="module">
 import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 import getFirebaseConfig from "./firebase-config.public.js";
@@ -133,7 +97,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/fireba
 import { 
   getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getAuth, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getAuth, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   loadNavbar();
@@ -146,13 +110,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// ✅ Sync Netlify → Firebase
-window.netlifyIdentity.on("login", async (user) => {
-  const token = await user.jwt();
-  await signInWithCustomToken(auth, token).catch(console.error);
-});
-window.netlifyIdentity.on("logout", () => auth.signOut());
-
 // UI Elements
 const postsEl = document.getElementById("posts");
 const tabs = document.querySelectorAll(".forum-tab");
@@ -162,7 +119,7 @@ const postBtn = document.getElementById("submitPost");
 
 let currentBoard = "general";
 
-// ✅ Load Posts Live
+// ✅ Load posts live
 function loadPosts(board) {
   postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
   const q = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
@@ -174,8 +131,8 @@ function loadPosts(board) {
       postsEl.innerHTML += `
         <div class="post">
           <div class="meta">
-            <span class="meta-name">${p.by || "Someone"}</span>
-            <span class="meta-time">${p.createdAt?.toDate().toLocaleString() || ""}</span>
+            <span>${p.by || "Someone"}</span>
+            <span>${p.createdAt?.toDate().toLocaleString() || ""}</span>
           </div>
           <p>${p.body}</p>
         </div>`;
@@ -185,7 +142,7 @@ function loadPosts(board) {
 
 loadPosts("general");
 
-// ✅ Switch Tabs
+// ✅ Switch tabs
 tabs.forEach(tab => {
   tab.addEventListener("click", () => {
     tabs.forEach(t => t.classList.remove("active"));
@@ -196,7 +153,7 @@ tabs.forEach(tab => {
   });
 });
 
-// ✅ Create Post
+// ✅ Post Messages (with synced auth)
 postBtn.addEventListener("click", async () => {
   const text = textarea.value.trim();
   if (!text) return;
@@ -207,15 +164,21 @@ postBtn.addEventListener("click", async () => {
   const token = await netlifyUser.jwt();
   await signInWithCustomToken(auth, token).catch(console.error);
 
+  await new Promise(r => setTimeout(r, 300)); // <-- ensures Firebase sees auth
+
   await addDoc(collection(db, `forum_${boardSelect.value}`), {
     body: text,
-    by: netlifyUser.user_metadata.full_name || netlifyUser.email,
+    by: netlifyUser.email,
     createdAt: serverTimestamp(),
   });
 
   textarea.value = "";
 });
 </script>
+
+</body>
+</html>
+
 
 </body>
 </html>
