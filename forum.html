@@ -97,7 +97,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/fireba
 import { 
   getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getAuth, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   loadNavbar();
@@ -105,12 +105,13 @@ document.addEventListener("DOMContentLoaded", () => {
   requireAuth();
 });
 
+// ✅ Firebase init
 const firebaseConfig = getFirebaseConfig();
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// UI Elements
+// UI
 const postsEl = document.getElementById("posts");
 const tabs = document.querySelectorAll(".forum-tab");
 const textarea = document.getElementById("postBody");
@@ -119,20 +120,25 @@ const postBtn = document.getElementById("submitPost");
 
 let currentBoard = "general";
 
-// ✅ Load posts live
+// ✅ LIVE Load Posts
 function loadPosts(board) {
-  postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
+  postsEl.innerHTML = `<p style="color:#aaa;text-align:center;">Loading...</p>`;
+
   const q = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
   onSnapshot(q, (snapshot) => {
     postsEl.innerHTML = "";
-    if (snapshot.empty) return postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
+    if (snapshot.empty) {
+      postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
+      return;
+    }
+
     snapshot.forEach((doc) => {
       const p = doc.data();
       postsEl.innerHTML += `
         <div class="post">
           <div class="meta">
-            <span>${p.by || "Someone"}</span>
-            <span>${p.createdAt?.toDate().toLocaleString() || ""}</span>
+            <span class="meta-name">${p.by || "Someone"}</span>
+            <span class="meta-time">${p.createdAt?.toDate().toLocaleString() || ""}</span>
           </div>
           <p>${p.body}</p>
         </div>`;
@@ -140,9 +146,10 @@ function loadPosts(board) {
   });
 }
 
-loadPosts("general");
+// ✅ Default load
+loadPosts(currentBoard);
 
-// ✅ Switch tabs
+// ✅ Tab switching
 tabs.forEach(tab => {
   tab.addEventListener("click", () => {
     tabs.forEach(t => t.classList.remove("active"));
@@ -153,32 +160,27 @@ tabs.forEach(tab => {
   });
 });
 
-// ✅ Post Messages (with synced auth)
-postBtn.addEventListener("click", async () => {
+// ✅ Posting
+postBtn.addEventListener("click", () => {
   const text = textarea.value.trim();
   if (!text) return;
 
-  const netlifyUser = window.netlifyIdentity.currentUser();
-  if (!netlifyUser) return window.netlifyIdentity.open("login");
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.netlifyIdentity.open("login");
+      return;
+    }
 
-  const token = await netlifyUser.jwt();
-  await signInWithCustomToken(auth, token).catch(console.error);
+    await addDoc(collection(db, `forum_${boardSelect.value}`), {
+      body: text,
+      by: user.email,
+      createdAt: serverTimestamp(),
+    });
 
-  await new Promise(r => setTimeout(r, 300)); // <-- ensures Firebase sees auth
-
-  await addDoc(collection(db, `forum_${boardSelect.value}`), {
-    body: text,
-    by: netlifyUser.email,
-    createdAt: serverTimestamp(),
+    textarea.value = "";
   });
-
-  textarea.value = "";
 });
 </script>
-
-</body>
-</html>
-
 
 </body>
 </html>
