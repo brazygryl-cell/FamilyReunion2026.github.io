@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Family Forum — Williams Family Reunion</title>
 
-<link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
 
 <style>
 /* 🌙 Discord-Inspired Forum Styling */
@@ -69,12 +69,25 @@
   border-radius: 12px;
 }
 #postBody {
-  width: 100%; background: #2b2d31; border: 1px solid #3a3c42;
-  padding: 12px; color: white; min-height: 80px; border-radius: 8px; resize: vertical;
+  width: 100%;
+  background: #2b2d31;
+  border: 1px solid #3a3c42;
+  padding: 12px;
+  color: white;
+  min-height: 80px;
+  border-radius: 8px;
+  resize: vertical;
 }
 #submitPost {
-  width: 100%; background: #5865F2; border: none; padding: 12px;
-  color: white; cursor: pointer; border-radius: 8px; margin-top: 8px; font-weight: 600;
+  width: 100%;
+  background: #5865F2;
+  border: none;
+  padding: 12px;
+  color: white;
+  cursor: pointer;
+  border-radius: 8px;
+  margin-top: 8px;
+  font-weight: 600;
 }
 #submitPost:hover { background: #4752C4; }
 </style>
@@ -108,7 +121,10 @@
 <!-- ✅ Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-<!-- ✅ Forum Logic -->
+<!-- ✅ Make env.js load FIRST -->
+<script src="env.js"></script>
+
+<!-- ✅ Firebase + Forum Logic -->
 <script type="module">
 import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 import getFirebaseConfig from "./firebase-config.public.js";
@@ -117,79 +133,81 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/fireba
 import { 
   getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
   loadNavbar();
   enableLogout();
   requireAuth();
+});
 
-  const firebaseConfig = await getFirebaseConfig();
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
+const firebaseConfig = getFirebaseConfig();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-  const postsEl = document.getElementById("posts");
-  const tabs = document.querySelectorAll(".forum-tab");
-  const textarea = document.getElementById("postBody");
-  const boardSelect = document.getElementById("postBoard");
-  const postBtn = document.getElementById("submitPost");
+// Elements
+const postsEl = document.getElementById("posts");
+const tabs = document.querySelectorAll(".forum-tab");
+const textarea = document.getElementById("postBody");
+const boardSelect = document.getElementById("postBoard");
+const postBtn = document.getElementById("submitPost");
 
-  let currentBoard = "general";
+let currentBoard = "general";
 
-  function loadPosts(board) {
-    postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
-    const q = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
+// ✅ Load posts
+function loadPosts(board) {
+  postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
 
-    onSnapshot(q, (snapshot) => {
-      postsEl.innerHTML = "";
-      if (snapshot.empty) {
-        postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
-        return;
-      }
-
-      snapshot.forEach((doc) => {
-        const p = doc.data();
-        postsEl.innerHTML += `
-          <div class="post">
-            <div class="meta">
-              <span class="meta-name">${p.by || "Someone"}</span>
-              <span class="meta-time">${p.createdAt?.toDate().toLocaleString() || ""}</span>
-            </div>
-            <p>${p.body}</p>
-          </div>`;
-      });
-    });
-  }
-
-  loadPosts("general");
-
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-      currentBoard = tab.dataset.board;
-      boardSelect.value = currentBoard;
-      loadPosts(currentBoard);
+  const q = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
+  onSnapshot(q, (snapshot) => {
+    postsEl.innerHTML = "";
+    if (snapshot.empty) return postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
+    snapshot.forEach((doc) => {
+      const p = doc.data();
+      postsEl.innerHTML += `
+        <div class="post">
+          <div class="meta">
+            <span class="meta-name">${p.by || "Someone"}</span>
+            <span class="meta-time">${p.createdAt?.toDate().toLocaleString() || ""}</span>
+          </div>
+          <p>${p.body}</p>
+        </div>`;
     });
   });
+}
 
-  postBtn.addEventListener("click", async () => {
-    const text = textarea.value.trim();
-    const user = auth.currentUser;
-    if (!text) return;
-    if (!user) return alert("You must be logged in.");
+loadPosts("general");
 
-    await addDoc(collection(db, `forum_${boardSelect.value}`), {
-      body: text,
-      by: user.email,
-      createdAt: serverTimestamp(),
-    });
-
-    textarea.value = "";
+// ✅ Switch tabs
+tabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    tabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    currentBoard = tab.dataset.board;
+    boardSelect.value = currentBoard;
+    loadPosts(currentBoard);
   });
+});
+
+// ✅ Create post
+postBtn.addEventListener("click", async () => {
+  const text = textarea.value.trim();
+  const user = auth.currentUser;
+
+  if (!text) return;
+  if (!user) return alert("You must be logged in.");
+
+  await addDoc(collection(db, `forum_${boardSelect.value}`), {
+    body: text,
+    by: user.email,
+    createdAt: serverTimestamp(),
+  });
+
+  textarea.value = "";
 });
 </script>
 
 </body>
 </html>
+
