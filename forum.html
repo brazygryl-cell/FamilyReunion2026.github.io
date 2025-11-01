@@ -9,33 +9,48 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
 
 <style>
+/* 🌙 Discord-Inspired Forum Styling */
 .tabs-container {
-  display: flex; gap: 10px; justify-content: center; margin-top: 1.5rem;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 1.5rem;
 }
 .forum-tab {
-  padding: 8px 16px; background: #232428; border: 1px solid #3a3c42; border-radius: 8px;
-  cursor: pointer; color: #cfcfcf; font-weight: 500; transition: 0.2s;
+  padding: 8px 16px;
+  background: #232428;
+  border: 1px solid #3a3c42;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #cfcfcf;
+  font-weight: 500;
+  transition: 0.2s;
 }
-.forum-tab.active, .forum-tab:hover { background: #5865F2; border-color: #5865F2; color: white; }
+.forum-tab.active, .forum-tab:hover {
+  background: #5865F2;
+  border-color: #5865F2;
+  color: white;
+}
 #posts { max-width: 750px; margin: 1rem auto; padding: 1rem; }
 .post {
-  background: #2b2d31; border: 1px solid #3a3c42; border-radius: 10px; padding: 14px 18px; margin-bottom: 14px;
+  background: #2b2d31; border: 1px solid #3a3c42;
+  border-radius: 10px; padding: 14px 18px; margin-bottom: 14px;
 }
 .meta {
-  font-size: 0.85rem; color: #9ca3af; margin-bottom: 6px;
-  display: flex; justify-content: space-between;
+  font-size: 0.85rem; color: #9ca3af;
+  margin-bottom: 6px; display: flex; justify-content: space-between;
 }
 #postBox {
-  max-width: 750px; margin: 2rem auto; padding: 1rem; background: #1e1f22;
-  border: 1px solid #3a3c42; border-radius: 12px;
+  max-width: 750px; margin: 2rem auto; padding: 1rem;
+  background: #1e1f22; border: 1px solid #3a3c42; border-radius: 12px;
 }
 #postBody {
   width: 100%; background: #2b2d31; border: 1px solid #3a3c42;
   padding: 12px; color: white; min-height: 80px; border-radius: 8px;
 }
 #submitPost {
-  width: 100%; background: #5865F2; border: none; padding: 12px; color: white;
-  cursor: pointer; border-radius: 8px; margin-top: 8px; font-weight: 600;
+  width: 100%; background: #5865F2; border: none; padding: 12px;
+  color: white; cursor: pointer; border-radius: 8px; margin-top: 8px; font-weight: 600;
 }
 #submitPost:hover { background: #4752C4; }
 </style>
@@ -66,17 +81,23 @@
 
 <footer></footer>
 
+<!-- ✅ Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-<script src="env.js"></script>
 
+<!-- ✅ Public Firebase Config Loader -->
+<script src="env.js"></script>
+<script type="module" src="firebase-config.public.js"></script>
+
+<!-- ✅ Forum Logic -->
 <script type="module">
 import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 import getFirebaseConfig from "./firebase-config.public.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { 
+  getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { getAuth, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   loadNavbar();
@@ -89,6 +110,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// UI Elements
 const postsEl = document.getElementById("posts");
 const tabs = document.querySelectorAll(".forum-tab");
 const textarea = document.getElementById("postBody");
@@ -97,16 +119,13 @@ const postBtn = document.getElementById("submitPost");
 
 let currentBoard = "general";
 
+// ✅ Load posts live
 function loadPosts(board) {
   postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
-
   const q = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
   onSnapshot(q, (snapshot) => {
     postsEl.innerHTML = "";
-    if (snapshot.empty) {
-      postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
-      return;
-    }
+    if (snapshot.empty) return postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
     snapshot.forEach((doc) => {
       const p = doc.data();
       postsEl.innerHTML += `
@@ -121,8 +140,9 @@ function loadPosts(board) {
   });
 }
 
-loadPosts(currentBoard);
+loadPosts("general");
 
+// ✅ Switch tabs
 tabs.forEach(tab => {
   tab.addEventListener("click", () => {
     tabs.forEach(t => t.classList.remove("active"));
@@ -133,16 +153,22 @@ tabs.forEach(tab => {
   });
 });
 
+// ✅ Post Messages (with synced auth)
 postBtn.addEventListener("click", async () => {
   const text = textarea.value.trim();
   if (!text) return;
 
-  const user = window.netlifyIdentity.currentUser();
-  if (!user) return window.netlifyIdentity.open("login");
+  const netlifyUser = window.netlifyIdentity.currentUser();
+  if (!netlifyUser) return window.netlifyIdentity.open("login");
+
+  const token = await netlifyUser.jwt();
+  await signInWithCustomToken(auth, token).catch(console.error);
+
+  await new Promise(r => setTimeout(r, 300)); // <-- ensures Firebase sees auth
 
   await addDoc(collection(db, `forum_${boardSelect.value}`), {
     body: text,
-    by: user.email,
+    by: netlifyUser.email,
     createdAt: serverTimestamp(),
   });
 
