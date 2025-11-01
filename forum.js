@@ -1,61 +1,61 @@
-import admin from "firebase-admin";
-import fs from "fs";
+import { db } from "./firebase-init.js";
+import {
+ collection,
+ addDoc,
+ serverTimestamp,
+ query,
+ orderBy,
+ onSnapshot
+} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-// ✅ Resolve service-account.json safely on Netlify
-const serviceURL = new URL("./service-account.json", import.meta.url);
-// Convert file URL → real file path & decode any % escapes
-const servicePath = decodeURIComponent(serviceURL.pathname);
 
-console.log("📄 Loading service-account.json from:", servicePath);
+// --- UI Elements ---
+const postsBox = document.getElementById("postsBox");
+const postInput = document.getElementById("postBody");
+const boardSelect = document.getElementById("postBoard");
+const postButton = document.getElementById("submitPost");
 
-let serviceAccount;
-try {
-  serviceAccount = JSON.parse(fs.readFileSync(servicePath, "utf8"));
-  console.log("✅ Parsed service account:", serviceAccount.project_id);
-} catch (err) {
-  console.error("❌ Could not read service-account.json:", err);
+// --- Load Posts When Board Changes ---
+boardSelect.addEventListener("change", loadPosts);
+
+// --- Submit Post ---
+postButton.addEventListener("click", async () => {
+ const board = boardSelect.value;
+ const text = postInput.value.trim();
+ if (!text) return;
+
+ try {
+ await addDoc(collection(db, "forum", board, "posts"), {
+ text,
+ createdAt: serverTimestamp()
+ });
+ postInput.value = "";
+ } catch (err) {
+ console.error(" Add post failed:", err);
+ alert("Could not post. Please try again.");
+ }
+});
+
+// --- Load Posts from Firestore Live ---
+function loadPosts() {
+ const board = boardSelect.value;
+ const postsRef = collection(db, "forum", board, "posts");
+ const q = query(postsRef, orderBy("createdAt", "desc"));
+
+ // Clear UI before reloading
+ postsBox.innerHTML = "";
+
+ onSnapshot(q, (snapshot) => {
+ postsBox.innerHTML = ""; // Reset post list
+ snapshot.forEach((doc) => {
+ const post = doc.data();
+ const div = document.createElement("div");
+ div.className = "post";
+ div.textContent = post.text;
+ postsBox.appendChild(div);
+ });
+ });
 }
 
-// ✅ Initialize Firebase Admin cleanly
-if (!admin.apps.length) {
-  try {
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      projectId: serviceAccount.project_id,
-    });
-    console.log("✅ Firebase Admin initialized");
-  } catch (err) {
-    console.error("🔥 Error initializing Firebase Admin:", err);
-  }
-}
-
-const db = admin.firestore();
-
-// ✅ Function Handler
-export const handler = async (event) => {
-  try {
-    const params = new URLSearchParams(event.rawQuery || "");
-    const board = params.get("board") || "general";
-
-    console.log("📥 Fetching posts for:", `forum_${board}`);
-
-    const ref = db.collection(`forum_${board}`).orderBy("createdAt", "desc");
-    const snapshot = await ref.get();
-
-    const posts = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify(posts),
-    };
-  } catch (err) {
-    console.error("🔥 FETCH ERROR:", err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message }),
-    };
-  }
-};
+// --- Load Default Board on Page Open ---
+loadPosts();
