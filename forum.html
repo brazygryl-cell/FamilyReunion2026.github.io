@@ -56,11 +56,6 @@
 
 <!-- Forum logic -->
 <script type="module">
-  console.log("ENV at module start:", window.ENV);
-if (!window.ENV || !window.ENV.FIREBASE_API_KEY) {
-  document.getElementById("posts").innerHTML = "<p style='color:#e88;text-align:center;'>Config missing. Check env.js load order.</p>";
-  throw new Error("ENV not ready");
-}
 import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 import getFirebaseConfig from "./firebase-config.public.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
