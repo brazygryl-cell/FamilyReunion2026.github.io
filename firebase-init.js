@@ -1,15 +1,16 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-const firebaseConfig = window.ENV;
+const firebaseConfig = {
+  apiKey: window.ENV.FIREBASE_API_KEY,
+  authDomain: window.ENV.FIREBASE_AUTH_DOMAIN,
+  projectId: window.ENV.FIREBASE_PROJECT_ID
+};
 
-// ✅ Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+export const auth = getAuth(app);
 
-// ✅ Sign In Anonymously
-signInAnonymously(auth)
-  .then(() => console.log("✅ Anonymous login successful"))
-  .catch(err => console.error("❌ Anonymous login failed:", err));
+// ✅ Auto-login anonymously if not signed in
+signInAnonymously(auth).catch(console.error);
