@@ -10,48 +10,15 @@
 
 <style>
 /* 🌙 Discord-Inspired Forum Styling */
-.tabs-container {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 1.5rem;
-}
-.forum-tab {
-  padding: 8px 16px;
-  background: #232428;
-  border: 1px solid #3a3c42;
-  border-radius: 8px;
-  cursor: pointer;
-  color: #cfcfcf;
-  font-weight: 500;
-  transition: 0.2s;
-}
-.forum-tab.active, .forum-tab:hover {
-  background: #5865F2;
-  border-color: #5865F2;
-  color: white;
-}
+.tabs-container { display: flex; gap: 10px; justify-content: center; margin-top: 1.5rem; }
+.forum-tab { padding: 8px 16px; background: #232428; border: 1px solid #3a3c42; border-radius: 8px; cursor: pointer; color: #cfcfcf; font-weight: 500; transition: 0.2s; }
+.forum-tab.active, .forum-tab:hover { background: #5865F2; border-color: #5865F2; color: white; }
 #posts { max-width: 750px; margin: 1rem auto; padding: 1rem; }
-.post {
-  background: #2b2d31; border: 1px solid #3a3c42;
-  border-radius: 10px; padding: 14px 18px; margin-bottom: 14px;
-}
-.meta {
-  font-size: 0.85rem; color: #9ca3af;
-  margin-bottom: 6px; display: flex; justify-content: space-between;
-}
-#postBox {
-  max-width: 750px; margin: 2rem auto; padding: 1rem;
-  background: #1e1f22; border: 1px solid #3a3c42; border-radius: 12px;
-}
-#postBody {
-  width: 100%; background: #2b2d31; border: 1px solid #3a3c42;
-  padding: 12px; color: white; min-height: 80px; border-radius: 8px;
-}
-#submitPost {
-  width: 100%; background: #5865F2; border: none; padding: 12px;
-  color: white; cursor: pointer; border-radius: 8px; margin-top: 8px; font-weight: 600;
-}
+.post { background: #2b2d31; border: 1px solid #3a3c42; border-radius: 10px; padding: 14px 18px; margin-bottom: 14px; }
+.meta { font-size: 0.85rem; color: #9ca3af; margin-bottom: 6px; display: flex; justify-content: space-between; }
+#postBox { max-width: 750px; margin: 2rem auto; padding: 1rem; background: #1e1f22; border: 1px solid #3a3c42; border-radius: 12px; }
+#postBody { width: 100%; background: #2b2d31; border: 1px solid #3a3c42; padding: 12px; color: white; min-height: 80px; border-radius: 8px; resize: vertical; }
+#submitPost { width: 100%; background: #5865F2; border: none; padding: 12px; color: white; cursor: pointer; border-radius: 8px; margin-top: 8px; font-weight: 600; }
 #submitPost:hover { background: #4752C4; }
 </style>
 </head>
@@ -81,12 +48,11 @@
 
 <footer></footer>
 
-<!-- ✅ Netlify Identity -->
+<!-- ✅ Netlify Identity (your login gate stays) -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-<!-- ✅ Public Firebase Config Loader -->
+<!-- ✅ Make sure env.js is loaded BEFORE the module below -->
 <script src="env.js"></script>
-<script type="module" src="firebase-config.public.js"></script>
 
 <!-- ✅ Forum Logic -->
 <script type="module">
@@ -97,35 +63,54 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/fireba
 import { 
   getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getAuth, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
+/* ---- UI boot ---- */
 document.addEventListener("DOMContentLoaded", () => {
   loadNavbar();
   enableLogout();
-  requireAuth();
+  requireAuth(); // ← your existing Netlify gate
 });
 
+/* ---- Firebase boot ---- */
 const firebaseConfig = getFirebaseConfig();
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// UI Elements
-const postsEl = document.getElementById("posts");
-const tabs = document.querySelectorAll(".forum-tab");
-const textarea = document.getElementById("postBody");
-const boardSelect = document.getElementById("postBoard");
-const postBtn = document.getElementById("submitPost");
+/* ---- Ensure Firebase has an auth user (anonymous) so rules allow writes ---- */
+onAuthStateChanged(auth, (u) => {
+  if (!u) {
+    // Only runs once per fresh browser/session. Satisfies request.auth != null.
+    signInAnonymously(auth).catch((e) => console.error("Anon sign-in failed:", e));
+  }
+});
+
+/* ---- Elements ---- */
+const postsEl   = document.getElementById("posts");
+const tabs      = document.querySelectorAll(".forum-tab");
+const textarea  = document.getElementById("postBody");
+const boardSel  = document.getElementById("postBoard");
+const postBtn   = document.getElementById("submitPost");
 
 let currentBoard = "general";
+let unsubscribe  = null; // keep one live listener
 
-// ✅ Load posts live
+/* ---- Live loader with proper unsubscribe ---- */
 function loadPosts(board) {
   postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
+
+  if (typeof unsubscribe === "function") {
+    unsubscribe(); // stop previous board listener
+  }
+
   const q = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
-  onSnapshot(q, (snapshot) => {
+  unsubscribe = onSnapshot(q, (snapshot) => {
     postsEl.innerHTML = "";
-    if (snapshot.empty) return postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
+    if (snapshot.empty) {
+      postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
+      return;
+    }
     snapshot.forEach((doc) => {
       const p = doc.data();
       postsEl.innerHTML += `
@@ -137,42 +122,48 @@ function loadPosts(board) {
           <p>${p.body}</p>
         </div>`;
     });
+  }, (err) => {
+    console.error("Snapshot error:", err);
+    postsEl.innerHTML = `<p style="text-align:center;color:#e88;">Failed to load posts.</p>`;
   });
 }
 
-loadPosts("general");
+/* ---- First load ---- */
+loadPosts(currentBoard);
 
-// ✅ Switch tabs
+/* ---- Tab switching ---- */
 tabs.forEach(tab => {
   tab.addEventListener("click", () => {
     tabs.forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
     currentBoard = tab.dataset.board;
-    boardSelect.value = currentBoard;
+    boardSel.value = currentBoard;
     loadPosts(currentBoard);
   });
 });
 
-// ✅ Post Messages (with synced auth)
+/* ---- Posting ---- */
 postBtn.addEventListener("click", async () => {
   const text = textarea.value.trim();
   if (!text) return;
 
-  const netlifyUser = window.netlifyIdentity.currentUser();
-  if (!netlifyUser) return window.netlifyIdentity.open("login");
+  const netlifyUser = window.netlifyIdentity?.currentUser();
+  if (!netlifyUser) {
+    window.netlifyIdentity?.open("login");
+    return;
+  }
 
-  const token = await netlifyUser.jwt();
-  await signInWithCustomToken(auth, token).catch(console.error);
-
-  await new Promise(r => setTimeout(r, 300)); // <-- ensures Firebase sees auth
-
-  await addDoc(collection(db, `forum_${boardSelect.value}`), {
-    body: text,
-    by: netlifyUser.email,
-    createdAt: serverTimestamp(),
-  });
-
-  textarea.value = "";
+  try {
+    await addDoc(collection(db, `forum_${boardSel.value}`), {
+      body: text,
+      by: netlifyUser.email,
+      createdAt: serverTimestamp(),
+    });
+    textarea.value = "";
+  } catch (e) {
+    console.error("Add post failed:", e);
+    alert("Could not post. Please try again.");
+  }
 });
 </script>
 
