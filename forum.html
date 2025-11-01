@@ -48,17 +48,17 @@
 
 <footer></footer>
 
-<!-- Netlify Identity (your login gate) -->
+<!-- Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-<!-- env.js MUST load before the module below -->
-<script src="/env.js"></script>
+<!-- ✅ env.js MUST load BEFORE firebase config + forum code -->
+<script src="env.js"></script>
 
-<!-- Forum logic -->
+<!-- ✅ NOW load the module code -->
 <script type="module">
-import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-import getFirebaseConfig from "./firebase-config.public.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+   import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+   import getFirebaseConfig from "./firebase-config.public.js";
+   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signInAnonymously }
