@@ -1,3 +1,4 @@
+// firebase-config.public.js
 export default function getFirebaseConfig() {
   return {
     apiKey: window.ENV.FIREBASE_API_KEY,
