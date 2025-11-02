@@ -96,4 +96,29 @@ export function requireAuth() {
     location.reload();
   });
 }
+// ✅ Sync Netlify Identity ↔ Firebase Auth
+if (window.netlifyIdentity) {
+  window.netlifyIdentity.on("init", (user) => {
+    if (user) {
+      firebase.auth().signInWithCustomToken(user.token.access_token)
+        .catch(err => console.error("Firebase login init error:", err));
+    }
+  });
+
+  window.netlifyIdentity.on("login", (user) => {
+    firebase.auth().signInWithCustomToken(user.token.access_token)
+      .then(() => {
+        console.log("✅ Firebase login success");
+        location.reload();
+      })
+      .catch(err => console.error("Firebase login error:", err));
+  });
+
+  window.netlifyIdentity.on("logout", () => {
+    firebase.auth().signOut().then(() => {
+      console.log("👋 Logged out of Firebase too");
+      location.reload();
+    });
+  });
+}
 
