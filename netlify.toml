@@ -1,9 +1,8 @@
 [build]
-publish = "."
-command = "echo \"window.ENV = { FIREBASE_API_KEY: '$FIREBASE_API_KEY', FIREBASE_AUTH_DOMAIN: '$FIREBASE_AUTH_DOMAIN', FIREBASE_PROJECT_ID: '$FIREBASE_PROJECT_ID' };\" > env.js"
+  publish = "."
+  functions = "netlify/functions"
 
-[functions]
-directory = "netlify/functions"
-
-[build.environment]
-SECRETS_SCAN_SMART_DETECTION_ENABLED = "true"
+[[redirects]]
+  from = "/api/forum"
+  to = "/.netlify/functions/forum"
+  status = 200
