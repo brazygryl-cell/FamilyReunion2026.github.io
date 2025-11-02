@@ -1,205 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Family Forum — Williams Family Reunion</title>
-
-<link rel="stylesheet" href="style.css" />
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
-
-<style>
-/* 🌙 Discord-ish styling */
-.tabs-container { display:flex; gap:10px; justify-content:center; margin-top:1.5rem; }
-.forum-tab { padding:8px 16px; background:#232428; border:1px solid #3a3c42; border-radius:8px; cursor:pointer; color:#cfcfcf; font-weight:500; transition:0.2s; }
-.forum-tab.active, .forum-tab:hover { background:#5865F2; border-color:#5865F2; color:#fff; }
-#posts { max-width:750px; margin:1rem auto; padding:1rem; }
-.post { background:#2b2d31; border:1px solid #3a3c42; border-radius:10px; padding:14px 18px; margin-bottom:14px; }
-.meta { font-size:0.85rem; color:#9ca3af; margin-bottom:6px; display:flex; justify-content:space-between; }
-#postBox { max-width:750px; margin:2rem auto; padding:1rem; background:#1e1f22; border:1px solid #3a3c42; border-radius:12px; }
-#postBody { width:100%; background:#2b2d31; border:1px solid #3a3c42; padding:12px; color:#fff; min-height:80px; border-radius:8px; resize:vertical; }
-#submitPost { width:100%; background:#5865F2; border:none; padding:12px; color:#fff; cursor:pointer; border-radius:8px; margin-top:8px; font-weight:600; }
-#submitPost:hover { background:#4752C4; }
-</style>
+  <meta charset="UTF-8" />
+  <title>Family Forum</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 <header></header>
 
-<h2 style="text-align:center;margin-top:1.5rem;">Family Forum 💬</h2>
+<h2 style="text-align:center;margin-top:1rem;">Family Forum 💬</h2>
 
-<div class="tabs-container">
-  <div class="forum-tab active" data-board="general">General</div>
-  <div class="forum-tab" data-board="memories">Memories</div>
-  <div class="forum-tab" data-board="planning">Planning</div>
-</div>
+<div id="posts" style="max-width:700px;margin:1rem auto;"></div>
 
-<div id="posts"></div>
-
-<div id="postBox">
-  <select id="postBoard">
-    <option value="general">General</option>
-    <option value="memories">Memories</option>
-    <option value="planning">Planning</option>
-  </select>
-  <textarea id="postBody" placeholder="Say something..."></textarea>
-  <button id="submitPost">Post</button>
+<div style="max-width:700px;margin:1.5rem auto;">
+  <textarea id="postText" placeholder="Say something..." style="width:100%;height:90px;"></textarea>
+  <button id="postBtn" style="margin-top:8px;width:100%;">Post</button>
 </div>
 
 <footer></footer>
 
-<!-- Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
-<!-- ✅ env.js MUST load BEFORE firebase config + forum code -->
-<script src="env.js?v=7"></script>
-
-<!-- ✅ NOW load the module code -->
 <script type="module">
-   import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-   import getFirebaseConfig from "./firebase-config.public.js";
-   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signInAnonymously }
-  from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-
-/* ---------- 1) Navbar + Netlify Gate ---------- */
-document.addEventListener("DOMContentLoaded", () => {
+  import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
   loadNavbar();
   enableLogout();
-  requireAuth(); // you keep this so only your family can access the page
-});
+  requireAuth();
 
-/* ---------- 2) Wait for env.js (hard guarantee) ---------- */
-function waitForEnv(maxMs = 2000) {
-  const start = Date.now();
-  return new Promise((resolve) => {
-    (function tick() {
-      if (window.ENV && window.ENV.FIREBASE_API_KEY) return resolve(true);
-      if (Date.now() - start > maxMs) return resolve(false);
-      setTimeout(tick, 50);
-    })();
-  });
-}
-
-/* ---------- 3) Safe Firebase boot + anonymous auth ---------- */
-let app, db, auth;
-
-async function bootFirebase() {
-  const envOk = await waitForEnv();
-  if (!envOk) {
-    console.error("env.js not loaded or FIREBASE_API_KEY missing. window.ENV =", window.ENV);
-    // Keep the UI alive even if Firebase fails (tabs still work, just show message)
-    document.getElementById("posts").innerHTML =
-      `<p style="text-align:center;color:#e88;">Config missing. Check env.js load order.</p>`;
-    return;
+  async function loadPosts() {
+    const res = await fetch("/api/forum");
+    const posts = await res.json();
+    const box = document.getElementById("posts");
+    box.innerHTML = posts
+      .map(p => `<div class="post"><strong>${p.by}</strong><br>${p.body}<br><small>${new Date(p.createdAt).toLocaleString()}</small></div>`)
+      .join("");
   }
 
-  const cfg = getFirebaseConfig();
-  app = initializeApp(cfg);
-  db = getFirestore(app);
-  auth = getAuth(app);
+  async function createPost() {
+    const user = netlifyIdentity.currentUser();
+    if (!user) return netlifyIdentity.open("login");
 
-  // Ensure Firestore rules see request.auth != null
-  onAuthStateChanged(auth, (u) => {
-    if (!u) {
-      signInAnonymously(auth).catch((e) => console.error("Anon sign-in failed:", e));
-    }
-  });
-}
+    const email = user.email;
+    const body = document.getElementById("postText").value.trim();
+    if (!body) return;
 
-/* ---------- 4) UI wiring (tabs always work) ---------- */
-const postsEl  = document.getElementById("posts");
-const tabs     = document.querySelectorAll(".forum-tab");
-const textarea = document.getElementById("postBody");
-const boardSel = document.getElementById("postBoard");
-const postBtn  = document.getElementById("submitPost");
-
-let currentBoard = "general";
-let unsubscribe = null;
-
-function attachLiveFeed(board) {
-  // If Firebase never booted, do nothing (UI stays usable)
-  if (!db) return;
-
-  postsEl.innerHTML = `<p style="text-align:center;color:#bbb;">Loading...</p>`;
-  if (typeof unsubscribe === "function") unsubscribe();
-
-  const qRef = query(collection(db, `forum_${board}`), orderBy("createdAt", "desc"));
-  unsubscribe = onSnapshot(qRef, (snap) => {
-    postsEl.innerHTML = "";
-    if (snap.empty) {
-      postsEl.innerHTML = `<p style="text-align:center;color:#777;">No posts yet.</p>`;
-      return;
-    }
-    snap.forEach((doc) => {
-      const p = doc.data();
-      postsEl.innerHTML += `
-        <div class="post">
-          <div class="meta">
-            <span>${p.by || "Someone"}</span>
-            <span>${p.createdAt?.toDate().toLocaleString() || ""}</span>
-          </div>
-          <p>${p.body}</p>
-        </div>`;
+    await fetch("/api/forum", {
+      method: "POST",
+      body: JSON.stringify({ body, email })
     });
-  }, (err) => {
-    console.error("Snapshot error:", err);
-    postsEl.innerHTML = `<p style="text-align:center;color:#e88;">Failed to load posts.</p>`;
-  });
-}
 
-function wireTabs() {
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-      currentBoard = tab.dataset.board;
-      boardSel.value = currentBoard;
-      attachLiveFeed(currentBoard);
-    });
-  });
-}
-
-/* ---------- 5) Posting ---------- */
-async function handlePost() {
-  const text = textarea.value.trim();
-  if (!text) return;
-
-  // Require Netlify login for *who can post* label, but Firestore auth is anonymous under the hood
-  const netlifyUser = window.netlifyIdentity?.currentUser();
-  if (!netlifyUser) {
-    window.netlifyIdentity?.open("login");
-    return;
+    document.getElementById("postText").value = "";
+    loadPosts();
   }
 
-  if (!db) {
-    alert("Forum not ready yet. Try again in a moment.");
-    return;
-  }
-
-  try {
-    await addDoc(collection(db, `forum_${boardSel.value}`), {
-      body: text,
-      by: netlifyUser.email,
-      createdAt: serverTimestamp(),
-    });
-    textarea.value = "";
-  } catch (e) {
-    console.error("Add post failed:", e);
-    alert("Could not post. Please try again.");
-  }
-}
-
-/* ---------- 6) Start everything ---------- */
-wireTabs();             // tabs work even if Firebase boot fails
-await bootFirebase();   // start Firebase + anonymous auth
-attachLiveFeed(currentBoard);  // attach initial feed
-postBtn.addEventListener("click", handlePost);
+  document.getElementById("postBtn").addEventListener("click", createPost);
+  loadPosts();
+  setInterval(loadPosts, 4000); // live updates
 </script>
-
 </body>
 </html>
+
 
 
