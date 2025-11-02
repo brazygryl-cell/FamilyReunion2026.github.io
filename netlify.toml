@@ -1,11 +1,11 @@
 [build]
-publish = "."
-command = "echo \"window.ENV = { FIREBASE_API_KEY: '$FIREBASE_API_KEY', FIREBASE_AUTH_DOMAIN: '$FIREBASE_AUTH_DOMAIN', FIREBASE_PROJECT_ID: '$FIREBASE_PROJECT_ID' };\" > env.js"
+  publish = "."
+  command = "echo \"window.ENV = { FIREBASE_API_KEY: '$FIREBASE_API_KEY', FIREBASE_AUTH_DOMAIN: '$FIREBASE_AUTH_DOMAIN', FIREBASE_PROJECT_ID: '$FIREBASE_PROJECT_ID' };\" > env.js"
 
 [build.environment]
-FIREBASE_API_KEY = "AIzaSyAldYSp37LZO31XkG4F1xhnQ9bpBXLU6Q"
-FIREBASE_AUTH_DOMAIN = "williams-reunion.firebaseapp.com"
-FIREBASE_PROJECT_ID = "williams-reunion"
+  FIREBASE_API_KEY = "" # SET IN UI, NOT HERE
+  FIREBASE_AUTH_DOMAIN = ""
+  FIREBASE_PROJECT_ID = ""
 
-# ✅ This is the part that stops the deploy from failing
-NETLIFY_SKIP_SECRET_SUITABILITY_CHECK = "true"
+[functions]
+  directory = "netlify/functions"
