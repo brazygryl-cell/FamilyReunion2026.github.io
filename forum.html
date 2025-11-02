@@ -1,63 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Family Forum</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Family Forum — Williams Family Reunion</title>
+
+<link rel="stylesheet" href="style.css" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
+<style>
+/* Simple Discord-style look */
+.tabs-container { display:flex; gap:10px; justify-content:center; margin-top:1.5rem; }
+.forum-tab { padding:8px 16px; background:#232428; border:1px solid #3a3c42; border-radius:8px;
+  cursor:pointer; color:#cfcfcf; font-weight:500; transition:0.2s; }
+.forum-tab.active, .forum-tab:hover { background:#5865F2; border-color:#5865F2; color:white; }
+
+#posts { max-width:750px; margin:1rem auto; padding:1rem; }
+.post { background:#2b2d31; border:1px solid #3a3c42; border-radius:10px; padding:14px 18px; margin-bottom:14px; }
+.meta { font-size:0.85rem; color:#9ca3af; margin-bottom:6px; display:flex; justify-content:space-between; }
+
+#postBox { max-width:750px; margin:2rem auto; padding:1rem; background:#1e1f22; border:1px solid #3a3c42;
+  border-radius:12px; }
+#postBody { width:100%; background:#2b2d31; border:1px solid #3a3c42; padding:12px; color:white; min-height:80px;
+  border-radius:8px; resize:vertical; }
+#submitPost { width:100%; background:#5865F2; border:none; padding:12px; color:white; cursor:pointer;
+  border-radius:8px; margin-top:8px; font-weight:600; }
+#submitPost:hover { background:#4752C4; }
+</style>
 </head>
+
 <body>
 <header></header>
 
-<h2 style="text-align:center;margin-top:1rem;">Family Forum 💬</h2>
+<h2 style="text-align:center;margin-top:1.5rem;">Family Forum 💬</h2>
 
-<div id="posts" style="max-width:700px;margin:1rem auto;"></div>
+<!-- ✅ Only two boards now -->
+<div class="tabs-container">
+  <div class="forum-tab active" data-board="general">General</div>
+  <div class="forum-tab" data-board="planning">Planning</div>
+</div>
 
-<div style="max-width:700px;margin:1.5rem auto;">
-  <textarea id="postText" placeholder="Say something..." style="width:100%;height:90px;"></textarea>
-  <button id="postBtn" style="margin-top:8px;width:100%;">Post</button>
+<div id="posts"></div>
+
+<div id="postBox">
+  <select id="postBoard">
+    <option value="general">General</option>
+    <option value="planning">Planning</option>
+  </select>
+  <textarea id="postBody" placeholder="Say something..."></textarea>
+  <button id="submitPost">Post</button>
 </div>
 
 <footer></footer>
 
+<!-- Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-<script type="module">
-  import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-  loadNavbar();
-  enableLogout();
-  requireAuth();
 
-  async function loadPosts() {
-    const res = await fetch("/api/forum");
-    const posts = await res.json();
-    const box = document.getElementById("posts");
-    box.innerHTML = posts
-      .map(p => `<div class="post"><strong>${p.by}</strong><br>${p.body}<br><small>${new Date(p.createdAt).toLocaleString()}</small></div>`)
-      .join("");
-  }
+<!-- ✅ Load scripts AFTER Identity -->
+<script type="module" src="forum.js"></script>
 
-  async function createPost() {
-    const user = netlifyIdentity.currentUser();
-    if (!user) return netlifyIdentity.open("login");
-
-    const email = user.email;
-    const body = document.getElementById("postText").value.trim();
-    if (!body) return;
-
-    await fetch("/api/forum", {
-      method: "POST",
-      body: JSON.stringify({ body, email })
-    });
-
-    document.getElementById("postText").value = "";
-    loadPosts();
-  }
-
-  document.getElementById("postBtn").addEventListener("click", createPost);
-  loadPosts();
-  setInterval(loadPosts, 4000); // live updates
-</script>
 </body>
 </html>
-
-
 
