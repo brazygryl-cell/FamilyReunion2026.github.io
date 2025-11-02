@@ -5,12 +5,11 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.3/firebas
 const firebaseConfig = {
   apiKey: window.ENV.FIREBASE_API_KEY,
   authDomain: window.ENV.FIREBASE_AUTH_DOMAIN,
-  projectId: window.ENV.FIREBASE_PROJECT_ID
+  projectId: window.ENV.FIREBASE_PROJECT_ID,
 };
 
 export const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 
-// ✅ Auto-login anonymously if not signed in
-signInAnonymously(auth).catch(console.error);
+signInAnonymously(auth).catch((err) => console.error("❌ Anonymous login failed:", err));
