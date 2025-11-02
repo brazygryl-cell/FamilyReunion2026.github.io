@@ -60,6 +60,18 @@
 <!-- ✅ Load scripts AFTER Identity -->
 <script type="module" src="forum.js"></script>
 
+  <script type="module">
+  import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadNavbar();
+    enableLogout();
+    if (!window.location.pathname.includes("login.html")) {
+      requireAuth();
+    }
+  });
+</script>
+
 </body>
 </html>
 
