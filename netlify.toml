@@ -1,11 +1,8 @@
 [build]
-  publish = "."
-  command = "echo \"window.ENV = { FIREBASE_API_KEY: '$FIREBASE_API_KEY', FIREBASE_AUTH_DOMAIN: '$FIREBASE_AUTH_DOMAIN', FIREBASE_PROJECT_ID: '$FIREBASE_PROJECT_ID' };\" > env.js"
+publish = "."
+command = "echo \"window.ENV = { FIREBASE_API_KEY: '\\\"$FIREBASE_API_KEY\\\"', FIREBASE_AUTH_DOMAIN: '\\\"$FIREBASE_AUTH_DOMAIN\\\"', FIREBASE_PROJECT_ID: '\\\"$FIREBASE_PROJECT_ID\\\"' };\" > env.js"
 
 [build.environment]
-  FIREBASE_API_KEY = "" # SET IN UI, NOT HERE
-  FIREBASE_AUTH_DOMAIN = ""
-  FIREBASE_PROJECT_ID = ""
-
-[functions]
-  directory = "netlify/functions"
+FIREBASE_API_KEY = "${FIREBASE_API_KEY}"
+FIREBASE_AUTH_DOMAIN = "${FIREBASE_AUTH_DOMAIN}"
+FIREBASE_PROJECT_ID = "${FIREBASE_PROJECT_ID}"
