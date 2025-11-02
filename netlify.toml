@@ -1,7 +1,8 @@
 [build]
   publish = "."
-  command = "echo \"window._env_ = { FIREBASE_API_KEY: '$FIREBASE_API_KEY' };\" > env.js"
+  command = ""
 
-[build.environment]
-  FIREBASE_API_KEY = "${FIREBASE_API_KEY}"
-  SECRETS_SCAN_SMART_DETECTION_ENABLED = "true"
+[[redirects]]
+  from = "/_env.js"
+  to = "/env.js"
+  status = 200
