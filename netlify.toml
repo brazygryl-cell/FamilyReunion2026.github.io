@@ -1,8 +1,9 @@
 [build]
 publish = "."
-command = "echo \"window.ENV = { FIREBASE_API_KEY: '\\\"$FIREBASE_API_KEY\\\"', FIREBASE_AUTH_DOMAIN: '\\\"$FIREBASE_AUTH_DOMAIN\\\"', FIREBASE_PROJECT_ID: '\\\"$FIREBASE_PROJECT_ID\\\"' };\" > env.js"
+command = "echo \"window.ENV = { FIREBASE_API_KEY: '$FIREBASE_API_KEY', FIREBASE_AUTH_DOMAIN: '$FIREBASE_AUTH_DOMAIN', FIREBASE_PROJECT_ID: '$FIREBASE_PROJECT_ID' };\" > env.js"
+
+[functions]
+directory = "netlify/functions"
 
 [build.environment]
-FIREBASE_API_KEY = "${FIREBASE_API_KEY}"
-FIREBASE_AUTH_DOMAIN = "${FIREBASE_AUTH_DOMAIN}"
-FIREBASE_PROJECT_ID = "${FIREBASE_PROJECT_ID}"
+SECRETS_SCAN_SMART_DETECTION_ENABLED = "true"
