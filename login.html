@@ -1,47 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login — Williams Family Reunion</title>
+
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+
   <script type="module" src="nav.js"></script>
 </head>
 <body>
-  <header></header>
 
-  <section class="section">
-    <div class="container">
-      <div class="card pad" style="max-width:560px;margin:0 auto;text-align:center">
-        <h2>Sign in to Continue</h2>
-        <p class="muted">Only family members can access the site. Ask the organizer for an invite.</p>
-        <div style="margin-top:12px">
-          <button class="btn mint" onclick="netlifyIdentity && netlifyIdentity.open()">Login / Register</button>
-        </div>
-      </div>
+<header></header>
+
+<section class="section">
+  <div class="container">
+    <div class="card" style="max-width:560px;margin:0 auto;text-align:center">
+      <h2>Sign in to Continue</h2>
+      <p class="muted">Only family members can access the site. Ask the organizer for an invite.</p>
+
+      <!-- ✅ CORRECT LOGIN BUTTON -->
+      <button class="btn" id="loginBtn" style="margin-top:16px;">Login / Register</button>
     </div>
-  </section>
+  </div>
+</section>
 
-  <footer></footer>
+<footer></footer>
 
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <script>
-    if (window.netlifyIdentity) {
-      window.netlifyIdentity.on('login', () => location.href = 'index.html');
-    }
-  </script>
+<!-- ✅ Netlify Identity -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-  <p class="invite-note" style="
-text-align: center;
-color: #777;
-font-size: 0.9rem;
-margin-top: 20px;
-">
-Registration is <strong>by invite only</strong>.
-<br><a href="mailto:taylor.clarkjones25@gmail.com?subject=Family%20Reunion%20Registration">
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.netlifyIdentity) {
+    
+    // Open login modal when button is clicked
+    const btn = document.getElementById("loginBtn");
+    btn.addEventListener("click", () => {
+      window.netlifyIdentity.open("login");
+    });
+
+    // After login → go home
+    window.netlifyIdentity.on("login", () => {
+      window.location.href = "index.html";
+    });
+  }
+});
+</script>
+
+<!-- ✅ Invite note stays exactly as you had it -->
+<p class="invite-note" style="text-align:center; color:#777; font-size:0.9rem; margin-top:20px;">
+  Registration is <strong>by invite only</strong>.
+  <br/><a href="mailto:taylor.clarkjones25@gmail.com?subject=Family%20Reunion%20Registration">
   Email Taylor to Register
-</a>
+  </a>
 </p>
+
 </body>
 </html>
 
