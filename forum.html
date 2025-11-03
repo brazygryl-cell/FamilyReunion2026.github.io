@@ -30,20 +30,22 @@
 <section class="section">
   <div class="container">
 
-    <h2>Family Forum</h2>
-    <p style="color:#777;margin-bottom:18px;">Talk, plan, and share updates.</p>
+  <h2>Family Forum</h2>
+<p>Talk, plan, and share updates.</p>
 
-    <!-- ✅ Tabs -->
-    <div class="tabs-container">
-      <button class="forum-tab active" data-topic="general">General</button>
-      <button class="forum-tab" data-topic="planning">Planning</button>
-    </div>
+<div class="tabs-container">
+  <button class="forum-tab active" data-topic="general">General</button>
+  <button class="forum-tab" data-topic="planning">Planning</button>
+</div>
 
-    <!-- ✅ Posts Container -->
-    <div id="posts"></div>
+<!-- ✅ Insert this -->
+<div id="postBox" style="display:none; margin-top:25px;">
+  <textarea id="postBody" placeholder="Write a new post..." rows="4"></textarea>
+  <button id="submitPost">Post</button>
+</div>
 
-    <!-- ✅ Post Box -->
-    <div id="postBox" style="display:none;">
+<!-- Posts list -->
+<div id="posts"></div>
       <textarea id="postBody" placeholder="Write your message..."></textarea>
       <button id="submitPost">Post</button>
     </div>
