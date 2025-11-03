@@ -1,15 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Sign In • Williams Reunion 2026</title>
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login</title>
 <link rel="stylesheet" href="style.css" />
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
-
-<!-- Navbar / Footer Loader -->
-<script type="module" src="nav.js"></script>
 </head>
 
 <body>
@@ -17,33 +12,37 @@
 
 <section class="section">
 <div class="container" style="max-width:560px;margin:0 auto;text-align:center;">
-<div class="card" style="padding:30px;">
 <h2>Sign in to Continue</h2>
-<p class="muted">Only family members can access the site. Ask the organizer for an invite.</p>
+<p class="muted">Only family members can access the site. If you received an invite email, click the button below.</p>
 
-<button class="btn mint" style="margin-top:20px;" onclick="window.netlifyIdentity.open()">
-Login / Register
-</button>
-</div>
+<button id="loginBtn" class="btn">Login / Create Account</button>
 
-<!-- ✅ Email Contact Block (Restored) -->
-<p style="text-align:center;color:#777;font-size:0.9rem;margin-top:25px;">
-Registration is <strong>invite only</strong>.<br><br>
-<a href="mailto:taylor.clarkjones25@gmail.com?subject=Family Reunion 2026 Registration"
-style="color:var(--mint);font-weight:600;">
-Email Taylor to Request Access
-</a>
+<p style="margin-top:20px;font-size:0.9rem;">
+<strong>Registration is invite only.</strong><br>
+Didn’t receive your invite? <a href="mailto:taylor.clarkjones25@gmail.com?subject=Family%20Reunion%20Registration">Email Taylor</a>
 </p>
-
 </div>
 </section>
 
 <footer></footer>
 
-<!-- Netlify Identity -->
+<!-- ✅ LOAD IDENTITY WIDGET -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-<script>
+<script type="module">
+import { loadNavbar } from "./nav.js";
+loadNavbar();
+
+// ✅ FORCE LOGIN MODAL TO OPEN
+document.getElementById("loginBtn").addEventListener("click", () => {
+if (window.netlifyIdentity) {
+window.netlifyIdentity.open("login");
+} else {
+alert("Netlify Identity failed to load. Check connection.");
+}
+});
+
+// ✅ Redirect after login
 if (window.netlifyIdentity) {
 window.netlifyIdentity.on("login", () => {
 window.location.href = "index.html";
