@@ -1,6 +1,13 @@
 // nav.js
 // nav.js
 // Handles navigation bar, footer, and Netlify Identity auth (login/logout)
+if (window.netlifyIdentity) {
+window.netlifyIdentity.on("init", user => {
+if (!user && !window.location.pathname.includes("login.html")) {
+window.location.href = "login.html";
+}
+});
+}
 
 export function loadNavbar() {
   const header = document.querySelector("header");
