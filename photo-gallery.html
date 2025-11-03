@@ -158,15 +158,19 @@ lightbox.addEventListener("click", () => {
 <!-- 🔐 Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-<!-- ✅ Correct Auth Flow -->
 <script type="module">
-import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+  import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadNavbar();
-  enableLogout();
-  requireAuth();   // ✅ No flicker, no infinite reload
-});
+  document.addEventListener("DOMContentLoaded", () => {
+    // ✅ Require Auth FIRST. Don’t wait for nav to render.
+    if (!window.location.pathname.includes("login.html")) {
+      requireAuth();
+    }
+
+    // Then load UI stuff
+    loadNavbar();
+    enableLogout();
+  });
 </script>
 
 </body>
