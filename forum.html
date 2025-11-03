@@ -55,75 +55,61 @@
 
 <footer></footer>
 
-<!-- ✅ Forum Logic -->
-<script type="module">
-import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-
+<script>
 document.addEventListener("DOMContentLoaded", () => {
-  loadNavbar();
-  enableLogout();
-  requireAuth(); // ✅ Protects this page
-
-  const postsContainer = document.getElementById("posts");
   const postBody = document.getElementById("postBody");
   const submitPost = document.getElementById("submitPost");
-  const postBox = document.getElementById("postBox");
-  let currentTopic = "general";
+  const postsContainer = document.getElementById("posts");
+  const tabs = document.querySelectorAll(".forum-tab");
 
-  // ✅ If logged in → show posting box
-  window.netlifyIdentity.on("init", (user) => {
-    if (user) postBox.style.display = "block";
-  });
-  window.netlifyIdentity.on("login", () => location.reload());
-  window.netlifyIdentity.on("logout", () => location.reload());
-
-  // ✅ Load Posts
-  async function loadPosts() {
-    const res = await fetch("/posts.json");
-    const data = await res.json();
-    const posts = data[currentTopic] || [];
-
-    postsContainer.innerHTML = posts
-      .map(post => `
-        <div class="post">
-          <div class="meta">${post.author} — ${post.date}</div>
-          <div>${post.body}</div>
-        </div>
-      `).join("");
-  }
-
-  // ✅ Switch Tabs
-  document.querySelectorAll(".forum-tab").forEach(tab => {
+  // ✅ Switch tabs (General / Planning) — this part remains functional
+  tabs.forEach(tab => {
     tab.addEventListener("click", () => {
-      document.querySelector(".forum-tab.active").classList.remove("active");
+      tabs.forEach(t => t.classList.remove("active"));
       tab.classList.add("active");
-      currentTopic = tab.dataset.topic;
-      loadPosts();
     });
   });
 
-  // ✅ Submit Post → Netlify Function
-  submitPost.addEventListener("click", async () => {
-    const user = window.netlifyIdentity.currentUser();
-    if (!user) return alert("Log in first.");
+  // ✅ Load posts
+  async function loadPosts() {
+    try {
+      const res = await fetch("/.netlify/functions/forum"); // <— Correct API endpoint
+      const posts = await res.json();
+      postsContainer.innerHTML = "";
 
+      posts.forEach(post => {
+        const div = document.createElement("div");
+        div.className = "post";
+        div.innerHTML = `
+          <div class="meta"><strong>${post.by}</strong> • ${new Date(post.createdAt).toLocaleString()}</div>
+          <div>${post.body}</div>
+        `;
+        postsContainer.appendChild(div);
+      });
+    } catch (err) {
+      console.error("Failed to load posts:", err);
+    }
+  }
+
+  // ✅ Submit post
+  submitPost.addEventListener("click", async () => {
     const body = postBody.value.trim();
     if (!body) return;
 
-    await fetch("/.netlify/functions/save-posts", {
+    const user = window.netlifyIdentity.currentUser();
+    const email = user.email;
+
+    await fetch("/.netlify/functions/forum", {   // <— Correct API endpoint
       method: "POST",
-      body: JSON.stringify({
-        topic: currentTopic,
-        author: user.user_metadata.full_name || user.email,
-        body: body
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ body, email })
     });
 
     postBody.value = "";
-    loadPosts();
+    loadPosts(); // refresh posts
   });
 
-  loadPosts();
+  loadPosts(); // load on page open
 });
 </script>
 
