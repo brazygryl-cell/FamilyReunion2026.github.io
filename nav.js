@@ -71,13 +71,10 @@ export function enableLogout() {
 export function requireAuth() {
   if (!window.netlifyIdentity) return;
 
-  window.netlifyIdentity.on("init", (user) => {
-    if (!user && !window.location.pathname.includes("login.html")) {
-      window.location.href = "login.html";
-    }
-  });
-
-  window.netlifyIdentity.on("login", () => {
-    location.reload();
-  });
+  const user = window.netlifyIdentity.currentUser();
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
 }
+
