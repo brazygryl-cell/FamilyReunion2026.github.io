@@ -208,16 +208,15 @@ setInterval(() => {
 <!-- 🔐 Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-<script type="module">
-  import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-
-  document.addEventListener("DOMContentLoaded", () => {
-    loadNavbar();
-    enableLogout();
-    if (!window.location.pathname.includes("login.html")) {
-      requireAuth();
-    }
-  });
+<script>
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on("init", user => {
+      if (!user && !window.location.pathname.includes("login.html")) {
+        window.location.href = "login.html";
+      }
+    });
+  }
 </script>
+
 </body>
 </html>
