@@ -55,8 +55,6 @@
 <footer></footer>
 
 <!-- Netlify Identity -->
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
 <script type="module">
 import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 
@@ -66,100 +64,78 @@ document.addEventListener("DOMContentLoaded", () => {
   requireAuth();
 });
 
-/* --------- CONFIG -------- */
-const repoOwner = "FamilyReunion2026";
-const repoName = "FamilyReunion2026.github.io";
-const filePath = "posts.json";
+let postsData = {};
+let currentBoard = "General";
 
-/* --------- UI -------- */
 const postsEl = document.getElementById("posts");
 const tabs = document.querySelectorAll(".forum-tab");
+const selectBoard = document.getElementById("postBoard");
 const textarea = document.getElementById("postBody");
 const postBtn = document.getElementById("submitPost");
 
-let currentBoard = "general";
-
-/* --------- Load Posts -------- */
 async function loadPosts() {
-  const res = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${filePath}?v=${Date.now()}`);
-  const data = await res.json();
-  const boardPosts = data[currentBoard] || [];
+  try {
+    const res = await fetch("posts.json", { cache: "no-store" });
+    postsData = await res.json();
+    displayPosts();
+  } catch (err) {
+    console.error("Error loading posts:", err);
+  }
+}
 
-  postsEl.innerHTML = boardPosts.length ? "" : `<p style="text-align:center;color:#777;">No posts yet.</p>`;
-
-  boardPosts.slice().reverse().forEach(p => {
-    postsEl.innerHTML += `
+function displayPosts() {
+  const boardPosts = postsData[currentBoard] || [];
+  postsEl.innerHTML = boardPosts.length
+    ? boardPosts.map(p => `
       <div class="post">
         <div class="meta">
           <span>${p.by}</span>
           <span>${p.time}</span>
         </div>
         <p>${p.body}</p>
-      </div>`;
-  });
+      </div>
+    `).join("")
+    : `<p style="text-align:center;color:#777;">No posts yet.</p>`;
 }
 
-/* --------- Save Post to GitHub -------- */
-async function savePost(body) {
-  const user = window.netlifyIdentity.currentUser();
-  if (!user) return window.netlifyIdentity.open("login");
-
-  const token = (await user.jwt()).token;
-
-  const res = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-
-  const json = await res.json();
-  const content = atob(json.content);
-  const data = JSON.parse(content);
-
-  data[currentBoard].push({
-    by: user.email,
-    body,
-    time: new Date().toLocaleString()
-  });
-
-  await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`, {
-    method: "PUT",
-    headers: { Authorization: `Bearer ${token}` },
-    body: JSON.stringify({
-      message: "New forum post",
-      content: btoa(JSON.stringify(data, null, 2)),
-      sha: json.sha
-    })
-  });
-
-  textarea.value = "";
-  loadPosts();
-}
-
-/* --------- Events -------- */
 tabs.forEach(tab => {
   tab.addEventListener("click", () => {
     tabs.forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
     currentBoard = tab.dataset.board;
-    loadPosts();
+    selectBoard.value = currentBoard;
+    displayPosts();
   });
 });
 
-postBtn.addEventListener("click", () => {
+postBtn.addEventListener("click", async () => {
   const text = textarea.value.trim();
-  if (text) savePost(text);
+  if (!text) return;
+
+  const user = window.netlifyIdentity?.currentUser();
+  if (!user) return window.netlifyIdentity.open("login");
+
+  const newPost = {
+    by: user.user_metadata.full_name || user.email,
+    body: text,
+    time: new Date().toLocaleString()
+  };
+
+  postsData[currentBoard].unshift(newPost);
+  textarea.value = "";
+  displayPosts();
+  await savePosts();
 });
 
-loadPosts();
-</script>
+async function savePosts() {
+  await fetch("/.netlify/functions/save-posts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(postsData)
+  });
+}
 
-  <script>
-  if (window.netlifyIdentity) {
-    window.netlifyIdentity.on("init", user => {
-      if (!user && !window.location.pathname.includes("login.html")) {
-        window.location.href = "login.html";
-      }
-    });
-  }
+loadPosts();
 </script>
 
 </body>
