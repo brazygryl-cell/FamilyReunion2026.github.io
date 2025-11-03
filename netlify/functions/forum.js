@@ -2,30 +2,31 @@ import fs from "fs";
 import path from "path";
 
 export const handler = async (event) => {
-  const dbPath = path.join(process.cwd(), "data", "posts.json");
+  // ✅ Look for posts.json in the ROOT of the repo
+  const dbPath = path.join(process.cwd(), "posts.json");
 
-  // Load DB
+  // Load existing posts
   let posts = [];
   if (fs.existsSync(dbPath)) {
     posts = JSON.parse(fs.readFileSync(dbPath, "utf8"));
   }
 
-  // GET → return posts
+  // ✅ GET → return posts
   if (event.httpMethod === "GET") {
     return {
       statusCode: 200,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(posts.reverse()), // newest first
     };
   }
 
-  // POST → add new post
+  // ✅ POST → add new post
   if (event.httpMethod === "POST") {
     if (!event.body) {
       return { statusCode: 400, body: "Missing post data" };
     }
 
     const { body, email } = JSON.parse(event.body);
-
     if (!body || !email) {
       return { statusCode: 400, body: "Missing required fields" };
     }
@@ -42,6 +43,7 @@ export const handler = async (event) => {
 
     return {
       statusCode: 200,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newPost),
     };
   }
