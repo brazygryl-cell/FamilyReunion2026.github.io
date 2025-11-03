@@ -71,45 +71,44 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ✅ Load posts
-  async function loadPosts() {
-    try {
-      const res = await fetch("/.netlify/functions/forum"); // <— Correct API endpoint
-      const posts = await res.json();
-      postsContainer.innerHTML = "";
+const API = "/.netlify/functions/forum";
 
-      posts.forEach(post => {
-        const div = document.createElement("div");
-        div.className = "post";
-        div.innerHTML = `
-          <div class="meta"><strong>${post.by}</strong> • ${new Date(post.createdAt).toLocaleString()}</div>
-          <div>${post.body}</div>
-        `;
-        postsContainer.appendChild(div);
-      });
-    } catch (err) {
-      console.error("Failed to load posts:", err);
-    }
-  }
+async function loadPosts() {
+  try {
+    const response = await fetch(API);
+    const posts = await response.json();
 
-  // ✅ Submit post
-  submitPost.addEventListener("click", async () => {
-    const body = postBody.value.trim();
-    if (!body) return;
+    const container = document.getElementById("posts");
+    container.innerHTML = "";
 
-    const user = window.netlifyIdentity.currentUser();
-    const email = user.email;
-
-    await fetch("/.netlify/functions/forum", {   // <— Correct API endpoint
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ body, email })
+    posts.forEach(post => {
+      const div = document.createElement("div");
+      div.className = "post";
+      div.innerHTML = `
+        <p>${post.body}</p>
+        <span class="meta">— ${post.by}, ${new Date(post.createdAt).toLocaleString()}</span>
+      `;
+      container.appendChild(div);
     });
+  } catch (err) {
+    console.error("Failed to load posts:", err);
+  }
+}
 
-    postBody.value = "";
-    loadPosts(); // refresh posts
+document.getElementById("submitPost").addEventListener("click", async () => {
+  const body = document.getElementById("postBody").value.trim();
+  if (!body) return;
+
+  const user = window.netlifyIdentity.currentUser();
+  const email = user ? user.email : "anonymous";
+
+  await fetch(API, {
+    method: "POST",
+    body: JSON.stringify({ body, email })
   });
 
-  loadPosts(); // load on page open
+  document.getElementById("postBody").value = "";
+  loadPosts();
 });
 </script>
 
