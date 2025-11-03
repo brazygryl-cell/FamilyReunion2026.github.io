@@ -25,6 +25,17 @@
 </head>
 
 <body>
+
+  <script>
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on("init", user => {
+      if (!user && !window.location.pathname.includes("login.html")) {
+        window.location.href = "login.html";
+      }
+    });
+  }
+</script>
+  
 <header></header>
 
 <h2 style="text-align:center;margin-top:1.5rem;">Family Forum 💬</h2>
