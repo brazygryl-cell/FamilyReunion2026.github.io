@@ -145,11 +145,17 @@ setInterval(() => {
   import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 
   document.addEventListener("DOMContentLoaded", () => {
+    // ✅ Require Auth FIRST. Don’t wait for nav to render.
+    if (!window.location.pathname.includes("login.html")) {
+      requireAuth();
+    }
+
+    // Then load UI stuff
     loadNavbar();
     enableLogout();
-    requireAuth();  // ✅ Only require auth AFTER nav loads
   });
 </script>
+
 
 </body>
 </html>
