@@ -1,143 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Family Forum — Williams Family Reunion</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Family Forum</title>
+  <link rel="stylesheet" href="style.css" />
 
-<link rel="stylesheet" href="style.css" />
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; }
+    .forum-tab { padding: 10px 16px; border-radius: 6px; cursor: pointer; background:#eee; }
+    .forum-tab.active { background:#333; color:white; }
 
-<style>
-.tabs-container { display:flex; gap:10px; justify-content:center; margin-top:1.5rem; }
-.forum-tab { padding:8px 16px; background:#232428; border:1px solid #3a3c42; border-radius:8px; cursor:pointer; color:#cfcfcf; font-weight:500; transition:0.2s; }
-.forum-tab.active, .forum-tab:hover { background:#5865F2; border-color:#5865F2; color:white; }
+    #posts { max-width:800px; margin:auto; }
+    .post { background:white; border-radius:6px; padding:12px; margin-bottom:14px; border:1px solid #ddd; }
+    .meta { font-size:0.8em; color:#555; margin-bottom:6px; }
 
-#posts { max-width:750px; margin:1rem auto; padding:1rem; }
-.post { background:#2b2d31; border:1px solid #3a3c42; border-radius:10px; padding:14px 18px; margin-bottom:14px; }
-.meta { font-size:0.85rem; color:#9ca3af; margin-bottom:6px; display:flex; justify-content:space-between; }
+    #postBox { max-width:800px; margin:auto; margin-top:18px; }
+    textarea { width:100%; height:120px; padding:10px; border-radius:6px; border:1px solid #ccc; }
+    #submitPost { margin-top:10px; padding:8px 14px; }
+  </style>
 
-#postBox { max-width:750px; margin:2rem auto; padding:1rem; background:#1e1f22; border:1px solid #3a3c42; border-radius:12px; }
-#postBody { width:100%; background:#2b2d31; border:1px solid #3a3c42; padding:12px; color:white; min-height:80px; border-radius:8px; resize:vertical; }
-#submitPost { width:100%; background:#5865F2; border:none; padding:12px; color:white; cursor:pointer; border-radius:8px; margin-top:8px; font-weight:600; }
-#submitPost:hover { background:#4752C4; }
-</style>
+  <!-- ✅ Load Netlify Identity -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script type="module" src="nav.js"></script>
 </head>
-
 <body>
-
-  <script>
-  if (window.netlifyIdentity) {
-    window.netlifyIdentity.on("init", user => {
-      if (!user && !window.location.pathname.includes("login.html")) {
-        window.location.href = "login.html";
-      }
-    });
-  }
-</script>
-  
 <header></header>
 
-<h2 style="text-align:center;margin-top:1.5rem;">Family Forum 💬</h2>
+<section class="section">
+  <div class="container">
 
-<div class="tabs-container">
-  <div class="forum-tab active" data-board="general">General</div>
-  <div class="forum-tab" data-board="planning">Planning</div>
-</div>
+    <h2>Family Forum</h2>
+    <p style="color:#777;margin-bottom:18px;">Talk, plan, and share updates.</p>
 
-<div id="posts"></div>
+    <!-- ✅ Tabs -->
+    <div class="tabs-container">
+      <button class="forum-tab active" data-topic="general">General</button>
+      <button class="forum-tab" data-topic="planning">Planning</button>
+    </div>
 
-<div id="postBox">
-  <textarea id="postBody" placeholder="Say something..."></textarea>
-  <button id="submitPost">Post</button>
-</div>
+    <!-- ✅ Posts Container -->
+    <div id="posts"></div>
+
+    <!-- ✅ Post Box -->
+    <div id="postBox" style="display:none;">
+      <textarea id="postBody" placeholder="Write your message..."></textarea>
+      <button id="submitPost">Post</button>
+    </div>
+
+  </div>
+</section>
 
 <footer></footer>
 
-<!-- Netlify Identity -->
+<!-- ✅ Forum Logic -->
 <script type="module">
 import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   loadNavbar();
   enableLogout();
-  requireAuth();
-});
+  requireAuth(); // ✅ Protects this page
 
-let postsData = {};
-let currentBoard = "General";
+  const postsContainer = document.getElementById("posts");
+  const postBody = document.getElementById("postBody");
+  const submitPost = document.getElementById("submitPost");
+  const postBox = document.getElementById("postBox");
+  let currentTopic = "general";
 
-const postsEl = document.getElementById("posts");
-const tabs = document.querySelectorAll(".forum-tab");
-const selectBoard = document.getElementById("postBoard");
-const textarea = document.getElementById("postBody");
-const postBtn = document.getElementById("submitPost");
+  // ✅ If logged in → show posting box
+  window.netlifyIdentity.on("init", (user) => {
+    if (user) postBox.style.display = "block";
+  });
+  window.netlifyIdentity.on("login", () => location.reload());
+  window.netlifyIdentity.on("logout", () => location.reload());
 
-async function loadPosts() {
-  try {
-    const res = await fetch("posts.json", { cache: "no-store" });
-    postsData = await res.json();
-    displayPosts();
-  } catch (err) {
-    console.error("Error loading posts:", err);
-  }
-}
+  // ✅ Load Posts
+  async function loadPosts() {
+    const res = await fetch("/posts.json");
+    const data = await res.json();
+    const posts = data[currentTopic] || [];
 
-function displayPosts() {
-  const boardPosts = postsData[currentBoard] || [];
-  postsEl.innerHTML = boardPosts.length
-    ? boardPosts.map(p => `
-      <div class="post">
-        <div class="meta">
-          <span>${p.by}</span>
-          <span>${p.time}</span>
+    postsContainer.innerHTML = posts
+      .map(post => `
+        <div class="post">
+          <div class="meta">${post.author} — ${post.date}</div>
+          <div>${post.body}</div>
         </div>
-        <p>${p.body}</p>
-      </div>
-    `).join("")
-    : `<p style="text-align:center;color:#777;">No posts yet.</p>`;
-}
+      `).join("");
+  }
 
-tabs.forEach(tab => {
-  tab.addEventListener("click", () => {
-    tabs.forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-    currentBoard = tab.dataset.board;
-    selectBoard.value = currentBoard;
-    displayPosts();
+  // ✅ Switch Tabs
+  document.querySelectorAll(".forum-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelector(".forum-tab.active").classList.remove("active");
+      tab.classList.add("active");
+      currentTopic = tab.dataset.topic;
+      loadPosts();
+    });
   });
-});
 
-postBtn.addEventListener("click", async () => {
-  const text = textarea.value.trim();
-  if (!text) return;
+  // ✅ Submit Post → Netlify Function
+  submitPost.addEventListener("click", async () => {
+    const user = window.netlifyIdentity.currentUser();
+    if (!user) return alert("Log in first.");
 
-  const user = window.netlifyIdentity?.currentUser();
-  if (!user) return window.netlifyIdentity.open("login");
+    const body = postBody.value.trim();
+    if (!body) return;
 
-  const newPost = {
-    by: user.user_metadata.full_name || user.email,
-    body: text,
-    time: new Date().toLocaleString()
-  };
+    await fetch("/.netlify/functions/save-posts", {
+      method: "POST",
+      body: JSON.stringify({
+        topic: currentTopic,
+        author: user.user_metadata.full_name || user.email,
+        body: body
+      })
+    });
 
-  postsData[currentBoard].unshift(newPost);
-  textarea.value = "";
-  displayPosts();
-  await savePosts();
-});
-
-async function savePosts() {
-  await fetch("/.netlify/functions/save-posts", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(postsData)
+    postBody.value = "";
+    loadPosts();
   });
-}
 
-loadPosts();
+  loadPosts();
+});
 </script>
 
 </body>
 </html>
-
