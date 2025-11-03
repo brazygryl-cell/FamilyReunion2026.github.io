@@ -316,5 +316,27 @@ transition: background 0.3s ease;
   100% { background-position: 400px 0; }
 }
 
+#postBody {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #111;
+  color: #eee;
+  margin-bottom: 10px;
+}
+
+#submitPost {
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: #4be6b5;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+#submitPost:hover {
+  filter: brightness(1.1);
+}
+
 
 
