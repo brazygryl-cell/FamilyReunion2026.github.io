@@ -78,3 +78,39 @@ export function requireAuth() {
   }
 }
 
+// Restore footer email popup behavior
+export function setupEmailPopup() {
+  const emailLink = document.querySelector("#emailLink");
+  if (!emailLink) return;
+
+  const email = "taylor.clarkjones25@gmail.com";
+  const subject = "Williams Family Reunion Registration";
+  const body =
+    "Hi Taylor,%0A%0AI'd like to register or learn more about the reunion.%0A%0AThanks,%0A[Your Name]";
+
+  emailLink.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(
+      subject
+    )}&body=${body}`;
+
+    const popup = window.open(
+      gmailURL,
+      "gmailCompose",
+      "width=700,height=600,left=" +
+        (window.innerWidth / 2 - 350) +
+        ",top=" +
+        (window.innerHeight / 2 - 300)
+    );
+
+    // If Gmail cannot open → fall back to mailto
+    setTimeout(() => {
+      if (!popup || popup.closed || typeof popup.closed === "undefined") {
+        window.location.href = `mailto:${email}?subject=${encodeURIComponent(
+          subject
+        )}&body=${body}`;
+      }
+    }, 600);
+  });
+}
