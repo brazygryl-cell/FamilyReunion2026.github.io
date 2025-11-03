@@ -60,6 +60,17 @@
 </head>
 
 <body>
+
+  <script>
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on("init", user => {
+      if (!user && !window.location.pathname.includes("login.html")) {
+        window.location.href = "login.html";
+      }
+    });
+  }
+</script>
+
 <header></header>
 
 <section class="section container">
