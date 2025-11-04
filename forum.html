@@ -11,44 +11,49 @@
     .forum-tab { padding: 10px 16px; border-radius: 6px; cursor: pointer; background:#eee; }
     .forum-tab.active { background:#333; color:white; }
 
-    #posts { max-width:800px; margin:auto; }
+    #posts { max-width:800px; margin:auto; margin-top:20px; }
     .post { background:white; border-radius:6px; padding:12px; margin-bottom:14px; border:1px solid #ddd; }
-    .meta { font-size:0.8em; color:#555; margin-bottom:6px; }
+    .meta { font-size:0.8em; color:#555; margin-top:6px; display:block; }
 
-    #postBox { max-width:800px; margin:auto; margin-top:18px; }
+    #postBox { max-width:800px; margin:auto; margin-top:25px; }
     textarea { width:100%; height:120px; padding:10px; border-radius:6px; border:1px solid #ccc; }
     #submitPost { margin-top:10px; padding:8px 14px; }
   </style>
 
   <!-- ✅ Load Netlify Identity -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <script type="module" src="nav.js"></script>
+
+  <!-- ✅ Load navbar & login protection -->
+  <script type="module">
+    import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+    document.addEventListener("DOMContentLoaded", () => {
+      loadNavbar();
+      enableLogout();
+      requireAuth();
+    });
+  </script>
 </head>
 <body>
 <header></header>
 
 <section class="section">
   <div class="container">
+    <h2>Family Forum</h2>
+    <p>Talk, plan, and share updates.</p>
 
-  <h2>Family Forum</h2>
-<p>Talk, plan, and share updates.</p>
+    <div class="tabs-container">
+      <button class="forum-tab active" data-topic="general">General</button>
+      <button class="forum-tab" data-topic="planning">Planning</button>
+    </div>
 
-<div class="tabs-container">
-  <button class="forum-tab active" data-topic="general">General</button>
-  <button class="forum-tab" data-topic="planning">Planning</button>
-</div>
-
-<!-- ✅ Insert this -->
-<div id="postBox" style="display:none; margin-top:25px;">
-  <textarea id="postBody" placeholder="Write a new post..." rows="4"></textarea>
-  <button id="submitPost">Post</button>
-</div>
-
-<!-- Posts list -->
-<div id="posts"></div>
+    <!-- ✅ Only ONE post box -->
+    <div id="postBox">
       <textarea id="postBody" placeholder="Write your message..."></textarea>
       <button id="submitPost">Post</button>
     </div>
+
+    <!-- ✅ Posts list -->
+    <div id="posts"></div>
 
   </div>
 </section>
@@ -57,57 +62,46 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const postBody = document.getElementById("postBody");
-  const submitPost = document.getElementById("submitPost");
+
+  const API = "/.netlify/functions/forum";
   const postsContainer = document.getElementById("posts");
-  const tabs = document.querySelectorAll(".forum-tab");
 
-  // ✅ Switch tabs (General / Planning) — this part remains functional
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-    });
-  });
+  async function loadPosts() {
+    try {
+      const response = await fetch(API);
+      const posts = await response.json();
 
-  // ✅ Load posts
-const API = "/.netlify/functions/forum";
-
-async function loadPosts() {
-  try {
-    const response = await fetch(API);
-    const posts = await response.json();
-
-    const container = document.getElementById("posts");
-    container.innerHTML = "";
-
-    posts.forEach(post => {
-      const div = document.createElement("div");
-      div.className = "post";
-      div.innerHTML = `
-        <p>${post.body}</p>
-        <span class="meta">— ${post.by}, ${new Date(post.createdAt).toLocaleString()}</span>
-      `;
-      container.appendChild(div);
-    });
-  } catch (err) {
-    console.error("Failed to load posts:", err);
+      postsContainer.innerHTML = "";
+      posts.forEach(post => {
+        const div = document.createElement("div");
+        div.className = "post";
+        div.innerHTML = `
+          <p>${post.body}</p>
+          <span class="meta">— ${post.by}, ${new Date(post.createdAt).toLocaleString()}</span>
+        `;
+        postsContainer.appendChild(div);
+      });
+    } catch (err) {
+      console.error("Failed to load posts:", err);
+    }
   }
-}
 
-document.getElementById("submitPost").addEventListener("click", async () => {
-  const body = document.getElementById("postBody").value.trim();
-  if (!body) return;
+  document.getElementById("submitPost").addEventListener("click", async () => {
+    const body = document.getElementById("postBody").value.trim();
+    if (!body) return;
 
-  const user = window.netlifyIdentity.currentUser();
-  const email = user ? user.email : "anonymous";
+    const user = window.netlifyIdentity.currentUser();
+    const email = user ? user.email : "anonymous";
 
-  await fetch(API, {
-    method: "POST",
-    body: JSON.stringify({ body, email })
+    await fetch(API, {
+      method: "POST",
+      body: JSON.stringify({ body, email })
+    });
+
+    document.getElementById("postBody").value = "";
+    loadPosts();
   });
 
-  document.getElementById("postBody").value = "";
   loadPosts();
 });
 </script>
