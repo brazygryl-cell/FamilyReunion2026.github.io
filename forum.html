@@ -65,10 +65,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const API = "/.netlify/functions/forum";
   const postsContainer = document.getElementById("posts");
+  const tabs = document.querySelectorAll(".forum-tab");
+
+  let currentTopic = "general";
 
   async function loadPosts() {
     try {
-      const response = await fetch(API);
+      const response = await fetch(`${API}?topic=${currentTopic}`);
       const posts = await response.json();
 
       postsContainer.innerHTML = "";
@@ -86,6 +89,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      currentTopic = tab.dataset.topic;
+      loadPosts();
+    });
+  });
+
   document.getElementById("submitPost").addEventListener("click", async () => {
     const body = document.getElementById("postBody").value.trim();
     if (!body) return;
@@ -95,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     await fetch(API, {
       method: "POST",
-      body: JSON.stringify({ body, email })
+      body: JSON.stringify({ body, email, topic: currentTopic })
     });
 
     document.getElementById("postBody").value = "";
