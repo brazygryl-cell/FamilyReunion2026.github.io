@@ -1,52 +1,110 @@
-import fs from "fs";
-import path from "path";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Family Forum</title>
+  <link rel="stylesheet" href="style.css" />
 
-export const handler = async (event) => {
-  // ✅ Look for posts.json in the ROOT of the repo
-  const dbPath = path.join(process.cwd(), "posts.json");
+  <style>
+    .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; }
+    .forum-tab { padding: 10px 16px; border-radius: 6px; cursor: pointer; background:#eee; }
+    .forum-tab.active { background:#333; color:white; }
 
-  // Load existing posts
-  let posts = [];
-  if (fs.existsSync(dbPath)) {
-    posts = JSON.parse(fs.readFileSync(dbPath, "utf8"));
-  }
+    #posts { max-width:800px; margin:auto; margin-top:20px; }
+    .post { background:white; border-radius:6px; padding:12px; margin-bottom:14px; border:1px solid #ddd; }
+    .meta { font-size:0.8em; color:#555; margin-top:6px; display:block; }
 
-  // ✅ GET → return posts
-  if (event.httpMethod === "GET") {
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(posts.reverse()), // newest first
-    };
-  }
+    #postBox { max-width:800px; margin:auto; margin-top:25px; }
+    textarea { width:100%; height:120px; padding:10px; border-radius:6px; border:1px solid #ccc; }
+    #submitPost { margin-top:10px; padding:8px 14px; }
+  </style>
 
-  // ✅ POST → add new post
-  if (event.httpMethod === "POST") {
-    if (!event.body) {
-      return { statusCode: 400, body: "Missing post data" };
+  <!-- ✅ Load Netlify Identity -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+  <!-- ✅ Load navbar & login protection -->
+  <script type="module">
+    import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+    document.addEventListener("DOMContentLoaded", () => {
+      loadNavbar();
+      enableLogout();
+      requireAuth();
+    });
+  </script>
+</head>
+<body>
+<header></header>
+
+<section class="section">
+  <div class="container">
+    <h2>Family Forum</h2>
+    <p>Talk, plan, and share updates.</p>
+
+    <div class="tabs-container">
+      <button class="forum-tab active" data-topic="general">General</button>
+      <button class="forum-tab" data-topic="planning">Planning</button>
+    </div>
+
+    <!-- ✅ Only ONE post box -->
+    <div id="postBox">
+      <textarea id="postBody" placeholder="Write your message..."></textarea>
+      <button id="submitPost">Post</button>
+    </div>
+
+    <!-- ✅ Posts list -->
+    <div id="posts"></div>
+
+  </div>
+</section>
+
+<footer></footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const API = "/.netlify/functions/forum";
+  const postsContainer = document.getElementById("posts");
+
+  async function loadPosts() {
+    try {
+      const response = await fetch(API);
+      const posts = await response.json();
+
+      postsContainer.innerHTML = "";
+      posts.forEach(post => {
+        const div = document.createElement("div");
+        div.className = "post";
+        div.innerHTML = `
+          <p>${post.body}</p>
+          <span class="meta">— ${post.by}, ${new Date(post.createdAt).toLocaleString()}</span>
+        `;
+        postsContainer.appendChild(div);
+      });
+    } catch (err) {
+      console.error("Failed to load posts:", err);
     }
-
-    const { body, email } = JSON.parse(event.body);
-    if (!body || !email) {
-      return { statusCode: 400, body: "Missing required fields" };
-    }
-
-    const newPost = {
-      id: Date.now(),
-      body,
-      by: email,
-      createdAt: new Date().toISOString(),
-    };
-
-    posts.push(newPost);
-    fs.writeFileSync(dbPath, JSON.stringify(posts, null, 2));
-
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newPost),
-    };
   }
 
-  return { statusCode: 405, body: "Method Not Allowed" };
-};
+  document.getElementById("submitPost").addEventListener("click", async () => {
+    const body = document.getElementById("postBody").value.trim();
+    if (!body) return;
+
+    const user = window.netlifyIdentity.currentUser();
+    const email = user ? user.email : "anonymous";
+
+    await fetch(API, {
+      method: "POST",
+      body: JSON.stringify({ body, email })
+    });
+
+    document.getElementById("postBody").value = "";
+    loadPosts();
+  });
+
+  loadPosts();
+});
+</script>
+
+</body>
+</html>
