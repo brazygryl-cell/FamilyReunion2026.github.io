@@ -6,3 +6,9 @@
   from = "/api/forum"
   to = "/.netlify/functions/forum"
   status = 200
+
+  [functions]
+directory = "netlify/functions"
+node_bundler = "esbuild"
+included_files = ["data/posts.json"]
+
