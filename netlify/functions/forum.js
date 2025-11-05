@@ -2,18 +2,17 @@ import fs from "fs";
 import path from "path";
 
 export const handler = async (event) => {
-  const topic = event.queryStringParameters?.topic || "general";
-  const dbPath = path.join(process.cwd(), "data", `${topic}.json`);
+  const dbPath = path.join(process.cwd(), "data", "posts.json");
 
   // Ensure file exists
   if (!fs.existsSync(dbPath)) {
-    fs.writeFileSync(dbPath, "[]", "utf8");
+    fs.mkdirSync(path.join(process.cwd(), "data"), { recursive: true });
+    fs.writeFileSync(dbPath, "[]");
   }
 
-  // Load posts
-  let posts = JSON.parse(fs.readFileSync(dbPath, "utf8") || "[]");
+  let posts = JSON.parse(fs.readFileSync(dbPath, "utf8"));
 
-  // GET → return posts
+  // GET posts
   if (event.httpMethod === "GET") {
     return {
       statusCode: 200,
@@ -21,17 +20,12 @@ export const handler = async (event) => {
     };
   }
 
-  // POST → add new post
+  // ADD post
   if (event.httpMethod === "POST") {
-    if (!event.body) {
-      return { statusCode: 400, body: "Missing post data" };
-    }
+    if (!event.body) return { statusCode: 400, body: "Missing data" };
 
     const { body, email } = JSON.parse(event.body);
-
-    if (!body || !email) {
-      return { statusCode: 400, body: "Missing required fields" };
-    }
+    if (!body || !email) return { statusCode: 400, body: "Missing fields" };
 
     const newPost = {
       id: Date.now(),
@@ -49,5 +43,5 @@ export const handler = async (event) => {
     };
   }
 
-  return { statusCode: 405, body: "Method Not Allowed" };
+  return { statusCode: 405, body: "Method not allowed" };
 };
