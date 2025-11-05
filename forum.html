@@ -4,26 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Family Forum</title>
+
   <link rel="stylesheet" href="style.css" />
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script type="module" src="nav.js"></script>
 
   <style>
     .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; }
-    .forum-tab { padding: 10px 16px; border-radius: 6px; cursor: pointer; background:#eee; border: none; }
+    .forum-tab { padding: 10px 16px; border-radius: 6px; cursor: pointer; background:#eee; }
     .forum-tab.active { background:#333; color:white; }
 
-    #posts { max-width:800px; margin:auto; margin-top: 25px; }
+    #posts { max-width:800px; margin:auto; margin-top:20px; }
     .post { background:white; border-radius:6px; padding:12px; margin-bottom:14px; border:1px solid #ddd; }
-    .meta { font-size:0.8em; color:#555; margin-top:6px; display:block; }
+    .meta { font-size:0.8em; color:#666; margin-top:6px; display:block; }
 
-    #postBox { max-width:800px; margin:25px auto; }
-    textarea { width:100%; height:100px; padding:10px; border-radius:6px; border:1px solid #ccc; }
-    #submitPost { margin-top:10px; padding:8px 14px; border:none; border-radius:6px; background:#007bff; color:white; cursor:pointer; }
+    #postBox { max-width:800px; margin:auto; margin-top:25px; }
+    textarea { width:100%; height:120px; padding:10px; border-radius:6px; border:1px solid #bbb; background:white; color:black; }
+    #submitPost { margin-top:10px; padding:8px 14px; border-radius:6px; cursor:pointer; }
   </style>
 
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <script type="module" src="nav.js"></script>
 </head>
-
 <body>
 <header></header>
 
@@ -33,19 +33,20 @@
     <h2>Family Forum</h2>
     <p>Talk, plan, and share updates.</p>
 
+    <!-- Tabs -->
     <div class="tabs-container">
       <button class="forum-tab active" data-topic="general">General</button>
       <button class="forum-tab" data-topic="planning">Planning</button>
     </div>
 
-    <!-- Post Input -->
+    <!-- Post box -->
     <div id="postBox">
       <textarea id="postBody" placeholder="Write your message..."></textarea>
       <button id="submitPost">Post</button>
     </div>
 
     <!-- Posts -->
-    <div id="posts"></div>
+    <div id="posts">No posts yet.</div>
 
   </div>
 </section>
@@ -54,46 +55,48 @@
 
 <script>
 const API = "/.netlify/functions/forum";
+let currentTopic = "general";
 
-// Load posts from server
 async function loadPosts() {
   try {
-    const topic = document.querySelector(".forum-tab.active").dataset.topic;
-    const response = await fetch(`${API}?topic=${topic}`);
-    const posts = await response.json();
+    const res = await fetch(`${API}?topic=${currentTopic}`);
+    const posts = await res.json();
 
     const container = document.getElementById("posts");
-    container.innerHTML = "";
-
-    if (!Array.isArray(posts) || posts.length === 0) {
-      container.innerHTML = "<p style='text-align:center;color:#777;'>No posts yet.</p>";
-      return;
-    }
+    container.innerHTML = posts.length ? "" : "No posts yet.";
 
     posts.forEach(post => {
       const div = document.createElement("div");
       div.className = "post";
       div.innerHTML = `
-        <div>${post.body}</div>
+        <p>${post.body}</p>
         <span class="meta">— ${post.by}, ${new Date(post.createdAt).toLocaleString()}</span>
       `;
       container.appendChild(div);
     });
+
   } catch (err) {
     console.error("Failed to load posts:", err);
   }
 }
 
-// Handle posting message
+document.querySelectorAll(".forum-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".forum-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    currentTopic = tab.dataset.topic;
+    loadPosts();
+  });
+});
+
 document.getElementById("submitPost").addEventListener("click", async () => {
   const body = document.getElementById("postBody").value.trim();
   if (!body) return;
 
   const user = window.netlifyIdentity.currentUser();
   const email = user ? user.email : "anonymous";
-  const topic = document.querySelector(".forum-tab.active").dataset.topic;
 
-  await fetch(`${API}?topic=${topic}`, {
+  await fetch(`${API}?topic=${currentTopic}`, {
     method: "POST",
     body: JSON.stringify({ body, email })
   });
@@ -102,17 +105,8 @@ document.getElementById("submitPost").addEventListener("click", async () => {
   loadPosts();
 });
 
-// Tab Switching
-document.querySelectorAll(".forum-tab").forEach(tab => {
-  tab.addEventListener("click", () => {
-    document.querySelectorAll(".forum-tab").forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-    loadPosts();
-  });
-});
-
-// Run on page load
-document.addEventListener("DOMContentLoaded", loadPosts);
+// Load posts on entry
+loadPosts();
 </script>
 
 </body>
