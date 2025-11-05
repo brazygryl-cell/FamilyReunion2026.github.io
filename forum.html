@@ -55,11 +55,10 @@
 
 <script>
 const API = "/.netlify/functions/forum";
-let currentTopic = "general";
 
 async function loadPosts() {
   try {
-    const res = await fetch(`${API}?topic=${currentTopic}`);
+    const res = await fetch(API);
     const posts = await res.json();
 
     const container = document.getElementById("posts");
@@ -74,20 +73,10 @@ async function loadPosts() {
       `;
       container.appendChild(div);
     });
-
   } catch (err) {
     console.error("Failed to load posts:", err);
   }
 }
-
-document.querySelectorAll(".forum-tab").forEach(tab => {
-  tab.addEventListener("click", () => {
-    document.querySelectorAll(".forum-tab").forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-    currentTopic = tab.dataset.topic;
-    loadPosts();
-  });
-});
 
 document.getElementById("submitPost").addEventListener("click", async () => {
   const body = document.getElementById("postBody").value.trim();
@@ -96,7 +85,7 @@ document.getElementById("submitPost").addEventListener("click", async () => {
   const user = window.netlifyIdentity.currentUser();
   const email = user ? user.email : "anonymous";
 
-  await fetch(`${API}?topic=${currentTopic}`, {
+  await fetch(API, {
     method: "POST",
     body: JSON.stringify({ body, email })
   });
@@ -105,9 +94,10 @@ document.getElementById("submitPost").addEventListener("click", async () => {
   loadPosts();
 });
 
-// Load posts on entry
+// Load posts on page open:
 loadPosts();
 </script>
+
 
 </body>
 </html>
