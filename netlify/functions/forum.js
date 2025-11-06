@@ -1,6 +1,3 @@
-import { promises as fs } from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 import nodeFetch from "node-fetch";
 
 const fetchApi = globalThis.fetch || nodeFetch;
@@ -18,98 +15,126 @@ const respond = (statusCode, payload = {}) => ({
   body: JSON.stringify(payload),
 });
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SEED_POSTS_PATH = path.resolve(__dirname, "../../data/posts.json");
+const NETLIFY_API_BASE = "https://api.netlify.com/api/v1";
+const FORM_NAME = process.env.FORUM_FORM_NAME || "forum-post";
+const NETLIFY_FORM_ID = process.env.NETLIFY_FORM_ID || "";
+const NETLIFY_SITE_ID = process.env.NETLIFY_SITE_ID || "";
+const NETLIFY_TOKEN =
+  process.env.NETLIFY_API_TOKEN ||
+  process.env.NETLIFY_AUTH_TOKEN ||
+  process.env.NETLIFY_TOKEN ||
+  "";
 
-const GITHUB_OWNER = process.env.GITHUB_OWNER || "FamilyReunion2026";
-const GITHUB_REPO = process.env.GITHUB_REPO || "FamilyReunion2026.github.io";
-const GITHUB_BRANCH = process.env.GITHUB_BRANCH || "main";
-const GITHUB_FILE_PATH = process.env.GITHUB_FILE_PATH || "data/posts.json";
-
-const githubContentUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
-
-const GITHUB_TOKEN =
-@@ -33,87 +36,87 @@ const buildGithubHeaders = (extra = {}) => {
-    "User-Agent": "family-reunion-forum",
-    Accept: "application/vnd.github.v3+json",
-    ...extra,
-  };
-
-  if (GITHUB_TOKEN) {
-    baseHeaders.Authorization = `Bearer ${GITHUB_TOKEN}`;
-  }
-
-  return baseHeaders;
-};
-
-const readSeedPosts = async () => {
-  try {
-    const raw = await fs.readFile(SEED_POSTS_PATH, "utf8");
-    const data = JSON.parse(raw);
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.warn("Unable to load seed posts", error);
-    return [];
-  }
-};
-
-const fetchGithubPosts = async () => {
-  try {
-    const response = await fetchApi(`${githubContentUrl}?ref=${encodeURIComponent(GITHUB_BRANCH)}`, {
-      headers: buildGithubHeaders(),
-    });
-
-    if (!response.ok) {
-      if (response.status !== 404) {
-        const detail = await response.text();
-        console.warn("Failed to load posts from GitHub", response.status, detail);
-      }
-      return null;
-    }
-
-    const payload = await response.json();
-    if (!payload || !payload.content) {
-      return { posts: [], sha: payload?.sha || null };
-    }
-
-    const decoded = Buffer.from(payload.content, payload.encoding || "base64").toString("utf8");
-    const data = JSON.parse(decoded);
-    return { posts: Array.isArray(data) ? data : [], sha: payload.sha || null };
-  } catch (error) {
-    console.warn("Unable to reach GitHub for posts", error);
-    return null;
-  }
-};
-
-const persistPostsToGithub = async (posts, sha) => {
-  if (!GITHUB_TOKEN) {
+const buildNetlifyHeaders = (extra = {}) => {
+  if (!NETLIFY_TOKEN) {
     throw new Error(
-      "Forum storage is not configured. Set the GITHUB_TOKEN (or GITHUB_WRITE_TOKEN) environment variable to enable saving posts."
+      "Netlify Forms access is not configured. Set NETLIFY_API_TOKEN (or NETLIFY_AUTH_TOKEN/NETLIFY_TOKEN) to enable the forum."
     );
   }
 
-  const message = `chore: update forum posts ${new Date().toISOString()}`;
-  const content = Buffer.from(JSON.stringify(posts, null, 2)).toString("base64");
+  return {
+    Authorization: `Bearer ${NETLIFY_TOKEN}`,
+    Accept: "application/json",
+    "User-Agent": "family-reunion-forum",
+    ...extra,
+  };
+};
 
-  const response = await fetchApi(githubContentUrl, {
-    method: "PUT",
-    headers: buildGithubHeaders({ "Content-Type": "application/json" }),
-    body: JSON.stringify({
-      message,
-      content,
-      branch: GITHUB_BRANCH,
-      sha: sha || undefined,
-      committer: {
-        name: "Family Reunion Forum",
-        email: "no-reply@familyreunion2026.blog",
-      },
-    }),
+let cachedFormId = NETLIFY_FORM_ID;
+
+const resolveFormId = async () => {
+  if (cachedFormId) {
+    return cachedFormId;
+  }
+
+  const endpoint = NETLIFY_SITE_ID
+    ? `${NETLIFY_API_BASE}/sites/${NETLIFY_SITE_ID}/forms`
+    : `${NETLIFY_API_BASE}/forms`;
+
+  const response = await fetchApi(endpoint, {
+    headers: buildNetlifyHeaders(),
   });
 
   if (!response.ok) {
     const detail = await response.text();
-    throw new Error(`GitHub update failed (${response.status}): ${detail}`);
+    throw new Error(`Unable to list Netlify forms (${response.status}): ${detail}`);
   }
+
+  const forms = await response.json();
+  const match = Array.isArray(forms)
+    ? forms.find((form) => form.name === FORM_NAME)
+    : null;
+
+  if (!match) {
+    throw new Error(
+      `Could not find a Netlify form named "${FORM_NAME}". Ensure the form exists or set NETLIFY_FORM_ID."
+    );
+  }
+
+  cachedFormId = match.id;
+  return cachedFormId;
+};
+
+const fetchFormPosts = async (formId) => {
+  const response = await fetchApi(
+    `${NETLIFY_API_BASE}/forms/${formId}/submissions?per_page=100`,
+    {
+      headers: buildNetlifyHeaders(),
+    }
+  );
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(
+      `Unable to load submissions from Netlify (${response.status}): ${detail}`
+    );
+  }
+
+  const submissions = await response.json();
+  if (!Array.isArray(submissions)) {
+    return [];
+  }
+
+  return submissions.map((submission) => ({
+    id: submission.id,
+    body: submission.data?.message || "",
+    by: submission.data?.email || "anonymous",
+    createdAt: submission.created_at,
+  }));
+};
+
+const submitFormPost = async (formId, { message, email }) => {
+  const params = new URLSearchParams({
+    "form-name": FORM_NAME,
+    message,
+    email,
+  });
+
+  const response = await fetchApi(
+    `${NETLIFY_API_BASE}/forms/${formId}/submissions`,
+    {
+      method: "POST",
+      headers: buildNetlifyHeaders({
+        "Content-Type": "application/x-www-form-urlencoded",
+      }),
+      body: params.toString(),
+    }
+  );
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(
+      `Unable to create Netlify submission (${response.status}): ${detail}`
+    );
+  }
+
+  const submission = await response.json();
+  return {
+    id: submission.id,
+    body: submission.data?.message || message,
+    by: submission.data?.email || email || "anonymous",
+    createdAt: submission.created_at,
+  };
 };
 
 export const handler = async (event) => {
@@ -117,3 +142,55 @@ export const handler = async (event) => {
     return { statusCode: 204, headers };
   }
 
+  try {
+    const formId = await resolveFormId();
+
+    if (event.httpMethod === "GET") {
+      const posts = await fetchFormPosts(formId);
+      return respond(200, posts.reverse());
+    }
+
+    if (event.httpMethod === "POST") {
+      if (!event.body) {
+        return respond(400, { error: "Missing data" });
+      }
+
+      let payload;
+      try {
+        payload = JSON.parse(event.body);
+      } catch (error) {
+        return respond(400, { error: "Invalid JSON" });
+      }
+
+      const { body, email } = payload;
+      if (!body || !email) {
+        return respond(400, { error: "Missing fields" });
+      }
+
+      try {
+        const submission = await submitFormPost(formId, {
+          message: body,
+          email,
+        });
+        return respond(200, submission);
+      } catch (error) {
+        console.error("Failed to submit Netlify form", error);
+        return respond(500, {
+          error: error.message.includes("Netlify Forms access is not configured")
+            ? error.message
+            : "Unable to save your post right now. Please try again shortly.",
+          details: error.message,
+        });
+      }
+    }
+
+    return respond(405, { error: "Method not allowed" });
+  } catch (error) {
+    console.error("Forum function failed", error);
+
+    return respond(500, {
+      error: "Forum storage is currently unavailable.",
+      details: error.message,
+    });
+  }
+};
