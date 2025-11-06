@@ -315,7 +315,14 @@
 
         postsContainer.appendChild(postEl);
         attachCommentUI(postEl, doc.id, currentUser);
-      });
+        // 🧩 Immediately fetch comment count for closed sections
+const commentsCol = collection(db, "posts", doc.id, "comments");
+getDocs(commentsCol).then(snap => {
+  const count = snap.size;
+  const summary = postEl.querySelector(".comment-summary");
+  if (summary) summary.querySelector(".count").textContent = count;
+});
+  
     } catch (err) {
       console.error("Failed to load posts:", err);
       showStatus(`Could not load posts: ${err.message}`, "error");
