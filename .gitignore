@@ -16,6 +16,7 @@ firebase-config.local.js
 # Node modules (Firebase Functions)
 functions/node_modules/
 reunion-functions/node_modules/
+node_modules/
 
 # macOS + Windows junk
 .DS_Store
