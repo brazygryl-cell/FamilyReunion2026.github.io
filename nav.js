@@ -85,47 +85,60 @@ export function requireAuth() {
   }
 }
 
-// Restore footer email popup behavior
-// Restore footer email popup behavior (mobile + desktop safe)
+// Restore footer email popup behavior (universal mobile + desktop fix)
 export function setupEmailPopup() {
   const emailLink = document.querySelector("#emailLink");
   if (!emailLink) return;
 
   const email = "taylor.clarkjones25@gmail.com";
   const subject = "Williams Family Reunion Registration";
-  const body =
-    "Hi Taylor,%0A%0AI'd like to register or learn more about the reunion.%0A%0AThanks,%0A[Your Name]";
+  const body = `Hi Taylor,
+
+I'd like to register or learn more about the reunion.
+
+Thanks,
+[Your Name]`;
 
   emailLink.addEventListener("click", (e) => {
     e.preventDefault();
 
-    const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(
-      subject
-    )}&body=${body}`;
-    const mailtoURL = `mailto:${email}?subject=${encodeURIComponent(
-      subject
-    )}&body=${body}`;
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    // Properly encode subject/body for URLs
+    const encSubj = encodeURIComponent(subject);
+    const encBody = encodeURIComponent(body);
+
+    const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encSubj}&body=${encBody}`;
+    const mailtoURL = `mailto:${email}?subject=${encSubj}&body=${encBody}`;
+
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    const isAndroid = /Android/.test(ua);
+    const isMobile = isIOS || isAndroid;
 
     if (isMobile) {
-      // 📱 On mobile → open native mail app
-      window.location.href = mailtoURL;
+      // 📱 For mobile, Gmail app often strips params unless URL encoded carefully
+      if (isAndroid) {
+        // Android Gmail app handles mailto: correctly
+        window.location.href = mailtoURL;
+      } else if (isIOS) {
+        // iOS Mail sometimes ignores body — use short delay hack
+        setTimeout(() => {
+          window.location.href = mailtoURL;
+        }, 100);
+      }
     } else {
-      // 💻 On desktop → open centered Gmail popup
+      // 💻 Desktop Gmail popup
       const popup = window.open(
         gmailURL,
         "gmailCompose",
-        "width=700,height=600,left=" +
-          (window.innerWidth / 2 - 350) +
-          ",top=" +
-          (window.innerHeight / 2 - 300)
+        `width=700,height=600,left=${window.innerWidth / 2 - 350},top=${
+          window.innerHeight / 2 - 300
+        }`
       );
 
-      // Fallback if popup blocked
+      // Fallback if blocked
       if (!popup || popup.closed || typeof popup.closed === "undefined") {
         window.location.href = mailtoURL;
       }
     }
   });
 }
-
