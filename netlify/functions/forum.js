@@ -1,4 +1,9 @@
+import { promises as fs } from "fs";
+import path from "path";
 import { fileURLToPath } from "url";
+import nodeFetch from "node-fetch";
+
+const fetchApi = globalThis.fetch || nodeFetch;
 
 const headers = {
   "Content-Type": "application/json",
@@ -24,10 +29,7 @@ const GITHUB_FILE_PATH = process.env.GITHUB_FILE_PATH || "data/posts.json";
 const githubContentUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
 
 const GITHUB_TOKEN =
-  process.env.GITHUB_TOKEN || process.env.GITHUB_WRITE_TOKEN || "";
-
-const buildGithubHeaders = (extra = {}) => {
-  const baseHeaders = {
+@@ -33,87 +36,87 @@ const buildGithubHeaders = (extra = {}) => {
     "User-Agent": "family-reunion-forum",
     Accept: "application/vnd.github.v3+json",
     ...extra,
@@ -53,7 +55,7 @@ const readSeedPosts = async () => {
 
 const fetchGithubPosts = async () => {
   try {
-    const response = await fetch(`${githubContentUrl}?ref=${encodeURIComponent(GITHUB_BRANCH)}`, {
+    const response = await fetchApi(`${githubContentUrl}?ref=${encodeURIComponent(GITHUB_BRANCH)}`, {
       headers: buildGithubHeaders(),
     });
 
@@ -89,7 +91,7 @@ const persistPostsToGithub = async (posts, sha) => {
   const message = `chore: update forum posts ${new Date().toISOString()}`;
   const content = Buffer.from(JSON.stringify(posts, null, 2)).toString("base64");
 
-  const response = await fetch(githubContentUrl, {
+  const response = await fetchApi(githubContentUrl, {
     method: "PUT",
     headers: buildGithubHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify({
@@ -107,5 +109,11 @@ const persistPostsToGithub = async (posts, sha) => {
   if (!response.ok) {
     const detail = await response.text();
     throw new Error(`GitHub update failed (${response.status}): ${detail}`);
+  }
+};
+
+export const handler = async (event) => {
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 204, headers };
   }
 
