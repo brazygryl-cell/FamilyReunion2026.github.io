@@ -9,8 +9,7 @@
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
   <style>
-    #postBody,
-    .comment-input { font-size: 1.05rem; line-height: 1.6; }
+    #postBody, .comment-input { font-size: 1.05rem; line-height: 1.6; }
 
     .comment-section {
       margin-top: 12px;
@@ -57,72 +56,63 @@
       padding: 10px 14px; cursor: pointer;
     }
     .send-comment:hover { filter: brightness(1.1); }
+
     /* 🎞️ Forum Slideshow Banner */
-#forum-hero {
-  position: relative;
-  height: 300px;
-  overflow: hidden;
-  border-radius: 0 0 40px 40px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-  margin-bottom: 30px;
-}
+    #forum-hero {
+      position: relative;
+      height: 300px;
+      overflow: hidden;
+      border-radius: 0 0 40px 40px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      margin-bottom: 30px;
+    }
+    #forum-hero .slide {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transform: scale(1.05);
+      transition: opacity 2s ease-in-out, transform 6s ease-in-out;
+    }
+    #forum-hero .slide.active { opacity: 1; transform: scale(1); }
 
-#forum-hero .slide {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  opacity: 0;
-  transform: scale(1.05);
-  transition: opacity 2s ease-in-out, transform 6s ease-in-out;
-}
-#forum-hero .slide.active {
-  opacity: 1;
-  transform: scale(1);
-}
+    #forum-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 1;
+    }
 
-#forum-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  z-index: 1;
-}
+    #forum-hero .overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #fff;
+      z-index: 2;
+      max-width: 800px;
+    }
 
-#forum-hero .overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  color: #fff;
-  z-index: 2;
-  max-width: 800px;
-}
+    #forum-hero h1 {
+      font-family: "Playfair Display", serif;
+      font-size: 2.4rem;
+      margin-bottom: 0.3rem;
+    }
 
-#forum-hero h1 {
-  font-family: "Playfair Display", serif;
-  font-size: 2.4rem;
-  margin-bottom: 0.3rem;
-}
-
-#forum-hero p {
-  color: #d0d6e0;
-  font-size: 1.1rem;
-}
-
-/* 🎬 Animation */
-@keyframes slideIn {
-  from { opacity: 0; transform: scale(1.05); }
-  to { opacity: 1; transform: scale(1); }
-}
+    #forum-hero p {
+      color: #d0d6e0;
+      font-size: 1.1rem;
+    }
   </style>
 </head>
 
 <body>
 <header></header>
-  
-  <!-- 🎞️ Family Slideshow Hero -->
+
+<!-- 🎞️ Family Slideshow Hero -->
 <section id="forum-hero">
   <div class="slide active" style="background-image:url('images/family1.jpg')"></div>
   <div class="slide" style="background-image:url('images/family2.jpg')"></div>
@@ -132,7 +122,6 @@
     <p>Share memories, updates, and love — all in one place 💬</p>
   </div>
 </section>
-
 
 <section class="section">
   <div class="container">
@@ -168,9 +157,8 @@
 
 <script type="module">
   import { db } from "./firebase-init.js";
-  import {
-    collection, addDoc, getDocs, query, orderBy
-  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  import { collection, addDoc, getDocs, query, orderBy } 
+  from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
   const postsContainer = document.getElementById("posts");
   const statusMessage = document.getElementById("postStatus");
@@ -200,7 +188,6 @@
     const list = wrapperEl.querySelector(".comments-list");
 
     const count = snap.size;
-    summary.dataset.count = count;
     summary.querySelector(".count").textContent = count;
 
     list.innerHTML = "";
@@ -251,58 +238,57 @@
       }
     });
 
-   sendBtn.addEventListener("click", async () => {
-  const message = input.value.trim();
-  const name = nameField.value.trim() || "Family Member";
-  if (!message) return;
+    sendBtn.addEventListener("click", async () => {
+      const message = input.value.trim();
+      const name = nameField.value.trim() || "Family Member";
+      if (!message) return;
 
-  const commentsCol = collection(db, "posts", postId, "comments");
-  try {
-    sendBtn.disabled = true;
+      const commentsCol = collection(db, "posts", postId, "comments");
+      try {
+        sendBtn.disabled = true;
 
-    await addDoc(commentsCol, {
-      name,
-      email: currentUser?.email || "anonymous",
-      message,
-      timestamp: Date.now()
-    });
+        await addDoc(commentsCol, {
+          name,
+          email: currentUser?.email || "anonymous",
+          message,
+          timestamp: Date.now()
+        });
 
-    // 🧩 Immediately update visible comment count — even if details are closed
-    const summary = section.querySelector(".comment-summary");
-    if (summary) {
-      const countEl = summary.querySelector(".count");
-      if (countEl) {
-        const newCount = parseInt(countEl.textContent || "0", 10) + 1;
-        countEl.textContent = newCount;
+        // 🧩 Update comment count immediately
+        const summary = section.querySelector(".comment-summary");
+        if (summary) {
+          const countEl = summary.querySelector(".count");
+          if (countEl) {
+            const newCount = parseInt(countEl.textContent || "0", 10) + 1;
+            countEl.textContent = newCount;
+            countEl.style.transform = "scale(1.3)";
+            countEl.style.transition = "transform 0.2s ease";
+            setTimeout(() => (countEl.style.transform = "scale(1)"), 200);
+          }
+        }
 
-        // Optional: little bounce animation for feedback
-        countEl.style.transform = "scale(1.3)";
-        countEl.style.transition = "transform 0.2s ease";
-        setTimeout(() => (countEl.style.transform = "scale(1)"), 200);
+        input.value = "";
+        nameField.value = "";
+
+        if (detailsEl.open || !firstOpenLoaded) {
+          await loadComments(postId, section, currentUser?.email || "");
+        }
+      } catch (e) {
+        console.error("Failed to add comment:", e);
+        showStatus("Could not add comment. Please try again.", "error");
+      } finally {
+        sendBtn.disabled = false;
       }
-    }
-
-    input.value = "";
-    nameField.value = "";
-
-    if (detailsEl.open || !firstOpenLoaded) {
-      await loadComments(postId, section, currentUser?.email || "");
-    }
-  } catch (e) {
-    console.error("Failed to add comment:", e);
-    showStatus("Could not add comment. Please try again.", "error");
-  } finally {
-    sendBtn.disabled = false;
+    });
   }
-});
-  }
+
   async function loadPosts(currentUser) {
     try {
       const q = query(postsCol, orderBy("timestamp", "desc"));
       const snapshot = await getDocs(q);
       postsContainer.innerHTML = snapshot.empty ? "No posts yet." : "";
 
-      snapshot.forEach((doc) => {
+      snapshot.forEach(async (doc) => {
         const data = doc.data();
         const postEl = document.createElement("div");
         postEl.className = "post";
@@ -315,14 +301,14 @@
 
         postsContainer.appendChild(postEl);
         attachCommentUI(postEl, doc.id, currentUser);
-        // 🧩 Immediately fetch comment count for closed sections
-const commentsCol = collection(db, "posts", doc.id, "comments");
-getDocs(commentsCol).then(snap => {
-  const count = snap.size;
-  const summary = postEl.querySelector(".comment-summary");
-  if (summary) summary.querySelector(".count").textContent = count;
-});
-  
+
+        // 🧩 Immediately show comment count
+        const commentsCol = collection(db, "posts", doc.id, "comments");
+        const snap = await getDocs(commentsCol);
+        const count = snap.size;
+        const summary = postEl.querySelector(".comment-summary");
+        if (summary) summary.querySelector(".count").textContent = count;
+      });
     } catch (err) {
       console.error("Failed to load posts:", err);
       showStatus(`Could not load posts: ${err.message}`, "error");
@@ -386,14 +372,13 @@ getDocs(commentsCol).then(snap => {
 
 <script type="module">
   import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-
   document.addEventListener("DOMContentLoaded", () => {
     if (!window.location.pathname.includes("login.html")) requireAuth();
     loadNavbar();
     enableLogout();
   });
 </script>
-  
+
 <!-- 🎞️ Forum Slideshow Logic -->
 <script>
 const heroSlides = document.querySelectorAll("#forum-hero .slide");
@@ -405,7 +390,5 @@ setInterval(() => {
 }, 6000);
 </script>
 
-  
 </body>
 </html>
-
