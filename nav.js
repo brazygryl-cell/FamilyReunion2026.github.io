@@ -27,14 +27,21 @@ export function loadNavbar() {
     `;
   }
 
-  // Footer
-  if (footer) {
-    footer.innerHTML = `
-      <p>Made with ❤️ by 
-        <a href="#" id="emailLink">Taylor Clark Jones</a>
-      </p>
-      <p>Art by Andre Clark</p>
-    `;
+  // footer
+ if (footer) {
+  footer.innerHTML = `
+    <p style="margin-bottom:8px;">
+      Made with ❤️ by <strong>Taylor Clark Jones</strong><br>
+      <span style="font-size:0.95rem; color:var(--muted);">
+        📧 Email Taylor:
+        <a href="mailto:taylor.clarkjones25@gmail.com" class="email-link">
+          taylor.clarkjones25@gmail.com
+        </a>
+      </span>
+    </p>
+    <p>Art by Andre Clark</p>
+  `;
+}
 
     const emailLink = footer.querySelector("#emailLink");
     if (emailLink) {
