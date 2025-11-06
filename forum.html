@@ -57,11 +57,82 @@
       padding: 10px 14px; cursor: pointer;
     }
     .send-comment:hover { filter: brightness(1.1); }
+    /* 🎞️ Forum Slideshow Banner */
+#forum-hero {
+  position: relative;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 0 0 40px 40px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  margin-bottom: 30px;
+}
+
+#forum-hero .slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: scale(1.05);
+  transition: opacity 2s ease-in-out, transform 6s ease-in-out;
+}
+#forum-hero .slide.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+#forum-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1;
+}
+
+#forum-hero .overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  z-index: 2;
+  max-width: 800px;
+}
+
+#forum-hero h1 {
+  font-family: "Playfair Display", serif;
+  font-size: 2.4rem;
+  margin-bottom: 0.3rem;
+}
+
+#forum-hero p {
+  color: #d0d6e0;
+  font-size: 1.1rem;
+}
+
+/* 🎬 Animation */
+@keyframes slideIn {
+  from { opacity: 0; transform: scale(1.05); }
+  to { opacity: 1; transform: scale(1); }
+}
   </style>
 </head>
 
 <body>
 <header></header>
+  
+  <!-- 🎞️ Family Slideshow Hero -->
+<section id="forum-hero">
+  <div class="slide active" style="background-image:url('images/family1.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family2.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family3.jpg')"></div>
+  <div class="overlay">
+    <h1>Family Forum</h1>
+    <p>Share memories, updates, and love — all in one place 💬</p>
+  </div>
+</section>
+
 
 <section class="section">
   <div class="container">
@@ -298,7 +369,19 @@
     enableLogout();
   });
 </script>
+  
+<!-- 🎞️ Forum Slideshow Logic -->
+<script>
+const heroSlides = document.querySelectorAll("#forum-hero .slide");
+let heroIndex = 0;
+setInterval(() => {
+  heroSlides[heroIndex].classList.remove("active");
+  heroIndex = (heroIndex + 1) % heroSlides.length;
+  heroSlides[heroIndex].classList.add("active");
+}, 6000);
+</script>
 
+  
 </body>
 </html>
 
