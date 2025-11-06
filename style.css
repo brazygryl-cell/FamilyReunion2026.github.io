@@ -377,6 +377,18 @@ body {
   letter-spacing: 0.3px;
 }
 
+.email-link {
+  color: var(--mint);
+  font-weight: 600;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.email-link:hover {
+  color: var(--mint-2);
+  text-decoration: underline;
+}
+
 
 
 
