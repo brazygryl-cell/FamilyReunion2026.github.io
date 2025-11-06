@@ -10,14 +10,14 @@
 <script type="module" src="nav.js"></script>
 
 <style>
-#villa-slideshow {
+#lodging-hero {
   position: relative;
   height: 70vh;
-  border-radius: 0 0 40px 40px;
   overflow: hidden;
+  border-radius: 0 0 40px 40px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.4);
 }
-#villa-slideshow .slide {
+#lodging-hero .slide {
   position: absolute;
   inset: 0;
   background-size: cover;
@@ -26,15 +26,15 @@
   transform: scale(1.05);
   transition: opacity 2s ease-in-out, transform 6s ease-in-out;
 }
-#villa-slideshow .slide.active { opacity: 1; transform: scale(1); }
-#villa-slideshow::after {
+#lodging-hero .slide.active { opacity: 1; transform: scale(1); }
+#lodging-hero::after {
   content: "";
   position: absolute;
   inset: 0;
   background: rgba(0,0,0,0.55);
   z-index: 1;
 }
-#villa-slideshow .overlay {
+#lodging-hero .overlay {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -43,8 +43,10 @@
   color: #fff;
   z-index: 2;
   max-width: 800px;
-  padding: 1rem;
 }
+#lodging-hero h1 { font-family: "Playfair Display", serif; font-size: clamp(2rem, 5vw, 3.2rem); }
+#lodging-hero p { font-size: 1.2rem; }
+
 .lodging-grid {
   display: grid;
   gap: 1.8rem;
@@ -73,18 +75,18 @@
 
 <header></header>
 
-<section class="section container">
-  <div id="villa-slideshow">
-    <div class="slide active" style="background-image:url('images/villa1.jpg')"></div>
-    <div class="slide" style="background-image:url('images/villa2.jpg')"></div>
-    <div class="slide" style="background-image:url('images/villa3.jpg')"></div>
+<section id="lodging-hero">
+  <div class="slide active" style="background-image:url('images/villa1.jpg')"></div>
+  <div class="slide" style="background-image:url('images/villa2.jpg')"></div>
+  <div class="slide" style="background-image:url('images/villa3.jpg')"></div>
 
-    <div class="overlay">
-      <h2>Villatel Orlando Resort</h2>
-      <p>Luxury family villas with private pools — the perfect home base for our reunion.</p>
-    </div>
+  <div class="overlay">
+    <h1>Stay Together in Style</h1>
+    <p>Villatel Orlando Resort offers spacious villas with private pools for every family.</p>
   </div>
+</section>
 
+<section class="section container">
   <div class="lodging-grid">
     <div class="card pad">
       <h3>Where We'll Stay</h3>
@@ -118,6 +120,8 @@
     <h3>Before You Travel</h3>
     <ul>
       <li>Bring a <strong>Real ID</strong> or passport for TSA</li>
+      <li>Share flight details for shuttle planning</li>
+      <li>Reserve group vans early</li>
     </ul>
     <p>Questions? Email our <a href="mailto:familyreunionwilliams2026@gmail.com">Lead Coordinator: ShaSha Clark</a></p>
   </div>
@@ -127,7 +131,7 @@
 
 <!-- 🎞️ Slideshow -->
 <script>
-const slides = document.querySelectorAll('#villa-slideshow .slide');
+const slides = document.querySelectorAll('#lodging-hero .slide');
 let current = 0;
 setInterval(() => {
   slides[current].classList.remove('active');
