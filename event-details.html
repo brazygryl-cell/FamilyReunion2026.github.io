@@ -7,6 +7,7 @@
 
 <link rel="stylesheet" href="style.css" />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <script type="module" src="nav.js"></script>
 
 <style>
 /* ✨ Hero Slideshow */
@@ -208,14 +209,17 @@ setInterval(() => {
 <!-- 🔐 Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-<script>
-  if (window.netlifyIdentity) {
-    window.netlifyIdentity.on("init", user => {
-      if (!user && !window.location.pathname.includes("login.html")) {
-        window.location.href = "login.html";
-      }
-    });
-  }
+<script type="module">
+  import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    if (!window.location.pathname.includes("login.html")) {
+      requireAuth();
+    }
+
+    loadNavbar();
+    enableLogout();
+  });
 </script>
 
 </body>
