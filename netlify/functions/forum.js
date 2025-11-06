@@ -1,7 +1,6 @@
 import { readFile } from "node:fs/promises";
-import nodeFetch from "node-fetch";
-
-const fetchApi = globalThis.fetch || nodeFetch;
+import { initializeApp, cert, getApps } from "firebase-admin/app";
+import { getFirestore, Timestamp } from "firebase-admin/firestore";
 
 const headers = {
   "Content-Type": "application/json",
@@ -16,35 +15,48 @@ const respond = (statusCode, payload = {}) => ({
   body: JSON.stringify(payload),
 });
 
-const OWNER_REPO = process.env.GITHUB_REPOSITORY || "FamilyReunion2026/FamilyReunion2026.github.io";
-const [DEFAULT_OWNER, DEFAULT_REPO] = OWNER_REPO.split("/");
-const GITHUB_OWNER = process.env.FORUM_GITHUB_OWNER || DEFAULT_OWNER;
-const GITHUB_REPO = process.env.FORUM_GITHUB_REPO || DEFAULT_REPO;
-const POSTS_PATH = process.env.FORUM_POSTS_PATH || "data/posts.json";
-const TARGET_BRANCH = process.env.FORUM_TARGET_BRANCH || process.env.GITHUB_BRANCH || "main";
-const GITHUB_TOKEN =
-  process.env.GITHUB_WRITE_TOKEN ||
-  process.env.GITHUB_TOKEN ||
-  process.env.GITHUB_ACCESS_TOKEN ||
-  "";
+const FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || "";
+const FIREBASE_CLIENT_EMAIL = process.env.FIREBASE_CLIENT_EMAIL || "";
+const FIREBASE_PRIVATE_KEY = (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n");
+const FIREBASE_DATABASE_URL = process.env.FIREBASE_DATABASE_URL || "";
+const FIREBASE_COLLECTION = process.env.FORUM_FIREBASE_COLLECTION || "forumPosts";
 
-const COMMITTER_NAME = process.env.FORUM_COMMITTER_NAME || "Family Reunion Bot";
-const COMMITTER_EMAIL =
-  process.env.FORUM_COMMITTER_EMAIL || "forum-bot@familyreunion2026.example";
+let firestoreInstance;
 
-const buildGitHubHeaders = (extra = {}) => ({
-  Accept: "application/vnd.github+json",
-  "User-Agent": "family-reunion-forum",
-  ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
-  ...extra,
-});
+const ensureFirestore = () => {
+  if (firestoreInstance) {
+    return firestoreInstance;
+  }
 
-const githubFileEndpoint = () =>
-  `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${POSTS_PATH}`;
+  if (!FIREBASE_PROJECT_ID || !FIREBASE_CLIENT_EMAIL || !FIREBASE_PRIVATE_KEY) {
+    throw new Error(
+      "Firebase credentials are not configured. Set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY in Netlify environment variables to enable forum storage."
+    );
+  }
+
+  if (!getApps().length) {
+    const options = {
+      credential: cert({
+        projectId: FIREBASE_PROJECT_ID,
+        clientEmail: FIREBASE_CLIENT_EMAIL,
+        privateKey: FIREBASE_PRIVATE_KEY,
+      }),
+    };
+
+    if (FIREBASE_DATABASE_URL) {
+      options.databaseURL = FIREBASE_DATABASE_URL;
+    }
+
+    initializeApp(options);
+  }
+
+  firestoreInstance = getFirestore();
+  return firestoreInstance;
+};
 
 const readSeedPosts = async () => {
   try {
-    const buffer = await readFile(`./${POSTS_PATH}`, "utf-8");
+    const buffer = await readFile(`./data/posts.json`, "utf-8");
     const data = JSON.parse(buffer);
     return Array.isArray(data) ? data : [];
   } catch (error) {
@@ -53,61 +65,71 @@ const readSeedPosts = async () => {
   }
 };
 
-const loadPostsFromGitHub = async () => {
-  const endpoint = `${githubFileEndpoint()}?ref=${encodeURIComponent(TARGET_BRANCH)}`;
-  const response = await fetchApi(endpoint, { headers: buildGitHubHeaders() });
-
-  if (response.status === 404) {
-    return { posts: await readSeedPosts(), sha: null };
+const toIsoString = (value) => {
+  if (!value) {
+    return new Date().toISOString();
   }
 
-  if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(`GitHub read failed (${response.status}): ${detail}`);
+  if (typeof value === "string") {
+    return value;
   }
 
-  const payload = await response.json();
-  const decoded = Buffer.from(payload.content, payload.encoding || "base64").toString("utf-8");
-  const posts = JSON.parse(decoded);
-  return { posts: Array.isArray(posts) ? posts : [], sha: payload.sha };
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (value instanceof Timestamp) {
+    return value.toDate().toISOString();
+  }
+
+  if (typeof value.toDate === "function") {
+    return value.toDate().toISOString();
+  }
+
+  if (typeof value.seconds === "number") {
+    return new Date(value.seconds * 1000).toISOString();
+  }
+
+  return new Date().toISOString();
 };
 
-const savePostsToGitHub = async ({ posts, sha }) => {
-  if (!GITHUB_TOKEN) {
-    throw new Error(
-      "GitHub token is not configured. Set GITHUB_WRITE_TOKEN or GITHUB_TOKEN in Netlify environment variables to save posts."
-    );
-  }
+const loadPostsFromFirebase = async () => {
+  const db = ensureFirestore();
+  const snapshot = await db
+    .collection(FIREBASE_COLLECTION)
+    .orderBy("createdAt", "desc")
+    .limit(100)
+    .get();
 
-  const endpoint = githubFileEndpoint();
-  const content = Buffer.from(JSON.stringify(posts, null, 2)).toString("base64");
+  return snapshot.docs.map((doc) => {
+    const data = doc.data() || {};
 
-  const body = {
-    message: "Update forum posts",
-    content,
-    branch: TARGET_BRANCH,
-    committer: {
-      name: COMMITTER_NAME,
-      email: COMMITTER_EMAIL,
-    },
-  };
+    return {
+      id: doc.id,
+      body: data.body || "",
+      by: data.by || "anonymous",
+      createdAt: toIsoString(data.createdAtIso || data.createdAt),
+    };
+  });
+};
 
-  if (sha) {
-    body.sha = sha;
-  }
+const savePostToFirebase = async ({ body, email }) => {
+  const db = ensureFirestore();
+  const createdAt = new Date();
 
-  const response = await fetchApi(endpoint, {
-    method: "PUT",
-    headers: buildGitHubHeaders({ "Content-Type": "application/json" }),
-    body: JSON.stringify(body),
+  const docRef = await db.collection(FIREBASE_COLLECTION).add({
+    body,
+    by: email || "anonymous",
+    createdAt: Timestamp.fromDate(createdAt),
+    createdAtIso: createdAt.toISOString(),
   });
 
-  if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(`GitHub write failed (${response.status}): ${detail}`);
-  }
-
-  return response.json();
+  return {
+    id: docRef.id,
+    body,
+    by: email || "anonymous",
+    createdAt: createdAt.toISOString(),
+  };
 };
 
 export const handler = async (event) => {
@@ -118,8 +140,8 @@ export const handler = async (event) => {
   try {
     if (event.httpMethod === "GET") {
       try {
-        const { posts } = await loadPostsFromGitHub();
-        return respond(200, posts.slice().reverse());
+        const posts = await loadPostsFromFirebase();
+        return respond(200, posts);
       } catch (error) {
         console.error("Falling back to seeded posts", error);
         const posts = await readSeedPosts();
@@ -144,40 +166,20 @@ export const handler = async (event) => {
         return respond(400, { error: "Missing fields" });
       }
 
-      let snapshot;
       try {
-        snapshot = await loadPostsFromGitHub();
-      } catch (error) {
-        console.error("Unable to load posts before writing", error);
-        return respond(500, {
-          error: "Forum storage is currently unavailable.",
-          details: error.message,
-        });
-      }
-
-      const createdAt = new Date().toISOString();
-      const newPost = {
-        id: `${createdAt}-${Math.random().toString(36).slice(2, 10)}`,
-        body,
-        by: email || "anonymous",
-        createdAt,
-      };
-
-      const posts = [...snapshot.posts, newPost];
-
-      try {
-        await savePostsToGitHub({ posts, sha: snapshot.sha });
+        const newPost = await savePostToFirebase({ body, email });
+        return respond(200, newPost);
       } catch (error) {
         console.error("Failed to persist forum post", error);
+        const message = error.message.includes("Firebase credentials are not configured")
+          ? error.message
+          : "Unable to save your post right now. Please try again later.";
+
         return respond(500, {
-          error: error.message.includes("GitHub token is not configured")
-            ? error.message
-            : "Unable to save your post right now. Please try again later.",
+          error: message,
           details: error.message,
         });
       }
-
-      return respond(200, newPost);
     }
 
     return respond(405, { error: "Method not allowed" });
