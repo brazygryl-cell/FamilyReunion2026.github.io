@@ -9,10 +9,6 @@
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
   <style>
-    .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; }
-    .forum-tab { padding: 10px 16px; border-radius: 6px; cursor: pointer; background:#eee; }
-    .forum-tab.active { background:#333; color:white; }
-
     #posts { max-width:800px; margin:auto; margin-top:20px; }
     .post { background:white; border-radius:6px; padding:12px; margin-bottom:14px; border:1px solid #ddd; }
     .meta { font-size:0.8em; color:#666; margin-top:6px; display:block; }
@@ -33,39 +29,30 @@
     .status-message.success { color:#0f5132; }
     .status-message.info { color:#0d6efd; }
   </style>
-
 </head>
+
 <body>
 <header></header>
 
 <section class="section">
   <div class="container">
-
     <h2>Family Forum</h2>
     <p>Talk, plan, and share updates.</p>
 
     <!-- Post box -->
-  <form id="forumForm" novalidate>
-      
-      <input type="hidden" name="email" id="postEmail" value="" />
-      <textarea
-        id="postBody"
-        name="message"
-        placeholder="Write your message..."
-      ></textarea>
+    <form id="forumForm" novalidate style="display:none;">
+      <textarea id="postBody" name="message" placeholder="Write your message..." required></textarea>
       <button id="submitPost" type="submit">Post</button>
     </form>
 
     <p id="postStatus" class="status-message"></p>
-
-    <!-- Posts -->
-    <div id="posts">No posts yet.</div>
-
+    <div id="posts">Loading posts...</div>
   </div>
 </section>
 
 <footer></footer>
 
+<!-- Forum Logic -->
 <script type="module">
   import { db } from "./firebase-init.js";
   import {
@@ -73,18 +60,17 @@
     addDoc,
     getDocs,
     query,
-    orderBy,
+    orderBy
   } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
   const postsContainer = document.getElementById("posts");
   const statusMessage = document.getElementById("postStatus");
-  const submitButton = document.getElementById("submitPost");
-  const postField = document.getElementById("postBody");
   const form = document.getElementById("forumForm");
+  const postField = document.getElementById("postBody");
+  const submitButton = document.getElementById("submitPost");
   const postsCol = collection(db, "posts");
 
   function showStatus(message = "", type = "") {
-    if (!statusMessage) return;
     statusMessage.textContent = message;
     statusMessage.className = `status-message${type ? " " + type : ""}`;
   }
@@ -111,24 +97,19 @@
     }
   }
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  async function postMessage(user) {
     const message = postField.value.trim();
     if (!message) {
       showStatus("Please write something before posting.", "info");
       return;
     }
 
-    const user =
-      window.netlifyIdentity && window.netlifyIdentity.currentUser();
-    const email = user ? user.email : "anonymous";
-
     try {
       submitButton.disabled = true;
       showStatus("Saving your post...", "info");
 
       await addDoc(postsCol, {
-        email,
+        email: user.email,
         message,
         timestamp: Date.now(),
       });
@@ -142,12 +123,34 @@
     } finally {
       submitButton.disabled = false;
     }
-  });
+  }
 
-  loadPosts();
+  // --- Auth-aware behavior ---
+  document.addEventListener("DOMContentLoaded", () => {
+    const identity = window.netlifyIdentity;
+
+    const handleLogin = (user) => {
+      if (user) {
+        form.style.display = "block";
+        loadPosts();
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          postMessage(user);
+        });
+      } else {
+        form.style.display = "none";
+        postsContainer.textContent = "Please log in to view and post.";
+      }
+    };
+
+    identity.on("init", (user) => handleLogin(user));
+    identity.on("login", (user) => handleLogin(user));
+    identity.on("logout", () => handleLogin(null));
+    identity.init();
+  });
 </script>
 
-
+<!-- Navbar / Auth Gate -->
 <script type="module">
   import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 
@@ -155,12 +158,10 @@
     if (!window.location.pathname.includes("login.html")) {
       requireAuth();
     }
-
     loadNavbar();
     enableLogout();
   });
 </script>
-
-
 </body>
 </html>
+
