@@ -1,4 +1,6 @@
-import { getStore } from "@netlify/blobs";
+import { promises as fs } from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const headers = {
   "Content-Type": "application/json",
@@ -13,10 +15,37 @@ const respond = (statusCode, payload = {}) => ({
   body: JSON.stringify(payload),
 });
 
-const missingBlobsConfig = () =>
-  !process.env.NETLIFY_BLOBS_CONTEXT &&
-  !process.env.NETLIFY_BLOBS_URL &&
-  !process.env.NETLIFY_BLOBS_TOKEN;
+const TMP_POSTS_PATH = "/tmp/forum-posts.json";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const SEED_POSTS_PATH = path.resolve(__dirname, "../../data/posts.json");
+
+const readSeedPosts = async () => {
+  try {
+    const raw = await fs.readFile(SEED_POSTS_PATH, "utf8");
+    const data = JSON.parse(raw);
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.warn("Unable to load seed posts", error);
+    return [];
+  }
+};
+
+const readPersistedPosts = async () => {
+  try {
+    const raw = await fs.readFile(TMP_POSTS_PATH, "utf8");
+    const data = JSON.parse(raw);
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      console.warn("Unable to read persisted posts", error);
+    }
+    return null;
+  }
+};
+
+const writePersistedPosts = async (posts) => {
+  await fs.writeFile(TMP_POSTS_PATH, JSON.stringify(posts, null, 2), "utf8");
+};
 
 export const handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
@@ -24,15 +53,9 @@ export const handler = async (event) => {
   }
 
   try {
-    if (missingBlobsConfig()) {
-      throw new Error(
-        "Netlify Blobs is not enabled for this site. Enable Blobs in Site settings > Labs (beta) and redeploy."
-      );
-    }
-
-    const store = getStore({ name: "forum-posts", consistency: "strong" });
-    const existing = (await store.get("posts", { type: "json" })) || [];
-    const posts = Array.isArray(existing) ? existing : [];
+    const persisted = await readPersistedPosts();
+    const posts =
+      persisted === null ? await readSeedPosts() : Array.isArray(persisted) ? persisted : [];
 
     if (event.httpMethod === "GET") {
       return respond(200, [...posts].reverse());
@@ -63,7 +86,14 @@ export const handler = async (event) => {
       };
 
       const updatedPosts = [...posts, newPost];
-      await store.set("posts", updatedPosts, { type: "json" });
+      try {
+        await writePersistedPosts(updatedPosts);
+      } catch (error) {
+        console.warn("Failed to persist posts to /tmp", error);
+        return respond(500, {
+          error: "Unable to save your post right now. Please try again shortly.",
+        });
+      }
 
       return respond(200, newPost);
     }
