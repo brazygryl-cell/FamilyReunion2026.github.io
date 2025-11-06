@@ -8,16 +8,10 @@
   <link rel="stylesheet" href="style.css" />
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-  <!-- minimal page-level tweaks (theme stays in style.css) -->
   <style>
-    /* larger, comfy inputs for older eyes */
     #postBody,
-    .comment-input {
-      font-size: 1.05rem;
-      line-height: 1.6;
-    }
+    .comment-input { font-size: 1.05rem; line-height: 1.6; }
 
-    /* comment block shell — uses your existing dark palette */
     .comment-section {
       margin-top: 12px;
       border: 1px solid var(--border);
@@ -26,25 +20,16 @@
       overflow: hidden;
     }
     .comment-summary {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      cursor: pointer;
-      padding: 10px 14px;
-      background: #151a22;
-      color: var(--text);
-      font-weight: 600;
-      font-size: 1rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      cursor: pointer; padding: 10px 14px; background: #151a22;
+      color: var(--text); font-weight: 600; font-size: 1rem;
       border-bottom: 1px solid rgba(255,255,255,0.06);
     }
     .comment-summary:hover { color: var(--mint); }
-
     .comments-body {
       padding: 12px 14px;
       background: linear-gradient(180deg, #121624 0%, #0f121a 100%);
     }
-
     .comment {
       background: rgba(255,255,255,0.05);
       border-left: 3px solid var(--mint-2);
@@ -61,25 +46,15 @@
       font-size: 0.95rem;
       font-style: italic;
     }
-
     .comment-input {
-      width: 100%;
-      background: #0f121a;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 12px;
-      color: var(--text);
+      width: 100%; background: #0f121a; border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px; color: var(--text);
       margin-top: 10px;
     }
     .send-comment {
-      margin-top: 10px;
-      background: var(--mint);
-      color: #000;
-      font-weight: 700;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 14px;
-      cursor: pointer;
+      margin-top: 10px; background: var(--mint); color: #000;
+      font-weight: 700; border: none; border-radius: 8px;
+      padding: 10px 14px; cursor: pointer;
     }
     .send-comment:hover { filter: brightness(1.1); }
   </style>
@@ -95,25 +70,20 @@
 
     <!-- Post box -->
     <form id="forumForm" novalidate style="display:none;">
-  <input
-    type="text"
-    id="posterName"
-    name="posterName"
-    placeholder="Your name (optional)"
-    maxlength="40"
-    style="
-      width:100%;
-      padding:10px 12px;
-      border-radius:8px;
-      border:1px solid var(--border);
-      background:#111;
-      color:var(--text);
-      margin-bottom:10px;
-      font-size:1.05rem;"
-  />
-  <textarea id="postBody" name="message" placeholder="Write your message..." required></textarea>
-  <button id="submitPost" type="submit">Post</button>
-</form>
+      <input
+        type="text"
+        id="posterName"
+        name="posterName"
+        placeholder="Your name (optional)"
+        maxlength="40"
+        style="
+          width:100%; padding:10px 12px; border-radius:8px;
+          border:1px solid var(--border); background:#111; color:var(--text);
+          margin-bottom:10px; font-size:1.05rem;"
+      />
+      <textarea id="postBody" name="message" placeholder="Write your message..." required></textarea>
+      <button id="submitPost" type="submit">Post</button>
+    </form>
 
     <p id="postStatus" class="status-message"></p>
     <div id="posts">Loading posts...</div>
@@ -122,19 +92,13 @@
 
 <footer></footer>
 
-<!-- Must be classic script (not module) -->
 <script src="/env.js"></script>
 <script type="module" src="firebase-init.js"></script>
 
-<!-- Forum + Comments Logic -->
 <script type="module">
   import { db } from "./firebase-init.js";
   import {
-    collection,
-    addDoc,
-    getDocs,
-    query,
-    orderBy
+    collection, addDoc, getDocs, query, orderBy
   } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
   const postsContainer = document.getElementById("posts");
@@ -143,7 +107,6 @@
   const postField = document.getElementById("postBody");
   const submitButton = document.getElementById("submitPost");
   const postsCol = collection(db, "posts");
-
   const identity = window.netlifyIdentity;
 
   function showStatus(message = "", type = "") {
@@ -151,19 +114,20 @@
     statusMessage.className = `status-message${type ? " " + type : ""}`;
   }
 
-  const displayLabel = (itemEmail, currentEmail) =>
-    itemEmail && currentEmail && itemEmail === currentEmail ? "You" : "Family Member";
+  const displayLabel = (name, itemEmail, currentEmail) => {
+    if (name) return name;
+    if (itemEmail && currentEmail && itemEmail === currentEmail) return "You";
+    return "Family Member";
+  };
 
   async function loadComments(postId, wrapperEl, currentEmail) {
     const commentsCol = collection(db, "posts", postId, "comments");
     const q = query(commentsCol, orderBy("timestamp", "asc"));
     const snap = await getDocs(q);
 
-    // Elements inside wrapper
     const summary = wrapperEl.querySelector(".comment-summary");
     const list = wrapperEl.querySelector(".comments-list");
 
-    // Count + render
     const count = snap.size;
     summary.dataset.count = count;
     summary.querySelector(".count").textContent = count;
@@ -175,14 +139,13 @@
       el.className = "comment";
       el.innerHTML = `
         <p>${c.message}</p>
-        <span class="byline">— ${displayLabel(c.email, currentEmail)}, ${new Date(c.timestamp).toLocaleString()}</span>
+        <span class="byline">— ${displayLabel(c.name, c.email, currentEmail)}, ${new Date(c.timestamp).toLocaleString()}</span>
       `;
       list.appendChild(el);
     });
   }
 
   function attachCommentUI(postCardEl, postId, currentUser) {
-    // Build the comment section
     const section = document.createElement("div");
     section.className = "comment-section";
     section.innerHTML = `
@@ -193,6 +156,10 @@
         </summary>
         <div class="comments-body">
           <div class="comments-list"></div>
+          <input class="comment-name" type="text" placeholder="Your name (optional)" maxlength="40" style="
+            width:100%; background:#0f121a; border:1px solid var(--border);
+            border-radius:8px; padding:8px 10px; color:var(--text);
+            margin-bottom:8px; font-size:1.02rem;">
           <textarea class="comment-input" placeholder="Add a reply…"></textarea>
           <button class="send-comment" type="button">Send</button>
         </div>
@@ -203,8 +170,8 @@
     const detailsEl = section.querySelector("details");
     const sendBtn = section.querySelector(".send-comment");
     const input = section.querySelector(".comment-input");
+    const nameField = section.querySelector(".comment-name");
 
-    // Lazy-load comments on first open, then refresh on each open
     let firstOpenLoaded = false;
     detailsEl.addEventListener("toggle", async () => {
       if (detailsEl.open) {
@@ -215,18 +182,20 @@
 
     sendBtn.addEventListener("click", async () => {
       const message = input.value.trim();
+      const name = nameField.value.trim() || "Family Member";
       if (!message) return;
 
       const commentsCol = collection(db, "posts", postId, "comments");
       try {
         sendBtn.disabled = true;
         await addDoc(commentsCol, {
+          name,
           email: currentUser?.email || "anonymous",
           message,
           timestamp: Date.now()
         });
         input.value = "";
-        // If panel is open, refresh list; if closed, bump the count on next open
+        nameField.value = "";
         if (detailsEl.open || !firstOpenLoaded) {
           await loadComments(postId, section, currentUser?.email || "");
         }
@@ -249,13 +218,11 @@
         const data = doc.data();
         const postEl = document.createElement("div");
         postEl.className = "post";
-        if (data.email === (currentUser?.email || "")) {
-          postEl.classList.add("mine"); // if you added .post.mine styling
-        }
+        if (data.email === (currentUser?.email || "")) postEl.classList.add("mine");
 
         postEl.innerHTML = `
           <p>${data.message}</p>
-          <span class="meta">— ${displayLabel(data.email, currentUser?.email || "")}, ${new Date(data.timestamp).toLocaleString()}</span>
+          <span class="meta">— ${displayLabel(data.name, data.email, currentUser?.email || "")}, ${new Date(data.timestamp).toLocaleString()}</span>
         `;
 
         postsContainer.appendChild(postEl);
@@ -269,6 +236,9 @@
 
   async function postMessage(user) {
     const message = postField.value.trim();
+    const nameInput = document.getElementById("posterName");
+    const name = nameInput.value.trim() || "Family Member";
+
     if (!message) {
       showStatus("Please write something before posting.", "info");
       return;
@@ -279,12 +249,14 @@
       showStatus("Saving your post...", "info");
 
       await addDoc(postsCol, {
+        name,
         email: user.email || "anonymous",
         message,
         timestamp: Date.now(),
       });
 
       postField.value = "";
+      nameInput.value = "";
       showStatus("Post published!", "success");
       await loadPosts(user);
     } catch (err) {
@@ -295,7 +267,6 @@
     }
   }
 
-  // --- Auth-aware behavior ---
   document.addEventListener("DOMContentLoaded", () => {
     const handleLogin = (user) => {
       if (user) {
@@ -318,14 +289,11 @@
   });
 </script>
 
-<!-- Navbar / Auth Gate -->
 <script type="module">
   import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 
   document.addEventListener("DOMContentLoaded", () => {
-    if (!window.location.pathname.includes("login.html")) {
-      requireAuth();
-    }
+    if (!window.location.pathname.includes("login.html")) requireAuth();
     loadNavbar();
     enableLogout();
   });
