@@ -1,5 +1,5 @@
 #!/bin/bash
-# create env file for client from Netlify env vars
+# --- Create env.js from Netlify environment variables ---
 cat > ./env.js <<EOF
 window.__FIREBASE_CONFIG__ = {
   apiKey: "${FIREBASE_API_KEY}",
@@ -11,6 +11,5 @@ window.__FIREBASE_CONFIG__ = {
 };
 EOF
 
-# no-op build if you don't have a static build tool
-# exit 0 so Netlify deploys the folder
+# make sure we exit cleanly
 exit 0
