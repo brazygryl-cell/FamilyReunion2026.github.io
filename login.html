@@ -84,7 +84,10 @@
 <section class="section login-wrapper">
   <div class="login-card">
     <h2>Sign In to Continue</h2>
-    <p>Access is limited to invited family members only.<br/>Please sign in with Google to proceed.</p>
+    <p>
+      Access is limited to invited family members only.<br />
+      Please sign in with Google to proceed.
+    </p>
 
     <button id="loginBtn" class="login-btn">Sign in with Google</button>
   </div>
@@ -114,7 +117,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         iframe.addEventListener("load", () => {
           const doc = iframe.contentDocument || iframe.contentWindow.document;
-
           const style = document.createElement("style");
           style.textContent = `
             body {
@@ -133,24 +135,18 @@ document.addEventListener("DOMContentLoaded", () => {
               font-weight: 700 !important;
               border-radius: 8px !important;
             }
-            a, .link {
-              color: #7EE0C2 !important;
-            }
-            /* 🚫 Hide Email/Password fields, login button, etc. */
+            a, .link { color: #7EE0C2 !important; }
             form[action*="/token"] input[name="email"],
             form[action*="/token"] input[name="password"],
             form[action*="/token"] button[type="submit"],
             form[action*="/token"] a[href*="recover"],
-            form[action*="/token"] hr {
-              display: none !important;
-            }
+            form[action*="/token"] hr { display: none !important; }
           `;
           doc.head.appendChild(style);
         });
       }, 400);
     });
 
-    // After login → go home
     window.netlifyIdentity.on("login", () => {
       window.location.href = "index.html";
     });
@@ -158,51 +154,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-<!-- ✅ Gmail popup setup with graceful fallback -->
+<!-- ✅ Unified email popup from nav.js -->
 <script type="module">
   import { setupEmailPopup } from "./nav.js";
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const emailLink = document.querySelector("#emailLink");
-    const email = "taylor.clarkjones25@gmail.com";
-    const subject = "Williams Family Reunion Registration";
-    const body =
-      "Hi Taylor,%0A%0AI'd like to register or learn more about the reunion.%0A%0AThanks,%0A[Your Name]";
-
-    if (!emailLink) return;
-
-    emailLink.addEventListener("click", (e) => {
-      e.preventDefault();
-
-      const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(
-        subject
-      )}&body=${body}`;
-
-      // Try opening Gmail popup
-      const popup = window.open(
-        gmailURL,
-        "gmailCompose",
-        "width=700,height=600,left=" +
-          (window.innerWidth / 2 - 350) +
-          ",top=" +
-          (window.innerHeight / 2 - 300)
-      );
-
-      // If Gmail blocked or unavailable → fallback to mailto
-      setTimeout(() => {
-        if (!popup || popup.closed || typeof popup.closed == "undefined") {
-          window.location.href = `mailto:${email}?subject=${encodeURIComponent(
-            subject
-          )}&body=${body}`;
-        }
-      }, 500);
-    });
-
-    // Optional: also run your nav.js popup setup (so it works sitewide)
-    setupEmailPopup();
-  });
+  setupEmailPopup();
 </script>
 
 </body>
 </html>
-
