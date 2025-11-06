@@ -22,8 +22,17 @@
       border:1px solid #bbb;
       background:white;
       color:black;
+      resize: vertical;
     }
-    #submitPost { margin-top:10px; padding:8px 14px; border-radius:6px; cursor:pointer; }
+    #submitPost {
+      margin-top:10px;
+      padding:8px 14px;
+      border-radius:6px;
+      cursor:pointer;
+      background:#333;
+      color:white;
+      border:none;
+    }
     .status-message { margin-top:12px; text-align:center; font-size:0.95em; }
     .status-message.error { color:#b00020; }
     .status-message.success { color:#0f5132; }
@@ -51,6 +60,8 @@
 </section>
 
 <footer></footer>
+
+<!-- Must be classic script (not module) -->
 <script src="/env.js"></script>
 <script type="module" src="firebase-init.js"></script>
 
@@ -89,7 +100,7 @@
         div.className = "post";
         div.innerHTML = `
           <p>${data.message}</p>
-          <span class="meta">— ${data.email}, ${new Date(data.timestamp).toLocaleString()}</span>
+          <span class="meta">— ${data.email || "unknown"}, ${new Date(data.timestamp).toLocaleString()}</span>
         `;
         postsContainer.appendChild(div);
       });
@@ -111,7 +122,7 @@
       showStatus("Saving your post...", "info");
 
       await addDoc(postsCol, {
-        email: user.email,
+        email: user.email || "anonymous",
         message,
         timestamp: Date.now(),
       });
@@ -135,18 +146,18 @@
       if (user) {
         form.style.display = "block";
         loadPosts();
-        form.addEventListener("submit", (e) => {
+        form.onsubmit = (e) => {
           e.preventDefault();
           postMessage(user);
-        });
+        };
       } else {
         form.style.display = "none";
         postsContainer.textContent = "Please log in to view and post.";
       }
     };
 
-    identity.on("init", (user) => handleLogin(user));
-    identity.on("login", (user) => handleLogin(user));
+    identity.on("init", handleLogin);
+    identity.on("login", handleLogin);
     identity.on("logout", () => handleLogin(null));
     identity.init();
   });
@@ -164,6 +175,6 @@
     enableLogout();
   });
 </script>
+
 </body>
 </html>
-
