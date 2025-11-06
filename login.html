@@ -65,7 +65,7 @@
       margin-top: 24px;
     }
 
-    .invite-note a {f
+    .invite-note a {
       color: var(--mint);
       font-weight: 600;
       text-decoration: none;
@@ -92,9 +92,7 @@
 
 <p class="invite-note">
   Registration is <strong>by invite only</strong>.<br/>
-  <a href="#" id="emailLink">
-    📧 Email Taylor to Request Access
-  </a>
+  <a href="#" id="emailLink">📧 Email Taylor to Request Access</a>
 </p>
 
 <footer></footer>
@@ -158,6 +156,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+</script>
+
+<!-- ✅ Gmail popup setup -->
+<script type="module">
+  import { setupEmailPopup } from "./nav.js";
+  document.addEventListener("DOMContentLoaded", () => {
+    setupEmailPopup();
+  });
 </script>
 
 </body>
