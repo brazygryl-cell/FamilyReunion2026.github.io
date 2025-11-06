@@ -33,11 +33,10 @@ export function loadNavbar() {
       <p style="margin-bottom:8px;">
         Made with ❤️ by <strong>Taylor Clark Jones</strong><br>
         <span style="font-size:0.95rem; color:var(--muted);">
-          📧 Email Taylor:
-          <a href="#" id="emailLink" class="email-link">taylor.clarkjones25@gmail.com</a>
+          📧 Email ShaSha:
+          <a href="#" id="emailLink" class="email-link">familyreunionwilliams2026@gmail.com</a>
         </span>
       </p>
-      <p>Art by Andre Clark</p>
     `;
   }
 
@@ -78,10 +77,10 @@ export function setupEmailPopup() {
   const emailLink = document.querySelector("#emailLink");
   if (!emailLink) return;
 
-  const email = "taylor.clarkjones25@gmail.com";
-  const subject = "Williams Family Reunion Registration";
+  const email = "familyreunionwilliams2026@gmail.com";
+  const subject = "Williams Family Reunion Questions;
   const body =
-    "Hi Taylor,%0A%0AI'd like to register or learn more about the reunion.%0A%0AThanks,%0A[Your Name]";
+    "Hi ShaSha,%0A%0AI'd like to learn more about the reunion.%0A%0AThanks,%0A[Your Name]";
 
   emailLink.addEventListener("click", (e) => {
     e.preventDefault();
