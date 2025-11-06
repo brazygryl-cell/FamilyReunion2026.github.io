@@ -1,31 +1,46 @@
-import fs from "fs";
-import path from "path";
+import { getStore } from "@netlify/blobs";
+
+const headers = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
 
 export const handler = async (event) => {
-  const dbPath = path.join(process.cwd(), "data", "posts.json");
+  const store = getStore({ name: "forum-posts", consistency: "strong" });
 
-  // Ensure file exists
-  if (!fs.existsSync(dbPath)) {
-    fs.mkdirSync(path.join(process.cwd(), "data"), { recursive: true });
-    fs.writeFileSync(dbPath, "[]");
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 204, headers };
   }
 
-  let posts = JSON.parse(fs.readFileSync(dbPath, "utf8"));
+  const existing = (await store.get("posts", { type: "json" })) || [];
+  const posts = Array.isArray(existing) ? existing : [];
 
-  // GET posts
   if (event.httpMethod === "GET") {
     return {
       statusCode: 200,
-      body: JSON.stringify(posts.reverse()),
+      headers,
+      body: JSON.stringify([...posts].reverse()),
     };
   }
 
-  // ADD post
   if (event.httpMethod === "POST") {
-    if (!event.body) return { statusCode: 400, body: "Missing data" };
+    if (!event.body) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing data" }) };
+    }
 
-    const { body, email } = JSON.parse(event.body);
-    if (!body || !email) return { statusCode: 400, body: "Missing fields" };
+    let payload;
+    try {
+      payload = JSON.parse(event.body);
+    } catch (error) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) };
+    }
+
+    const { body, email } = payload;
+    if (!body || !email) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing fields" }) };
+    }
 
     const newPost = {
       id: Date.now(),
@@ -35,13 +50,14 @@ export const handler = async (event) => {
     };
 
     posts.push(newPost);
-    fs.writeFileSync(dbPath, JSON.stringify(posts, null, 2));
+    await store.set("posts", posts, { type: "json" });
 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify(newPost),
     };
   }
 
-  return { statusCode: 405, body: "Method not allowed" };
+  return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
 };
