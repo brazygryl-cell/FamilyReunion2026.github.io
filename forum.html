@@ -66,92 +66,87 @@
 
 <footer></footer>
 
-<script>
-const API = "/.netlify/functions/forum";
-const postsContainer = document.getElementById("posts");
-const statusMessage = document.getElementById("postStatus");
-const submitButton = document.getElementById("submitPost");
-const postField = document.getElementById("postBody");
-const postEmailField = document.getElementById("postEmail");
-const form = document.getElementById("forumForm");
+<script type="module">
+  import { db } from "./firebase-init.js";
+  import {
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    orderBy,
+  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-function showStatus(message = "", type = "") {
-  if (!statusMessage) return;
-  statusMessage.textContent = message;
-  statusMessage.className = `status-message${type ? " " + type : ""}`;
-}
+  const postsContainer = document.getElementById("posts");
+  const statusMessage = document.getElementById("postStatus");
+  const submitButton = document.getElementById("submitPost");
+  const postField = document.getElementById("postBody");
+  const form = document.getElementById("forumForm");
+  const postsCol = collection(db, "posts");
 
-async function loadPosts() {
-  try {
-    const response = await fetch(API, { method: "GET" });
-    const data = await response.json().catch(() => []);
+  function showStatus(message = "", type = "") {
+    if (!statusMessage) return;
+    statusMessage.textContent = message;
+    statusMessage.className = `status-message${type ? " " + type : ""}`;
+  }
 
-    if (!response.ok) {
-      const message = (data && data.error) || response.statusText;
-      throw new Error(message || "Unable to load posts");
+  async function loadPosts() {
+    try {
+      const q = query(postsCol, orderBy("timestamp", "desc"));
+      const snapshot = await getDocs(q);
+      postsContainer.innerHTML = snapshot.empty ? "No posts yet." : "";
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const div = document.createElement("div");
+        div.className = "post";
+        div.innerHTML = `
+          <p>${data.message}</p>
+          <span class="meta">— ${data.email}, ${new Date(data.timestamp).toLocaleString()}</span>
+        `;
+        postsContainer.appendChild(div);
+      });
+    } catch (err) {
+      console.error("Failed to load posts:", err);
+      showStatus(`Could not load posts: ${err.message}`, "error");
+    }
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const message = postField.value.trim();
+    if (!message) {
+      showStatus("Please write something before posting.", "info");
+      return;
     }
 
-    const posts = Array.isArray(data) ? data : [];
-    postsContainer.innerHTML = posts.length ? "" : "No posts yet.";
+    const user =
+      window.netlifyIdentity && window.netlifyIdentity.currentUser();
+    const email = user ? user.email : "anonymous";
 
-    posts.forEach((post) => {
-      const div = document.createElement("div");
-      div.className = "post";
-      div.innerHTML = `
-        <p>${post.body}</p>
-        <span class="meta">— ${post.by}, ${new Date(post.createdAt).toLocaleString()}</span>
-      `;
-      postsContainer.appendChild(div);
-    });
-  } catch (err) {
-    console.error("Failed to load posts:", err);
-    showStatus(`Could not load posts: ${err.message}`, "error");
-  }
-}
+    try {
+      submitButton.disabled = true;
+      showStatus("Saving your post...", "info");
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const body = postField.value.trim();
-  if (!body) {
-    showStatus("Please write something before posting.", "info");
-    return;
-  }
+      await addDoc(postsCol, {
+        email,
+        message,
+        timestamp: Date.now(),
+      });
 
-  const user = window.netlifyIdentity && window.netlifyIdentity.currentUser();
-  const email = user ? user.email : "anonymous";
-  if (postEmailField) {
-    postEmailField.value = email;
-  }
-
-  try {
-    submitButton.disabled = true;
-    showStatus("Saving your post...", "info");
-
-    const response = await fetch(API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ body, email }),
-    });
-
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      const message = data.details || data.error || response.statusText;
-      throw new Error(message || "Unable to save post");
+      postField.value = "";
+      showStatus("Post published!", "success");
+      loadPosts();
+    } catch (err) {
+      console.error("Failed to submit post:", err);
+      showStatus(`Could not submit your post: ${err.message}`, "error");
+    } finally {
+      submitButton.disabled = false;
     }
+  });
 
-    postField.value = "";
-    showStatus("Post published!", "success");
-    loadPosts();
-  } catch (err) {
-    console.error("Failed to submit post:", err);
-    showStatus(`Could not submit your post: ${err.message}`, "error");
-  } finally {
-    submitButton.disabled = false;
-  }
-});
-
-loadPosts();
+  loadPosts();
 </script>
+
 
 <script type="module">
   import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
