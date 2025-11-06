@@ -1,5 +1,3 @@
-console.log("env before init:", window.__FIREBASE_CONFIG__);
-
 const cfg = window.__FIREBASE_CONFIG__;
 console.log("Firebase config used:", cfg);   // <— add this one line temporarily
 
