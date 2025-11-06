@@ -1,15 +1,3 @@
 [build]
   publish = "."
-  functions = "netlify/functions"
-
-# Route API calls to serverless function
-[[redirects]]
-  from = "/api/forum"
-  to = "/.netlify/functions/forum"
-  status = 200
-
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
-  included_files = ["data/posts.json"]
 
