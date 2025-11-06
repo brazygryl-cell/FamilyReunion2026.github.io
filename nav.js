@@ -1,4 +1,6 @@
+// nav.js
 // Handles navigation bar, footer, and Netlify Identity auth (login/logout)
+
 if (window.netlifyIdentity) {
   window.netlifyIdentity.on("init", (user) => {
     if (!user && !window.location.pathname.includes("login.html")) {
@@ -32,39 +34,15 @@ export function loadNavbar() {
         Made with ❤️ by <strong>Taylor Clark Jones</strong><br>
         <span style="font-size:0.95rem; color:var(--muted);">
           📧 Email Taylor:
-          <a href="mailto:taylor.clarkjones25@gmail.com" class="email-link" id="emailLink">
-            taylor.clarkjones25@gmail.com
-          </a>
+          <a href="#" id="emailLink" class="email-link">taylor.clarkjones25@gmail.com</a>
         </span>
       </p>
       <p>Art by Andre Clark</p>
     `;
-
-    // Attach email popup fallback handler
-    const emailLink = footer.querySelector("#emailLink");
-    if (emailLink) {
-      const email = "taylor.clarkjones25@gmail.com";
-      const subject = "Williams Family Reunion Registration";
-      const body =
-        "Hi Taylor,%0A%0AI'd like to register or learn more about the reunion.%0A%0AThanks,%0A[Your Name]";
-
-      emailLink.addEventListener("click", (e) => {
-        e.preventDefault();
-        const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(
-          subject
-        )}&body=${body}`;
-        const popup = window.open(gmailURL, "gmailCompose", "width=700,height=600");
-
-        setTimeout(() => {
-          if (!popup || popup.closed) {
-            window.location.href = `mailto:${email}?subject=${encodeURIComponent(
-              subject
-            )}&body=${body}`;
-          }
-        }, 600);
-      });
-    }
   }
+
+  // ✅ attach the unified popup handler
+  setupEmailPopup();
 }
 
 // Logout Button
@@ -95,28 +73,25 @@ export function requireAuth() {
   }
 }
 
-// 📧 Restore footer email popup behavior (mobile + desktop fix)
+// ✅ Unified popup (desktop Gmail + mobile mailto fallback)
 export function setupEmailPopup() {
   const emailLink = document.querySelector("#emailLink");
   if (!emailLink) return;
 
   const email = "taylor.clarkjones25@gmail.com";
   const subject = "Williams Family Reunion Registration";
-  const body = `Hi Taylor,
-
-I'd like to register or learn more about the reunion.
-
-Thanks,
-[Your Name]`;
+  const body =
+    "Hi Taylor,%0A%0AI'd like to register or learn more about the reunion.%0A%0AThanks,%0A[Your Name]";
 
   emailLink.addEventListener("click", (e) => {
     e.preventDefault();
 
-    const encSubj = encodeURIComponent(subject);
-    const encBody = encodeURIComponent(body);
-
-    const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encSubj}&body=${encBody}`;
-    const mailtoURL = `mailto:${email}?subject=${encSubj}&body=${encBody}`;
+    const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(
+      subject
+    )}&body=${body}`;
+    const mailtoURL = `mailto:${email}?subject=${encodeURIComponent(
+      subject
+    )}&body=${body}`;
 
     const ua = navigator.userAgent || navigator.vendor || window.opera;
     const isIOS = /iPad|iPhone|iPod/.test(ua);
@@ -124,9 +99,10 @@ Thanks,
     const isMobile = isIOS || isAndroid;
 
     if (isMobile) {
-      if (isAndroid) window.location.href = mailtoURL;
-      else if (isIOS) setTimeout(() => (window.location.href = mailtoURL), 100);
+      // Mobile: fallback directly to mailto
+      window.location.href = mailtoURL;
     } else {
+      // Desktop: open Gmail popup
       const popup = window.open(
         gmailURL,
         "gmailCompose",
@@ -134,9 +110,13 @@ Thanks,
           window.innerHeight / 2 - 300
         }`
       );
-      if (!popup || popup.closed || typeof popup.closed === "undefined") {
-        window.location.href = mailtoURL;
-      }
+
+      // If Gmail popup blocked → fallback to mailto
+      setTimeout(() => {
+        if (!popup || popup.closed || typeof popup.closed === "undefined") {
+          window.location.href = mailtoURL;
+        }
+      }, 500);
     }
   });
 }
