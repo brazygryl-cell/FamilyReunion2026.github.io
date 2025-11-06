@@ -33,12 +33,6 @@
     <h2>Family Forum</h2>
     <p>Talk, plan, and share updates.</p>
 
-    <!-- Tabs -->
-    <div class="tabs-container">
-      <button class="forum-tab active" data-topic="general">General</button>
-      <button class="forum-tab" data-topic="planning">Planning</button>
-    </div>
-
     <!-- Post box -->
     <div id="postBox">
       <textarea id="postBody" placeholder="Write your message..."></textarea>
@@ -58,8 +52,9 @@ const API = "/.netlify/functions/forum";
 
 async function loadPosts() {
   try {
-    const res = await fetch(API);
+    const res = await fetch("/.netlify/functions/forum");
     const posts = await res.json();
+
 
     const container = document.getElementById("posts");
     container.innerHTML = posts.length ? "" : "No posts yet.";
@@ -82,20 +77,18 @@ document.getElementById("submitPost").addEventListener("click", async () => {
   const body = document.getElementById("postBody").value.trim();
   if (!body) return;
 
-  const user = window.netlifyIdentity.currentUser();
+  const user = netlifyIdentity.currentUser();
   const email = user ? user.email : "anonymous";
 
-  await fetch(API, {
+  await fetch("/.netlify/functions/forum", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ body, email })
   });
 
   document.getElementById("postBody").value = "";
   loadPosts();
 });
-
-// Load posts on page open:
-loadPosts();
 </script>
 
 
