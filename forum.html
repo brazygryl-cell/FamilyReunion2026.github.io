@@ -265,6 +265,13 @@
           message,
           timestamp: Date.now()
         });
+        // 🧩 Immediately update the visible comment count
+const countEl = section.querySelector(".count");
+if (countEl) {
+  const newCount = parseInt(countEl.textContent || "0", 10) + 1;
+  countEl.textContent = newCount;
+}
+
         input.value = "";
         nameField.value = "";
         if (detailsEl.open || !firstOpenLoaded) {
