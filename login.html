@@ -92,8 +92,8 @@
 
 <p class="invite-note">
   Registration is <strong>by invite only</strong>.<br/>
-  <a href="mailto:taylor.clarkjones25@gmail.com?subject=Family%20Reunion%20Registration">
-    Email Taylor to Request Access
+  <a href="mailto:taylor.clarkjones25@gmail.com?subject=Family%20Reunion%20Registration&body=Hello%20Taylor%2C%0A%0AI%20would%20like%20to%20request%20access%20to%20the%20Family%20Reunion%20website.%0A%0AThank%20you!">
+    📧 Email Taylor to Request Access
   </a>
 </p>
 
@@ -109,11 +109,14 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => {
       window.netlifyIdentity.open("login");
 
-      // 🖤 Apply dark theme override after modal injects
+      // 🖤 Apply dark theme override + hide email login fields
       setTimeout(() => {
         const iframe = document.querySelector("iframe[src*='identity']");
+        if (!iframe) return;
 
-        if (iframe) {
+        iframe.addEventListener("load", () => {
+          const doc = iframe.contentDocument || iframe.contentWindow.document;
+
           const style = document.createElement("style");
           style.textContent = `
             body {
@@ -135,13 +138,18 @@ document.addEventListener("DOMContentLoaded", () => {
             a, .link {
               color: #7EE0C2 !important;
             }
+            /* 🚫 Hide Email/Password fields, login button, etc. */
+            form[action*="/token"] input[name="email"],
+            form[action*="/token"] input[name="password"],
+            form[action*="/token"] button[type="submit"],
+            form[action*="/token"] a[href*="recover"],
+            form[action*="/token"] hr {
+              display: none !important;
+            }
           `;
-          iframe.onload = () => {
-            const doc = iframe.contentDocument || iframe.contentWindow.document;
-            doc.head.appendChild(style);
-          };
-        }
-      }, 300);
+          doc.head.appendChild(style);
+        });
+      }, 400);
     });
 
     // After login → go home
@@ -154,4 +162,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
-
