@@ -95,9 +95,25 @@
 
     <!-- Post box -->
     <form id="forumForm" novalidate style="display:none;">
-      <textarea id="postBody" name="message" placeholder="Write your message..." required></textarea>
-      <button id="submitPost" type="submit">Post</button>
-    </form>
+  <input
+    type="text"
+    id="posterName"
+    name="posterName"
+    placeholder="Your name (optional)"
+    maxlength="40"
+    style="
+      width:100%;
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid var(--border);
+      background:#111;
+      color:var(--text);
+      margin-bottom:10px;
+      font-size:1.05rem;"
+  />
+  <textarea id="postBody" name="message" placeholder="Write your message..." required></textarea>
+  <button id="submitPost" type="submit">Post</button>
+</form>
 
     <p id="postStatus" class="status-message"></p>
     <div id="posts">Loading posts...</div>
