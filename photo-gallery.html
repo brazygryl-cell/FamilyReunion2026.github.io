@@ -134,24 +134,92 @@
   <img src="images/img58.jpg" alt="">
 </section>
 
-<div id="lightbox"><img src=""></div>
+<!-- Lightbox -->
+<div id="lightbox">
+  <button class="nav-btn prev" aria-label="Previous image">❮</button>
+  <img src="">
+  <button class="nav-btn next" aria-label="Next image">❯</button>
+</div>
 
-<footer></footer>
+<style>
+  #lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+    display: none;
+    place-items: center;
+    z-index: 999;
+  }
+  #lightbox img {
+    max-width: 90%;
+    max-height: 90vh;
+    border-radius: 14px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.3);
+    transition: transform 0.2s ease;
+  }
+  .nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: none;
+    font-size: 2rem;
+    padding: 0.4em 0.6em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.3); }
+  .nav-btn.prev { left: 4%; }
+  .nav-btn.next { right: 4%; }
+
+  @media (max-width: 600px) {
+    .nav-btn { font-size: 1.6rem; padding: 0.3em 0.5em; }
+  }
+</style>
 
 <!-- Lightbox JS -->
 <script>
+const imgs = Array.from(document.querySelectorAll(".gallery-grid img"));
 const lightbox = document.getElementById("lightbox");
 const lightboxImg = lightbox.querySelector("img");
+const prevBtn = lightbox.querySelector(".prev");
+const nextBtn = lightbox.querySelector(".next");
+let currentIndex = 0;
 
-document.querySelectorAll(".gallery-grid img").forEach(img => {
-  img.addEventListener("click", () => {
-    lightboxImg.src = img.src;
-    lightbox.style.display = "grid";
-  });
+function showImage(index) {
+  currentIndex = (index + imgs.length) % imgs.length;
+  lightboxImg.src = imgs[currentIndex].src;
+  lightbox.style.display = "grid";
+}
+
+imgs.forEach((img, i) => {
+  img.addEventListener("click", () => showImage(i));
 });
 
-lightbox.addEventListener("click", () => {
+function closeLightbox() {
   lightbox.style.display = "none";
+}
+
+lightbox.addEventListener("click", (e) => {
+  if (e.target === lightbox) closeLightbox();
+});
+prevBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  showImage(currentIndex - 1);
+});
+nextBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  showImage(currentIndex + 1);
+});
+
+// Keyboard navigation
+document.addEventListener("keydown", (e) => {
+  if (lightbox.style.display !== "grid") return;
+  if (e.key === "ArrowLeft") showImage(currentIndex - 1);
+  if (e.key === "ArrowRight") showImage(currentIndex + 1);
+  if (e.key === "Escape") closeLightbox();
 });
 </script>
 
