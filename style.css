@@ -338,5 +338,45 @@ transition: background 0.3s ease;
   filter: brightness(1.1);
 }
 
+/* --- Forum Chat Bubbles (accessible + dark mode consistent) --- */
+.post {
+  background: linear-gradient(180deg, #161a24 0%, #10131b 100%);
+  border-left: 4px solid var(--mint-2);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 1.2rem;
+  color: var(--text);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+  font-size: 1.05rem; /* larger text for readability */
+  line-height: 1.7;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.post:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+}
+
+.meta {
+  font-size: 0.95rem;
+  color: var(--muted);
+  margin-top: 10px;
+  display: block;
+  font-style: italic;
+}
+
+/* visually separate the user's own posts */
+.post.mine {
+  background: linear-gradient(180deg, #1a2b26 0%, #152520 100%);
+  border-left-color: var(--mint);
+}
+
+/* Make all text slightly larger for accessibility site-wide */
+body {
+  font-size: 1.05rem;
+  letter-spacing: 0.3px;
+}
+
+
 
 
