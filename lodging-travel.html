@@ -10,6 +10,7 @@
 <script type="module" src="nav.js"></script>
 
 <style>
+/* 🌅 Hero Slideshow */
 #lodging-hero {
   position: relative;
   height: 70vh;
@@ -17,6 +18,7 @@
   border-radius: 0 0 40px 40px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.4);
 }
+
 #lodging-hero .slide {
   position: absolute;
   inset: 0;
@@ -27,6 +29,22 @@
   transition: opacity 2s ease-in-out, transform 6s ease-in-out;
 }
 #lodging-hero .slide.active { opacity: 1; transform: scale(1); }
+
+/* ☁️ Cloud overlay effect */
+#lodging-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url('images/clouds.png') repeat-x;
+  opacity: 0.15;
+  animation: driftClouds 120s linear infinite;
+  z-index: 0;
+}
+@keyframes driftClouds {
+  0% { background-position: 0 0; }
+  100% { background-position: -2000px 0; }
+}
+
 #lodging-hero::after {
   content: "";
   position: absolute;
@@ -34,6 +52,7 @@
   background: rgba(0,0,0,0.55);
   z-index: 1;
 }
+
 #lodging-hero .overlay {
   position: absolute;
   top: 50%;
@@ -47,6 +66,7 @@
 #lodging-hero h1 { font-family: "Playfair Display", serif; font-size: clamp(2rem, 5vw, 3.2rem); }
 #lodging-hero p { font-size: 1.2rem; }
 
+/* Cards / Grid */
 .lodging-grid {
   display: grid;
   gap: 1.8rem;
@@ -57,13 +77,25 @@
   height: 230px;
   border-radius: 14px;
   border: none;
+  filter: grayscale(20%) contrast(1.05);
+  transition: filter 0.4s ease;
+}
+.map-frame iframe:hover { filter: none; }
+
+/* ✨ Card Hover Glow */
+.card.pad {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card.pad:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(126,224,194,0.2);
 }
 </style>
 </head>
 
 <body>
 
-  <script>
+<script>
   if (window.netlifyIdentity) {
     window.netlifyIdentity.on("init", user => {
       if (!user && !window.location.pathname.includes("login.html")) {
@@ -120,9 +152,25 @@
     <h3>Before You Travel</h3>
     <ul>
       <li>Bring a <strong>Real ID</strong> or passport for TSA</li>
-      <li> <strong> NO SMOKING INSIDE THE HOUSE OR ON THE PROPERTY!</strong></li>
+      <li>Share flight details for shuttle planning</li>
+      <li>Reserve group vans early</li>
     </ul>
-    <p>Questions? Email our <a href="mailto:familyreunionwilliams2026@gmail.com">Lead Coordinator: ShaSha Clark</a></p>
+    <p>
+      Questions? 
+      <a href="#" id="emailShasha">📧 Email our Lead Coordinator: ShaSha Clark</a>
+    </p>
+  </div>
+
+  <!-- 🏝️ New Info Box -->
+  <div class="card pad" style="margin-top:1.5rem;">
+    <h3>Nearby Attractions</h3>
+    <ul>
+      <li>🎢 <strong>Universal Orlando</strong> – 10 minutes from the resort</li>
+      <li>🐭 <strong>Walt Disney World</strong> – 20 minutes by car</li>
+      <li>🛍️ <strong>Vineland Premium Outlets</strong> – 15 minutes away</li>
+      <li>🍽️ <strong>ICON Park</strong> – family restaurants & nightlife</li>
+    </ul>
+    <p>Plan a free day for fun, shopping, or relaxing by your villa pool!</p>
   </div>
 </section>
 
@@ -139,6 +187,49 @@ setInterval(() => {
 }, 8000);
 </script>
 
+<!-- 📧 Email Popup Fix for ShaSha -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const emailLink = document.getElementById("emailShasha");
+  if (!emailLink) return;
+
+  const email = "familyreunionwilliams2026@gmail.com";
+  const subject = "Williams Family Reunion Travel Question";
+  const body =
+    "Hi ShaSha,%0A%0AI had a question about lodging or travel.%0A%0AThanks,%0A[Your Name]";
+
+  emailLink.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(
+      subject
+    )}&body=${body}`;
+    const mailtoURL = `mailto:${email}?subject=${encodeURIComponent(
+      subject
+    )}&body=${body}`;
+
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isMobile = /iPad|iPhone|iPod|Android/.test(ua);
+
+    if (isMobile) {
+      window.location.href = mailtoURL;
+    } else {
+      const popup = window.open(
+        gmailURL,
+        "gmailCompose",
+        `width=700,height=600,left=${window.innerWidth / 2 - 350},top=${window.innerHeight / 2 - 300}`
+      );
+
+      setTimeout(() => {
+        if (!popup || popup.closed || typeof popup.closed === "undefined") {
+          window.location.href = mailtoURL;
+        }
+      }, 500);
+    }
+  });
+});
+</script>
+
 <!-- 🔐 Netlify Identity -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
@@ -146,17 +237,14 @@ setInterval(() => {
   import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
 
   document.addEventListener("DOMContentLoaded", () => {
-    // ✅ Require Auth FIRST. Don’t wait for nav to render.
     if (!window.location.pathname.includes("login.html")) {
       requireAuth();
     }
-
-    // Then load UI stuff
     loadNavbar();
     enableLogout();
   });
 </script>
 
-
 </body>
 </html>
+
