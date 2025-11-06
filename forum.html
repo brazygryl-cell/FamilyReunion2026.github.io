@@ -45,18 +45,8 @@
     <p>Talk, plan, and share updates.</p>
 
     <!-- Post box -->
-    <form
-      id="forumForm"
-      name="forum-post"
-      method="POST"
-      data-netlify="true"
-      netlify-honeypot="bot-field"
-      novalidate
-    >
-      <input type="hidden" name="form-name" value="forum-post" />
-      <p class="sr-only" hidden>
-        <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
-      </p>
+  <form id="forumForm" novalidate>
+      
       <input type="hidden" name="email" id="postEmail" value="" />
       <textarea
         id="postBody"
