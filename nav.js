@@ -34,13 +34,15 @@ export function loadNavbar() {
         Made with ❤️ by <strong>Taylor Clark Jones</strong><br>
         <span style="font-size:0.95rem; color:var(--muted);">
           📧 Email ShaSha:
-          <a href="#" id="emailLink" class="email-link">familyreunionwilliams2026@gmail.com</a>
+          <a href="#" id="emailLink" class="email-link">
+            familyreunionwilliams2026@gmail.com
+          </a>
         </span>
       </p>
     `;
   }
 
-  // ✅ attach the unified popup handler
+  // ✅ Attach unified popup handler
   setupEmailPopup();
 }
 
@@ -68,7 +70,6 @@ export function requireAuth() {
   const user = window.netlifyIdentity.currentUser();
   if (!user) {
     window.location.href = "login.html";
-    return;
   }
 }
 
@@ -78,7 +79,7 @@ export function setupEmailPopup() {
   if (!emailLink) return;
 
   const email = "familyreunionwilliams2026@gmail.com";
-  const subject = "Williams Family Reunion Questions;
+  const subject = "Williams Family Reunion Questions";
   const body =
     "Hi ShaSha,%0A%0AI'd like to learn more about the reunion.%0A%0AThanks,%0A[Your Name]";
 
@@ -98,10 +99,10 @@ export function setupEmailPopup() {
     const isMobile = isIOS || isAndroid;
 
     if (isMobile) {
-      // Mobile: fallback directly to mailto
+      // 📱 Mobile: fallback directly to mailto
       window.location.href = mailtoURL;
     } else {
-      // Desktop: open Gmail popup
+      // 💻 Desktop: open Gmail popup
       const popup = window.open(
         gmailURL,
         "gmailCompose",
