@@ -86,6 +86,7 @@ export function requireAuth() {
 }
 
 // Restore footer email popup behavior
+// Restore footer email popup behavior (mobile + desktop safe)
 export function setupEmailPopup() {
   const emailLink = document.querySelector("#emailLink");
   if (!emailLink) return;
@@ -101,23 +102,30 @@ export function setupEmailPopup() {
     const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(
       subject
     )}&body=${body}`;
+    const mailtoURL = `mailto:${email}?subject=${encodeURIComponent(
+      subject
+    )}&body=${body}`;
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    const popup = window.open(
-      gmailURL,
-      "gmailCompose",
-      "width=700,height=600,left=" +
-        (window.innerWidth / 2 - 350) +
-        ",top=" +
-        (window.innerHeight / 2 - 300)
-    );
+    if (isMobile) {
+      // 📱 On mobile → open native mail app
+      window.location.href = mailtoURL;
+    } else {
+      // 💻 On desktop → open centered Gmail popup
+      const popup = window.open(
+        gmailURL,
+        "gmailCompose",
+        "width=700,height=600,left=" +
+          (window.innerWidth / 2 - 350) +
+          ",top=" +
+          (window.innerHeight / 2 - 300)
+      );
 
-    // If Gmail cannot open → fall back to mailto
-    setTimeout(() => {
+      // Fallback if popup blocked
       if (!popup || popup.closed || typeof popup.closed === "undefined") {
-        window.location.href = `mailto:${email}?subject=${encodeURIComponent(
-          subject
-        )}&body=${body}`;
+        window.location.href = mailtoURL;
       }
-    }, 600);
+    }
   });
 }
+
