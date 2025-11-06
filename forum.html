@@ -52,6 +52,30 @@
 
     <p id="postStatus" class="status-message"></p>
 
+    <!-- Post box -->
+    <form
+      id="forumForm"
+      name="forum-post"
+      method="POST"
+      data-netlify="true"
+      netlify-honeypot="bot-field"
+      novalidate
+    >
+      <input type="hidden" name="form-name" value="forum-post" />
+      <p class="sr-only" hidden>
+        <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
+      </p>
+      <input type="hidden" name="email" id="postEmail" value="" />
+      <textarea
+        id="postBody"
+        name="message"
+        placeholder="Write your message..."
+      ></textarea>
+      <button id="submitPost" type="submit">Post</button>
+    </form>
+
+    <p id="postStatus" class="status-message"></p>
+
     <!-- Posts -->
     <div id="posts">No posts yet.</div>
 
@@ -66,6 +90,8 @@ const postsContainer = document.getElementById("posts");
 const statusMessage = document.getElementById("postStatus");
 const submitButton = document.getElementById("submitPost");
 const postField = document.getElementById("postBody");
+const postEmailField = document.getElementById("postEmail");
+const form = document.getElementById("forumForm");
 
 function showStatus(message = "", type = "") {
   if (!statusMessage) return;
@@ -101,7 +127,8 @@ async function loadPosts() {
   }
 }
 
-submitButton.addEventListener("click", async () => {
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
   const body = postField.value.trim();
   if (!body) {
     showStatus("Please write something before posting.", "info");
@@ -110,6 +137,9 @@ submitButton.addEventListener("click", async () => {
 
   const user = window.netlifyIdentity && window.netlifyIdentity.currentUser();
   const email = user ? user.email : "anonymous";
+  if (postEmailField) {
+    postEmailField.value = email;
+  }
 
   try {
     submitButton.disabled = true;
