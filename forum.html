@@ -251,41 +251,51 @@
       }
     });
 
-    sendBtn.addEventListener("click", async () => {
-      const message = input.value.trim();
-      const name = nameField.value.trim() || "Family Member";
-      if (!message) return;
+   sendBtn.addEventListener("click", async () => {
+  const message = input.value.trim();
+  const name = nameField.value.trim() || "Family Member";
+  if (!message) return;
 
-      const commentsCol = collection(db, "posts", postId, "comments");
-      try {
-        sendBtn.disabled = true;
-        await addDoc(commentsCol, {
-          name,
-          email: currentUser?.email || "anonymous",
-          message,
-          timestamp: Date.now()
-        });
-        // 🧩 Immediately update the visible comment count
-const countEl = section.querySelector(".count");
-if (countEl) {
-  const newCount = parseInt(countEl.textContent || "0", 10) + 1;
-  countEl.textContent = newCount;
-}
+  const commentsCol = collection(db, "posts", postId, "comments");
+  try {
+    sendBtn.disabled = true;
 
-        input.value = "";
-        nameField.value = "";
-        if (detailsEl.open || !firstOpenLoaded) {
-          await loadComments(postId, section, currentUser?.email || "");
-        }
-      } catch (e) {
-        console.error("Failed to add comment:", e);
-        showStatus("Could not add comment. Please try again.", "error");
-      } finally {
-        sendBtn.disabled = false;
-      }
+    await addDoc(commentsCol, {
+      name,
+      email: currentUser?.email || "anonymous",
+      message,
+      timestamp: Date.now()
     });
-  }
 
+    // 🧩 Immediately update visible comment count — even if details are closed
+    const summary = section.querySelector(".comment-summary");
+    if (summary) {
+      const countEl = summary.querySelector(".count");
+      if (countEl) {
+        const newCount = parseInt(countEl.textContent || "0", 10) + 1;
+        countEl.textContent = newCount;
+
+        // Optional: little bounce animation for feedback
+        countEl.style.transform = "scale(1.3)";
+        countEl.style.transition = "transform 0.2s ease";
+        setTimeout(() => (countEl.style.transform = "scale(1)"), 200);
+      }
+    }
+
+    input.value = "";
+    nameField.value = "";
+
+    if (detailsEl.open || !firstOpenLoaded) {
+      await loadComments(postId, section, currentUser?.email || "");
+    }
+  } catch (e) {
+    console.error("Failed to add comment:", e);
+    showStatus("Could not add comment. Please try again.", "error");
+  } finally {
+    sendBtn.disabled = false;
+  }
+});
+  }
   async function loadPosts(currentUser) {
     try {
       const q = query(postsCol, orderBy("timestamp", "desc"));
