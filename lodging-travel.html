@@ -8,34 +8,10 @@
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <!-- ✅ Login Page: Custom email popup for Taylor -->
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const emailLink = document.querySelector("#emailLink");
-  const email = "taylor.clarkjones25@gmail.com";
-  const subject = "Williams Family Reunion Registration";
-  const body = "Hi Taylor,%0A%0AI'd like to register or learn more about the reunion.%0A%0AThanks,%0A[Your Name]";
-
-  if (!emailLink) return;
-
-  emailLink.addEventListener("click", (e) => {
-    e.preventDefault();
-
-    const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(subject)}&body=${body}`;
-    const popup = window.open(
-      gmailURL,
-      "gmailCompose",
-      `width=700,height=600,left=${window.innerWidth / 2 - 350},top=${window.innerHeight / 2 - 300}`
-    );
-
-    // Fallback if Gmail blocked or user not signed in
-    setTimeout(() => {
-      if (!popup || popup.closed || typeof popup.closed === "undefined") {
-        window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${body}`;
-      }
-    }, 600);
-  });
-});
+<script type="module">
+  import { setupEmailPopup } from "./nav.js";
 </script>
+
 
 <style>
 /* 🌅 Hero Slideshow */
