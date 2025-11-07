@@ -22,7 +22,6 @@
   border-radius: 0 0 40px 40px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.4);
 }
-
 #lodging-hero .slide {
   position: absolute;
   inset: 0;
@@ -37,8 +36,7 @@
 /* ☁️ Cloud overlay effect */
 #lodging-hero::before {
   content: "";
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background: url('images/clouds.png') repeat-x;
   opacity: 0.15;
   animation: driftClouds 120s linear infinite;
@@ -48,24 +46,14 @@
   0% { background-position: 0 0; }
   100% { background-position: -2000px 0; }
 }
-
 #lodging-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  z-index: 1;
+  content: ""; position: absolute; inset: 0;
+  background: rgba(0,0,0,0.55); z-index: 1;
 }
-
 #lodging-hero .overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+  position: absolute; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  text-align: center;
-  color: #fff;
-  z-index: 2;
-  max-width: 800px;
+  text-align: center; color: #fff; z-index: 2; max-width: 800px;
 }
 #lodging-hero h1 { font-family: "Playfair Display", serif; font-size: clamp(2rem, 5vw, 3.2rem); }
 #lodging-hero p { font-size: 1.2rem; }
@@ -75,14 +63,10 @@
   display: grid;
   gap: 1.8rem;
   margin: 2.5rem 0;
-/* 🌍 Fix map display on mobile */
-.map-frame {
-  width: 100%;
-  overflow: hidden;
-  border-radius: 14px;
-  margin-top: 1rem;
-}
+} /* 👈 this was missing */
 
+/* 🌍 Map frame */
+.map-frame { width: 100%; overflow: hidden; border-radius: 14px; margin-top: 1rem; }
 .map-frame iframe {
   width: 100%;
   height: 300px;
@@ -90,39 +74,19 @@
   border-radius: 14px;
   display: block;
 }
-  /* ✅ Responsive fix for mobile layout */
-@media (max-width: 768px) {
-  .lodging-grid {
-    grid-template-columns: 1fr !important;
-  }
-  .map-frame iframe {
-    width: 100% !important;
-    height: 260px !important;
-  }
-  .lodging-grid .card {
-    margin-bottom: 1.5rem;
-  }
-}
 
-/* On smaller screens, ensure full width + spacing */
+/* ✅ Responsive fix for mobile layout */
 @media (max-width: 768px) {
-  .map-frame iframe {
-    height: 260px;
-  }
-  .lodging-grid {
-    grid-template-columns: 1fr;
-  }
+  .lodging-grid { grid-template-columns: 1fr !important; }
+  .lodging-grid .card { margin-bottom: 1.5rem; }
+  .map-frame iframe { height: 260px !important; }
 }
 
 /* ✨ Card Hover Glow */
-.card.pad {
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-.card.pad:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 30px rgba(126,224,194,0.2);
-}
+.card.pad { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+.card.pad:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(126,224,194,0.2); }
 </style>
+  
 </head>
 
 <body>
