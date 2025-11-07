@@ -90,6 +90,19 @@
   border-radius: 14px;
   display: block;
 }
+  /* ✅ Responsive fix for mobile layout */
+@media (max-width: 768px) {
+  .lodging-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .map-frame iframe {
+    width: 100% !important;
+    height: 260px !important;
+  }
+  .lodging-grid .card {
+    margin-bottom: 1.5rem;
+  }
+}
 
 /* On smaller screens, ensure full width + spacing */
 @media (max-width: 768px) {
