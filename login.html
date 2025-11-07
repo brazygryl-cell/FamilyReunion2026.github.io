@@ -8,31 +8,61 @@
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
  <!-- ✅ Login Page: Custom email popup for Taylor -->
+<!-- ✅ Login Page: Mobile-friendly email popup for Taylor -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const emailLink = document.querySelector("#emailLink");
+  if (!emailLink) return;
+
   const email = "taylor.clarkjones25@gmail.com";
   const subject = "Williams Family Reunion Registration";
-  const body = "Hi Taylor,%0A%0AI'd like to register or learn more about the reunion.%0A%0AThanks,%0A[Your Name]";
+  const body = `Hi Taylor,
 
-  if (!emailLink) return;
+I'd like to register or learn more about the reunion.
+
+Thanks,
+[Your Name]`;
 
   emailLink.addEventListener("click", (e) => {
     e.preventDefault();
 
-    const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(subject)}&body=${body}`;
-    const popup = window.open(
-      gmailURL,
-      "gmailCompose",
-      `width=700,height=600,left=${window.innerWidth / 2 - 350},top=${window.innerHeight / 2 - 300}`
-    );
+    const encSubj = encodeURIComponent(subject);
+    const encBody = encodeURIComponent(body);
 
-    // Fallback if Gmail blocked or user not signed in
-    setTimeout(() => {
-      if (!popup || popup.closed || typeof popup.closed === "undefined") {
-        window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${body}`;
+    const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encSubj}&body=${encBody}`;
+    const mailtoURL = `mailto:${email}?subject=${encSubj}&body=${encBody}`;
+
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    const isAndroid = /Android/.test(ua);
+    const isMobile = isIOS || isAndroid;
+
+    if (isMobile) {
+      // 📱 mobile devices use mailto directly
+      if (isAndroid) {
+        window.location.href = mailtoURL;
+      } else if (isIOS) {
+        setTimeout(() => {
+          window.location.href = mailtoURL;
+        }, 100);
       }
-    }, 600);
+    } else {
+      // 💻 desktop → Gmail popup
+      const popup = window.open(
+        gmailURL,
+        "gmailCompose",
+        `width=700,height=600,left=${window.innerWidth / 2 - 350},top=${
+          window.innerHeight / 2 - 300
+        }`
+      );
+
+      // fallback if popup blocked
+      setTimeout(() => {
+        if (!popup || popup.closed || typeof popup.closed === "undefined") {
+          window.location.href = mailtoURL;
+        }
+      }, 600);
+    }
   });
 });
 </script>
