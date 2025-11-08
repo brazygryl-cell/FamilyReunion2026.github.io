@@ -179,27 +179,18 @@ setInterval(() => {
 }, 1000);
 </script>
 
-<!-- 🔐 Netlify Identity -->
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
 <script type="module">
-  import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-
+  import { loadNavbar, enableLogout, requireAuthFirebase } from "./nav.js";
   document.addEventListener("DOMContentLoaded", () => {
-    // ✅ Require Auth FIRST. Don’t wait for nav to render.
-    if (!window.location.pathname.includes("login.html")) {
-      requireAuth();
-    }
-
-    // Then load UI stuff
+    requireAuthFirebase();
     loadNavbar();
-    enableLogout();
   });
 </script>
 
 
 </body>
 </html>
+
 
 
 
