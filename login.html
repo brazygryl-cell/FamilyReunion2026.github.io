@@ -96,65 +96,54 @@
 
 <!-- ✅ Firebase login logic -->
 <script type="module">
-  import { auth, db } from "./firebase-init.js";
-  import {
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    onAuthStateChanged,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-  import { doc, getDoc, setDoc } 
-    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  import { auth } from "./firebase-init.js";
+  import { createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-  const emailEl = document.getElementById("email");
-  const passEl  = document.getElementById("password");
   const loginBtn = document.getElementById("loginBtn");
-  const signupBtn = document.getElementById("signupBtn");
-  const errorMsg = document.getElementById("errorMsg");
+  const emailInput = document.createElement("input");
+  const passInput = document.createElement("input");
+  const wrapper = document.querySelector(".login-card");
 
-  function showError(msg){ errorMsg.textContent = msg; }
+  emailInput.placeholder = "Email";
+  emailInput.type = "email";
+  emailInput.id = "emailInput";
+  emailInput.style.cssText = "width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:1px solid #333;";
+  passInput.placeholder = "Password";
+  passInput.type = "password";
+  passInput.id = "passwordInput";
+  passInput.style.cssText = "width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:1px solid #333;";
 
-  // 🔑 Sign In
+  wrapper.insertBefore(emailInput, loginBtn);
+  wrapper.insertBefore(passInput, loginBtn);
+
+  loginBtn.textContent = "Create Account / Log In";
+
   loginBtn.addEventListener("click", async () => {
+    const email = emailInput.value.trim();
+    const password = passInput.value.trim();
+    if (!email || !password) return alert("Please enter both email and password.");
+
     try {
-      const userCred = await signInWithEmailAndPassword(auth, emailEl.value, passEl.value);
-      const user = userCred.user;
-      const ref = doc(db, "approvedUsers", user.email);
-      const snap = await getDoc(ref);
-
-      if (snap.exists() && snap.data().approved === true) {
-        window.location.href = "index.html";
-      } else {
-        showError("Your account is pending approval. Please contact the coordinator.");
-        await signOut(auth);
-      }
-    } catch (err) {
-      console.error(err);
-      showError("Invalid credentials or network error. Please try again.");
-    }
-  });
-
-  // 🆕 Sign Up (creates unapproved account)
-  signupBtn.addEventListener("click", async () => {
-    try {
-      const userCred = await createUserWithEmailAndPassword(auth, emailEl.value, passEl.value);
-      const user = userCred.user;
-      await setDoc(doc(db, "approvedUsers", user.email), { approved:false });
-      showError("Account created! Await coordinator approval before you can log in.");
-      await signOut(auth);
-    } catch (err) {
-      console.error(err);
-      showError("Could not create account. Try again or use another email.");
-    }
-  });
-
-  // 🚪 Redirect approved users directly in
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) return;
-    const ref = doc(db, "approvedUsers", user.email);
-    const snap = await getDoc(ref);
-    if (snap.exists() && snap.data().approved === true) {
+      // Try to sign in first
+      await signInWithEmailAndPassword(auth, email, password);
+      alert("✅ Logged in successfully!");
       window.location.href = "index.html";
+    } catch (signInError) {
+      if (signInError.code === "auth/user-not-found") {
+        // If user doesn’t exist → create account
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+          alert("✅ Account created successfully!");
+          window.location.href = "index.html";
+        } catch (createError) {
+          console.error(createError);
+          alert("❌ " + createError.message);
+        }
+      } else {
+        console.error(signInError);
+        alert("❌ " + signInError.message);
+      }
     }
   });
 </script>
