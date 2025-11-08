@@ -83,7 +83,7 @@
 <input id="emailInput" type="email" placeholder="Email address" required />
 <input id="passwordInput" type="password" placeholder="Password" required />
 
-<button id="loginBtn" class="login-btn">Create Account / Log In</button>
+<button id="loginBtn" class="login-btn">Log In</button>
 <button id="createBtn" class="login-btn" style="margin-top:10px;background:#7EE0C2;color:#000;">
   Create Account
 </button>
@@ -109,27 +109,25 @@
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
   const loginBtn = document.getElementById("loginBtn");
-  const createBtn = document.getElementById("createBtn");
-
   const emailInput = document.getElementById("emailInput");
   const passwordInput = document.getElementById("passwordInput");
 
-  // 🔹 Helper: Approval check
   async function isApproved(email) {
     const ref = doc(db, "approvedUsers", email);
     const snap = await getDoc(ref);
     return snap.exists() && snap.data().approved === true;
   }
 
-  // 🔹 LOGIN existing account
   loginBtn.addEventListener("click", async () => {
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
     if (!email || !password) return alert("Please enter both email and password.");
 
     try {
-      const cred = await signInWithEmailAndPassword(auth, email, password);
+      // Try login first
+      await signInWithEmailAndPassword(auth, email, password);
       const approved = await isApproved(email);
+
       if (approved) {
         alert("✅ Welcome back! Redirecting...");
         window.location.href = "index.html";
@@ -137,29 +135,23 @@
         alert("⚠️ Your account is pending approval. Please email Taylor.");
         await signOut(auth);
       }
-    } catch (err) {
-      console.error(err);
-      alert("❌ " + (err.message || "Could not log in."));
-    }
-  });
 
-  // 🔹 CREATE new account
-  createBtn.addEventListener("click", async () => {
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-    if (!email || !password) return alert("Please enter both email and password.");
-
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-
-      // Add to Firestore pending list automatically
-      await setDoc(doc(db, "approvedUsers", email), { approved: false });
-
-      alert("✅ Account created! Your access is pending approval. Please email Taylor.");
-      await signOut(auth);
-    } catch (err) {
-      console.error(err);
-      alert("❌ " + (err.message || "Could not create account."));
+    } catch (error) {
+      if (error.code === "auth/user-not-found") {
+        // Auto-create new account
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+          await setDoc(doc(db, "approvedUsers", email), { approved: false });
+          alert("✅ Account created! Pending approval — please email Taylor.");
+          await signOut(auth);
+        } catch (createError) {
+          alert("❌ " + createError.message);
+        }
+      } else if (error.code === "auth/invalid-credential") {
+        alert("❌ Invalid password. Try again or reset your password.");
+      } else {
+        alert("❌ " + error.message);
+      }
     }
   });
 </script>
