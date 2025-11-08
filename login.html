@@ -15,9 +15,8 @@
       align-items: center;
       min-height: 70vh;
     }
-
     .login-card {
-      background: linear-gradient(180deg, #121624 0%, #0f121a 100%);
+      background: linear-gradient(180deg,#121624 0%,#0f121a 100%);
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 40px 28px;
@@ -26,53 +25,49 @@
       max-width: 460px;
       width: 100%;
     }
-
     .login-card h2 {
       font-family: "Playfair Display", serif;
       font-size: 2rem;
       margin-bottom: 10px;
       color: var(--text);
     }
-
     .login-card p {
       color: var(--muted);
       font-size: 1.05rem;
       margin-bottom: 28px;
       line-height: 1.6;
     }
-
+    input {
+      width:100%;
+      background:#0f121a;
+      border:1px solid var(--border);
+      border-radius:8px;
+      padding:10px 12px;
+      color:var(--text);
+      margin-bottom:12px;
+      font-size:1.05rem;
+    }
     .login-btn {
-      background: var(--mint);
-      color: #000;
-      font-weight: 700;
-      font-size: 1.05rem;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 22px;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      background:var(--mint);
+      color:#000;
+      font-weight:700;
+      font-size:1.05rem;
+      border:none;
+      border-radius:10px;
+      padding:12px 22px;
+      cursor:pointer;
+      transition:all .2s ease;
     }
-    .login-btn:hover {
-      filter: brightness(1.15);
-      transform: scale(1.03);
-    }
-
+    .login-btn:hover { filter:brightness(1.15); transform:scale(1.03); }
     .invite-note {
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.95rem;
-      margin-top: 24px;
+      text-align:center;
+      color:var(--muted);
+      font-size:.95rem;
+      margin-top:24px;
     }
-
-    .invite-note a {
-      color: var(--mint);
-      font-weight: 600;
-      text-decoration: none;
-    }
-    .invite-note a:hover {
-      color: var(--mint-2);
-      text-decoration: underline;
-    }
+    .invite-note a { color:var(--mint); font-weight:600; text-decoration:none; }
+    .invite-note a:hover { color:var(--mint-2); text-decoration:underline; }
+    .error-msg { color:#ff6b6b; margin-top:10px; font-size:.95rem; }
   </style>
 </head>
 
@@ -82,54 +77,78 @@
 
 <section class="section login-wrapper">
   <div class="login-card">
-    <h2>Sign In to Continue</h2>
-    <p>
-      Access is limited to invited family members only.<br />
-      Please sign in with Google to proceed.
-    </p>
+    <h2>Family Login</h2>
+    <p>Sign in or create your account using your email and password.</p>
 
-    <button id="loginBtn" class="login-btn">Sign in with Google</button>
+    <input id="email" type="email" placeholder="Email address" required />
+    <input id="password" type="password" placeholder="Password" required />
+    <button id="loginBtn" class="login-btn">Sign In</button>
+    <button id="signupBtn" class="login-btn" style="margin-top:10px;background:var(--mint-2);">Create Account</button>
+    <p id="errorMsg" class="error-msg"></p>
   </div>
 </section>
 
 <p class="invite-note">
-  Registration is <strong>by invite only</strong>.<br/>
-  <a href="#" id="emailLink">📧 Email Taylor to Request Access</a>
+  Need access? <a href="#" id="emailLink">📧 Email Taylor to Request Approval</a>
 </p>
 
 <footer></footer>
 
 <!-- ✅ Firebase login logic -->
 <script type="module">
-  import { auth, provider, db } from "./firebase-init.js";
-  import { signInWithPopup, onAuthStateChanged, signOut } 
-    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-  import { doc, getDoc } 
+  import { auth, db } from "./firebase-init.js";
+  import {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { doc, getDoc, setDoc } 
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
+  const emailEl = document.getElementById("email");
+  const passEl  = document.getElementById("password");
   const loginBtn = document.getElementById("loginBtn");
+  const signupBtn = document.getElementById("signupBtn");
+  const errorMsg = document.getElementById("errorMsg");
 
+  function showError(msg){ errorMsg.textContent = msg; }
+
+  // 🔑 Sign In
   loginBtn.addEventListener("click", async () => {
     try {
-      const result = await signInWithPopup(auth, provider);
-      const email = result.user?.email;
-
-      const ref = doc(db, "approvedUsers", email);
+      const userCred = await signInWithEmailAndPassword(auth, emailEl.value, passEl.value);
+      const user = userCred.user;
+      const ref = doc(db, "approvedUsers", user.email);
       const snap = await getDoc(ref);
 
       if (snap.exists() && snap.data().approved === true) {
         window.location.href = "index.html";
       } else {
-        alert("Your account is pending approval. Please email the coordinator.");
+        showError("Your account is pending approval. Please contact the coordinator.");
         await signOut(auth);
       }
     } catch (err) {
       console.error(err);
-      alert("Could not sign in. Please try again.");
+      showError("Invalid credentials or network error. Please try again.");
     }
   });
 
-  // Redirect if already signed in and approved
+  // 🆕 Sign Up (creates unapproved account)
+  signupBtn.addEventListener("click", async () => {
+    try {
+      const userCred = await createUserWithEmailAndPassword(auth, emailEl.value, passEl.value);
+      const user = userCred.user;
+      await setDoc(doc(db, "approvedUsers", user.email), { approved:false });
+      showError("Account created! Await coordinator approval before you can log in.");
+      await signOut(auth);
+    } catch (err) {
+      console.error(err);
+      showError("Could not create account. Try again or use another email.");
+    }
+  });
+
+  // 🚪 Redirect approved users directly in
   onAuthStateChanged(auth, async (user) => {
     if (!user) return;
     const ref = doc(db, "approvedUsers", user.email);
@@ -140,40 +159,25 @@
   });
 </script>
 
-<!-- ✅ Custom email popup for Taylor -->
+<!-- ✅ Email popup for Taylor -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const emailLink = document.querySelector("#emailLink");
   const email = "taylor.clarkjones25@gmail.com";
-  const subject = "Williams Family Reunion Registration";
-  const body = "Hi Taylor,%0A%0AI'd like to register or learn more about the reunion.%0A%0AThanks,%0A[Your Name]";
-
+  const subject = "Williams Family Reunion Access Request";
+  const body = "Hi Taylor,%0A%0AI'd like to request access to the family site.%0A%0AThanks,%0A[Your Name]";
   if (!emailLink) return;
-
-  emailLink.addEventListener("click", (e) => {
+  emailLink.addEventListener("click", e => {
     e.preventDefault();
-
     const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(subject)}&body=${body}`;
     const mailtoURL = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${body}`;
-
     const ua = navigator.userAgent || navigator.vendor || window.opera;
-    const isIOS = /iPad|iPhone|iPod/.test(ua);
-    const isAndroid = /Android/.test(ua);
-    const isMobile = isIOS || isAndroid;
-
-    if (isMobile) {
-      window.location.href = mailtoURL;
-    } else {
-      const popup = window.open(
-        gmailURL,
-        "gmailCompose",
-        `width=700,height=600,left=${window.innerWidth / 2 - 350},top=${window.innerHeight / 2 - 300}`
-      );
-      setTimeout(() => {
-        if (!popup || popup.closed || typeof popup.closed === "undefined") {
-          window.location.href = mailtoURL;
-        }
-      }, 600);
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
+    if (isMobile) window.location.href = mailtoURL;
+    else {
+      const popup = window.open(gmailURL,"gmailCompose",
+        `width=700,height=600,left=${window.innerWidth/2-350},top=${window.innerHeight/2-300}`);
+      setTimeout(()=>{ if(!popup||popup.closed||typeof popup.closed==="undefined") window.location.href = mailtoURL; },600);
     }
   });
 });
@@ -181,4 +185,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
-
