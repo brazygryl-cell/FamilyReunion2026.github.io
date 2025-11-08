@@ -7,65 +7,51 @@
 
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
- <!-- ✅ Login Page: Custom email popup for Taylor -->
-<!-- ✅ Login Page: Mobile-friendly email popup for Taylor -->
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const emailLink = document.querySelector("#emailLink");
-  if (!emailLink) return;
 
-  const email = "taylor.clarkjones25@gmail.com";
-  const subject = "Williams Family Reunion Registration";
-  const body = `Hi Taylor,
+<!-- login.html (scripts at the end of body) -->
+<script type="module">
+  import { auth, provider, db } from "./firebase-init.js";
+  import { signInWithPopup, onAuthStateChanged, signOut } 
+    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { doc, getDoc } 
+    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-I'd like to register or learn more about the reunion.
+  const loginBtn = document.getElementById("loginBtn");
 
-Thanks,
-[Your Name]`;
+  // Click → sign in with Google
+  loginBtn.addEventListener("click", async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const email = result.user?.email;
 
-  emailLink.addEventListener("click", (e) => {
-    e.preventDefault();
+      // Check approval
+      const ref = doc(db, "approvedUsers", email);
+      const snap = await getDoc(ref);
 
-    const encSubj = encodeURIComponent(subject);
-    const encBody = encodeURIComponent(body);
-
-    const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encSubj}&body=${encBody}`;
-    const mailtoURL = `mailto:${email}?subject=${encSubj}&body=${encBody}`;
-
-    const ua = navigator.userAgent || navigator.vendor || window.opera;
-    const isIOS = /iPad|iPhone|iPod/.test(ua);
-    const isAndroid = /Android/.test(ua);
-    const isMobile = isIOS || isAndroid;
-
-    if (isMobile) {
-      // 📱 mobile devices use mailto directly
-      if (isAndroid) {
-        window.location.href = mailtoURL;
-      } else if (isIOS) {
-        setTimeout(() => {
-          window.location.href = mailtoURL;
-        }, 100);
+      if (snap.exists() && snap.data().approved === true) {
+        window.location.href = "index.html";
+      } else {
+        alert("Your account is pending approval. Please email the coordinator.");
+        await signOut(auth);
       }
-    } else {
-      // 💻 desktop → Gmail popup
-      const popup = window.open(
-        gmailURL,
-        "gmailCompose",
-        `width=700,height=600,left=${window.innerWidth / 2 - 350},top=${
-          window.innerHeight / 2 - 300
-        }`
-      );
-
-      // fallback if popup blocked
-      setTimeout(() => {
-        if (!popup || popup.closed || typeof popup.closed === "undefined") {
-          window.location.href = mailtoURL;
-        }
-      }, 600);
+    } catch (err) {
+      console.error(err);
+      alert("Could not sign in. Please try again.");
     }
   });
-});
+
+  // If already signed in and approved, go in; otherwise stay here
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) return;
+    const ref = doc(db, "approvedUsers", user.email);
+    const snap = await getDoc(ref);
+    if (snap.exists() && snap.data().approved === true) {
+      window.location.href = "index.html";
+    }
+  });
 </script>
+
+  
   <style>
     .login-wrapper {
       display: flex;
