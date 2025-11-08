@@ -8,50 +8,6 @@
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
 
-<!-- login.html (scripts at the end of body) -->
-<script type="module">
-  import { auth, provider, db } from "./firebase-init.js";
-  import { signInWithPopup, onAuthStateChanged, signOut } 
-    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-  import { doc, getDoc } 
-    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
-  const loginBtn = document.getElementById("loginBtn");
-
-  // Click → sign in with Google
-  loginBtn.addEventListener("click", async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const email = result.user?.email;
-
-      // Check approval
-      const ref = doc(db, "approvedUsers", email);
-      const snap = await getDoc(ref);
-
-      if (snap.exists() && snap.data().approved === true) {
-        window.location.href = "index.html";
-      } else {
-        alert("Your account is pending approval. Please email the coordinator.");
-        await signOut(auth);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Could not sign in. Please try again.");
-    }
-  });
-
-  // If already signed in and approved, go in; otherwise stay here
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) return;
-    const ref = doc(db, "approvedUsers", user.email);
-    const snap = await getDoc(ref);
-    if (snap.exists() && snap.data().approved === true) {
-      window.location.href = "index.html";
-    }
-  });
-</script>
-
-  
   <style>
     .login-wrapper {
       display: flex;
@@ -143,65 +99,86 @@
 
 <footer></footer>
 
-<!-- ✅ Netlify Identity -->
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<!-- ✅ Firebase login logic -->
+<script type="module">
+  import { auth, provider, db } from "./firebase-init.js";
+  import { signInWithPopup, onAuthStateChanged, signOut } 
+    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { doc, getDoc } 
+    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  if (window.netlifyIdentity) {
-    const btn = document.getElementById("loginBtn");
-    btn.addEventListener("click", () => {
-      window.netlifyIdentity.open("login");
+  const loginBtn = document.getElementById("loginBtn");
 
-      // 🖤 Apply dark theme override + hide email login fields
-      setTimeout(() => {
-        const iframe = document.querySelector("iframe[src*='identity']");
-        if (!iframe) return;
+  loginBtn.addEventListener("click", async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const email = result.user?.email;
 
-        iframe.addEventListener("load", () => {
-          const doc = iframe.contentDocument || iframe.contentWindow.document;
-          const style = document.createElement("style");
-          style.textContent = `
-            body {
-              background: #0f1115 !important;
-              color: #E9EEF2 !important;
-              font-family: 'Poppins', sans-serif !important;
-            }
-            input, button, select, textarea {
-              background-color: #151822 !important;
-              border: 1px solid #222736 !important;
-              color: #E9EEF2 !important;
-            }
-            button, [type="submit"] {
-              background: #7EE0C2 !important;
-              color: #000 !important;
-              font-weight: 700 !important;
-              border-radius: 8px !important;
-            }
-            a, .link { color: #7EE0C2 !important; }
-            form[action*="/token"] input[name="email"],
-            form[action*="/token"] input[name="password"],
-            form[action*="/token"] button[type="submit"],
-            form[action*="/token"] a[href*="recover"],
-            form[action*="/token"] hr { display: none !important; }
-          `;
-          doc.head.appendChild(style);
-        });
-      }, 400);
-    });
+      const ref = doc(db, "approvedUsers", email);
+      const snap = await getDoc(ref);
 
-    window.netlifyIdentity.on("login", () => {
+      if (snap.exists() && snap.data().approved === true) {
+        window.location.href = "index.html";
+      } else {
+        alert("Your account is pending approval. Please email the coordinator.");
+        await signOut(auth);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Could not sign in. Please try again.");
+    }
+  });
+
+  // Redirect if already signed in and approved
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) return;
+    const ref = doc(db, "approvedUsers", user.email);
+    const snap = await getDoc(ref);
+    if (snap.exists() && snap.data().approved === true) {
       window.location.href = "index.html";
-    });
-  }
-});
+    }
+  });
 </script>
 
-<!-- ✅ Unified email popup from nav.js -->
-<script type="module">
-  import { setupEmailPopup } from "./nav.js";
-  setupEmailPopup();
+<!-- ✅ Custom email popup for Taylor -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const emailLink = document.querySelector("#emailLink");
+  const email = "taylor.clarkjones25@gmail.com";
+  const subject = "Williams Family Reunion Registration";
+  const body = "Hi Taylor,%0A%0AI'd like to register or learn more about the reunion.%0A%0AThanks,%0A[Your Name]";
+
+  if (!emailLink) return;
+
+  emailLink.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(subject)}&body=${body}`;
+    const mailtoURL = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${body}`;
+
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    const isAndroid = /Android/.test(ua);
+    const isMobile = isIOS || isAndroid;
+
+    if (isMobile) {
+      window.location.href = mailtoURL;
+    } else {
+      const popup = window.open(
+        gmailURL,
+        "gmailCompose",
+        `width=700,height=600,left=${window.innerWidth / 2 - 350},top=${window.innerHeight / 2 - 300}`
+      );
+      setTimeout(() => {
+        if (!popup || popup.closed || typeof popup.closed === "undefined") {
+          window.location.href = mailtoURL;
+        }
+      }, 600);
+    }
+  });
+});
 </script>
 
 </body>
 </html>
+
