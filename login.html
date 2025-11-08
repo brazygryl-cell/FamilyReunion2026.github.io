@@ -77,14 +77,17 @@
 
 <section class="section login-wrapper">
   <div class="login-card">
-    <h2>Family Login</h2>
-    <p>Sign in or create your account using your email and password.</p>
+  <h2>Family Login</h2>
+<p>Sign in or create your account using your email and password.</p>
 
-    <input id="email" type="email" placeholder="Email address" required />
-    <input id="password" type="password" placeholder="Password" required />
-    <button id="loginBtn" class="login-btn">Sign In</button>
-    <button id="signupBtn" class="login-btn" style="margin-top:10px;background:var(--mint-2);">Create Account</button>
-    <p id="errorMsg" class="error-msg"></p>
+<input id="emailInput" type="email" placeholder="Email address" required />
+<input id="passwordInput" type="password" placeholder="Password" required />
+
+<button id="loginBtn" class="login-btn">Create Account / Log In</button>
+<button id="createBtn" class="login-btn" style="margin-top:10px;background:#7EE0C2;color:#000;">
+  Create Account
+</button>
+
   </div>
 </section>
 
@@ -96,57 +99,71 @@
 
 <!-- ✅ Firebase login logic -->
 <script type="module">
-  import { auth } from "./firebase-init.js";
-  import { createUserWithEmailAndPassword, signInWithEmailAndPassword } 
-    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { auth, db } from "./firebase-init.js";
+  import { 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword, 
+    signOut 
+  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { doc, getDoc, setDoc } 
+    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
   const loginBtn = document.getElementById("loginBtn");
-  const emailInput = document.createElement("input");
-  const passInput = document.createElement("input");
-  const wrapper = document.querySelector(".login-card");
+  const createBtn = document.getElementById("createBtn");
 
-  emailInput.placeholder = "Email";
-  emailInput.type = "email";
-  emailInput.id = "emailInput";
-  emailInput.style.cssText = "width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:1px solid #333;";
-  passInput.placeholder = "Password";
-  passInput.type = "password";
-  passInput.id = "passwordInput";
-  passInput.style.cssText = "width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:1px solid #333;";
+  const emailInput = document.getElementById("emailInput");
+  const passwordInput = document.getElementById("passwordInput");
 
-  wrapper.insertBefore(emailInput, loginBtn);
-  wrapper.insertBefore(passInput, loginBtn);
+  // 🔹 Helper: Approval check
+  async function isApproved(email) {
+    const ref = doc(db, "approvedUsers", email);
+    const snap = await getDoc(ref);
+    return snap.exists() && snap.data().approved === true;
+  }
 
-  loginBtn.textContent = "Create Account / Log In";
-
+  // 🔹 LOGIN existing account
   loginBtn.addEventListener("click", async () => {
     const email = emailInput.value.trim();
-    const password = passInput.value.trim();
+    const password = passwordInput.value.trim();
     if (!email || !password) return alert("Please enter both email and password.");
 
     try {
-      // Try to sign in first
-      await signInWithEmailAndPassword(auth, email, password);
-      alert("✅ Logged in successfully!");
-      window.location.href = "index.html";
-    } catch (signInError) {
-      if (signInError.code === "auth/user-not-found") {
-        // If user doesn’t exist → create account
-        try {
-          await createUserWithEmailAndPassword(auth, email, password);
-          alert("✅ Account created successfully!");
-          window.location.href = "index.html";
-        } catch (createError) {
-          console.error(createError);
-          alert("❌ " + createError.message);
-        }
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const approved = await isApproved(email);
+      if (approved) {
+        alert("✅ Welcome back! Redirecting...");
+        window.location.href = "index.html";
       } else {
-        console.error(signInError);
-        alert("❌ " + signInError.message);
+        alert("⚠️ Your account is pending approval. Please email Taylor.");
+        await signOut(auth);
       }
+    } catch (err) {
+      console.error(err);
+      alert("❌ " + (err.message || "Could not log in."));
+    }
+  });
+
+  // 🔹 CREATE new account
+  createBtn.addEventListener("click", async () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    if (!email || !password) return alert("Please enter both email and password.");
+
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+
+      // Add to Firestore pending list automatically
+      await setDoc(doc(db, "approvedUsers", email), { approved: false });
+
+      alert("✅ Account created! Your access is pending approval. Please email Taylor.");
+      await signOut(auth);
+    } catch (err) {
+      console.error(err);
+      alert("❌ " + (err.message || "Could not create account."));
     }
   });
 </script>
+
 
 <!-- ✅ Email popup for Taylor -->
 <script>
