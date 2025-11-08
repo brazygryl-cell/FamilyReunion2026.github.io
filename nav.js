@@ -1,12 +1,12 @@
 // nav.js
-// Handles navigation bar, footer, and Netlify Identity auth (login/logout)
-
+import { auth } from "./firebase-init.js";
+import { onAuthStateChanged, signOut } 
+  from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 export function loadNavbar() {
   const header = document.querySelector("header");
   const footer = document.querySelector("footer");
 
-  // Navbar
   if (header) {
     header.innerHTML = `
       <nav class="nav-links">
@@ -20,28 +20,42 @@ export function loadNavbar() {
     `;
   }
 
-  // Footer
   if (footer) {
     footer.innerHTML = `
       <p style="margin-bottom:8px;">
         Made with ❤️ by <strong>Taylor Clark Jones</strong><br>
         <span style="font-size:0.95rem; color:var(--muted);">
           📧 Email ShaSha:
-          <a href="#" id="emailLink" class="email-link">
+          <a href="mailto:familyreunionwilliams2026@gmail.com" class="email-link">
             familyreunionwilliams2026@gmail.com
           </a>
         </span>
       </p>
+      <p>Art by Andre Clark</p>
     `;
   }
 
-  // ✅ Attach unified popup handler
-  setupEmailPopup();
+  enableLogout(); // attach handler after rendering
 }
 
+export function enableLogout() {
+  const btn = document.getElementById("logoutBtn");
+  if (!btn) return;
+  btn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    try { await signOut(auth); } finally {
+      window.location.href = "login.html";
+    }
+  });
+}
 
-
-
+// Gate every page except login.html
+export function requireAuthFirebase() {
+  if (window.location.pathname.includes("login.html")) return;
+  onAuthStateChanged(auth, (user) => {
+    if (!user) window.location.href = "login.html";
+  });
+}
 
 // ✅ Unified popup (desktop Gmail + mobile mailto fallback)
 export function setupEmailPopup() {
