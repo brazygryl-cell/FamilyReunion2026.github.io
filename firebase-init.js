@@ -1,8 +1,16 @@
-const cfg = window.__FIREBASE_CONFIG__;
-console.log("Firebase config used:", cfg);   // <— add this one line temporarily
+<!-- firebase-init.js -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  const firebaseConfig = window.__ENV?.FIREBASE_CONFIG; // from env.js
+  const app = initializeApp(firebaseConfig);
 
-const app = initializeApp(cfg);
-export const db = getFirestore(app);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  // make available to other modules
+  export { app, db, auth, provider };
+</script>
