@@ -6,7 +6,14 @@
   <title>Family Forum</title>
 
   <link rel="stylesheet" href="style.css" />
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script type="module">
+  import { loadNavbar, enableLogout, requireAuthFirebase } from "./nav.js";
+  document.addEventListener("DOMContentLoaded", () => {
+    requireAuthFirebase();
+    loadNavbar();
+  });
+</script>
+
 
   <style>
     #postBody, .comment-input { font-size: 1.05rem; line-height: 1.6; }
