@@ -6,12 +6,12 @@ import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/
 // 🔥 Your Firebase config
 // (keep the same values from your env.js or Firebase console)
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyA5G9ZrrV62qx1DRNy_BdIImevD1IL2Grc",
+  authDomain: "family-reunion-2026.firebaseapp.com",
+  projectId: "family-reunion-2026",
+  storageBucket: "family-reunion-2026.firebasestorage.app",
+  messagingSenderId: "110890823431",
+  appId: "1:110890823431:web:524b468c6371c260405fa2"
 };
 
 // Initialize
