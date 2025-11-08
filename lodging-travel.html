@@ -113,16 +113,6 @@ a.btn { margin-right: 8px; }
 
 <body>
 
-<script>
-  if (window.netlifyIdentity) {
-    window.netlifyIdentity.on("init", user => {
-      if (!user && !window.location.pathname.includes("login.html")) {
-        window.location.href = "login.html";
-      }
-    });
-  }
-</script>
-
 <header></header>
 
 <section id="lodging-hero">
@@ -249,20 +239,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-<!-- 🔐 Netlify Identity -->
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
 <script type="module">
-  import { loadNavbar, enableLogout, requireAuth } from "./nav.js";
-
+  import { loadNavbar, enableLogout, requireAuthFirebase } from "./nav.js";
   document.addEventListener("DOMContentLoaded", () => {
-    if (!window.location.pathname.includes("login.html")) {
-      requireAuth();
-    }
+    requireAuthFirebase();
     loadNavbar();
-    enableLogout();
   });
 </script>
+
 
 </body>
 </html>
