@@ -1,13 +1,6 @@
 // nav.js
 // Handles navigation bar, footer, and Netlify Identity auth (login/logout)
 
-if (window.netlifyIdentity) {
-  window.netlifyIdentity.on("init", (user) => {
-    if (!user && !window.location.pathname.includes("login.html")) {
-      window.location.href = "login.html";
-    }
-  });
-}
 
 export function loadNavbar() {
   const header = document.querySelector("header");
@@ -46,32 +39,9 @@ export function loadNavbar() {
   setupEmailPopup();
 }
 
-// Logout Button
-export function enableLogout() {
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (!logoutBtn) return;
 
-  logoutBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    if (window.netlifyIdentity.currentUser()) {
-      window.netlifyIdentity.logout();
-    }
-  });
 
-  window.netlifyIdentity.on("logout", () => {
-    window.location.href = "login.html";
-  });
-}
 
-// ✅ Require Login on *every* page except login.html
-export function requireAuth() {
-  if (!window.netlifyIdentity) return;
-
-  const user = window.netlifyIdentity.currentUser();
-  if (!user) {
-    window.location.href = "login.html";
-  }
-}
 
 // ✅ Unified popup (desktop Gmail + mobile mailto fallback)
 export function setupEmailPopup() {
