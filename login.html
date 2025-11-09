@@ -32,12 +32,14 @@
 #login-hero .slide {
   position: absolute;
   inset: 0;
-  background-size: cover;
-  background-position: center;
+  background-size: contain;   /* 👈 show entire photo */
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-color: #0f121a;  /* subtle backdrop fill */
   opacity: 0;
-  transform: scale(1.05);
-  transition: opacity 2s ease-in-out, transform 6s ease-in-out;
+  transition: opacity 2s ease-in-out;
 }
+
 #login-hero .slide.active {
   opacity: 1;
   transform: scale(1);
