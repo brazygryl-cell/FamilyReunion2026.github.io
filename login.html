@@ -9,201 +9,142 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
 
   <style>
-    /* 🌙 Unified Dark Mint Theme */
+    /* Page base */
     body {
       margin: 0;
       font-family: "Poppins", sans-serif;
       color: #f5f6f8;
       background: radial-gradient(circle at 30% 20%, #161a25 0%, #0f121a 70%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+    }
+
+    /* 🎞️ Login Slideshow */
+    #login-hero {
+      position: relative;
+      height: 60vh;
       overflow: hidden;
+      border-radius: 0 0 40px 40px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
     }
-
-    /* Background Slideshow */
-    .bg-slide {
-      position: fixed;
-      inset: 0;
-      background-size: cover;
-      background-position: center;
-      opacity: 0;
-      transition: opacity 2s ease-in-out;
-      z-index: -2;
+    #login-hero .slide {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      opacity: 0; transform: scale(1.05);
+      transition: opacity 2s ease-in-out, transform 6s ease-in-out;
     }
-    .bg-slide.active {
-      opacity: 0.3;
+    #login-hero .slide.active { opacity: 1; transform: scale(1); }
+    #login-hero::after {
+      content: ""; position: absolute; inset: 0;
+      background: rgba(0,0,0,0.55); z-index: 1;
     }
-
-    /* Soft mint glow overlay */
-    body::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 20% 20%, rgba(126, 224, 194, 0.08), transparent 60%),
-                  radial-gradient(circle at 80% 80%, rgba(87, 214, 165, 0.08), transparent 70%);
-      z-index: -1;
+    #login-hero .overlay {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center; color: #fff; z-index: 2; max-width: 800px;
     }
-
-    .login-card {
-      background: linear-gradient(180deg, rgba(20, 24, 34, 0.9), rgba(12, 15, 22, 0.95));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
-      padding: 40px 32px;
-      text-align: center;
-      box-shadow: 0 0 30px rgba(0, 255, 200, 0.08);
-      max-width: 420px;
-      width: 100%;
-      backdrop-filter: blur(10px);
-      animation: fadeIn 0.8s ease forwards;
-      z-index: 5;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(40px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .login-card h2 {
+    #login-hero h1 {
       font-family: "Playfair Display", serif;
-      font-size: 2.2rem;
-      margin-bottom: 8px;
-      color: #ffffff;
+      font-size: 2.2rem; margin-bottom: .4rem;
     }
+    #login-hero p { color: #d0d6e0; font-size: 1.1rem; }
 
-    .login-card p {
-      color: #aeb4c1;
-      font-size: 1.05rem;
-      margin-bottom: 28px;
-      line-height: 1.6;
+    /* Centered login card */
+    .login-wrapper {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 40vh; padding: 2rem 1rem; /* sits below hero */
     }
+    .login-card {
+      background: linear-gradient(180deg, rgba(20,24,34,.9), rgba(12,15,22,.95));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 40px 32px; text-align: center;
+      box-shadow: 0 0 30px rgba(0,255,200,0.08);
+      max-width: 420px; width: 100%;
+      backdrop-filter: blur(10px);
+      animation: fadeIn .8s ease forwards;
+    }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
+    .login-card h2 {
+      font-family: "Playfair Display", serif; font-size: 2rem;
+      margin-bottom: 10px; color: #fff;
+    }
+    .login-card p { color:#aeb4c1; font-size:1.05rem; margin-bottom: 24px; }
 
     input {
-      width: 100%;
-      background: rgba(15, 18, 26, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 12px 14px;
-      color: #f5f6f8;
-      margin-bottom: 14px;
-      font-size: 1.05rem;
-      transition: all 0.2s ease;
+      width: 100%; background: rgba(15,18,26,.85);
+      border: 1px solid rgba(255,255,255,.1); border-radius: 10px;
+      padding: 12px 14px; color: #f5f6f8; margin-bottom: 14px; font-size: 1.05rem;
+      transition: all .2s ease;
     }
     input:focus {
-      border-color: #7ee0c2;
-      outline: none;
-      box-shadow: 0 0 6px rgba(126, 224, 194, 0.3);
+      border-color: #7ee0c2; outline: none; box-shadow: 0 0 6px rgba(126,224,194,.3);
     }
 
     .login-btn {
       background: linear-gradient(90deg, #7ee0c2, #57d6a5);
-      color: #000;
-      font-weight: 700;
-      font-size: 1.05rem;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 22px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      width: 100%;
+      color: #000; font-weight: 700; font-size: 1.05rem;
+      border: none; border-radius: 10px; padding: 12px 22px;
+      cursor: pointer; transition: all .25s ease; width: 100%;
     }
-    .login-btn:hover {
-      transform: scale(1.04);
-      box-shadow: 0 0 20px rgba(126, 224, 194, 0.4);
-    }
+    .login-btn:hover { transform: scale(1.04); box-shadow: 0 0 20px rgba(126,224,194,.4); }
 
     .invite-note {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
-      color: #a7aebb;
-      font-size: 0.95rem;
-      width: 100%;
+      text-align: center; color: #a7aebb; font-size: .95rem;
+      padding: 1rem 1rem 2rem;
     }
-    .invite-note a {
-      color: #7ee0c2;
-      font-weight: 600;
-      text-decoration: none;
-    }
-    .invite-note a:hover {
-      text-decoration: underline;
-    }
+    .invite-note a { color: #7ee0c2; font-weight: 600; text-decoration: none; }
+    .invite-note a:hover { text-decoration: underline; }
 
     /* 🪟 Create Account Modal */
     .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(4px);
-      justify-content: center;
-      align-items: center;
-      animation: fadeIn 0.5s ease;
+      display: none; position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
+      justify-content: center; align-items: center; animation: fadeIn .5s ease;
     }
     .modal-content {
       background: linear-gradient(180deg, #161a25, #0f121a);
-      padding: 28px 26px;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 0 25px rgba(126, 224, 194, 0.15);
-      width: 90%;
-      max-width: 380px;
-      text-align: center;
-      transform: scale(0.9);
-      animation: popUp 0.35s ease forwards;
+      padding: 28px 26px; border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: 0 0 25px rgba(126,224,194,.15);
+      width: 90%; max-width: 380px; text-align: center;
+      transform: scale(.9); animation: popUp .35s ease forwards; position: relative;
     }
-    @keyframes popUp {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    .modal-content h3 {
-      font-family: "Playfair Display", serif;
-      color: #fff;
-      margin-bottom: 10px;
-    }
-    .modal-content p { color: #b7bdc9; margin-bottom: 18px; }
+    @keyframes popUp { from{transform:scale(.8);opacity:0} to{transform:scale(1);opacity:1} }
+    .modal-content h3 { font-family:"Playfair Display",serif; color:#fff; margin-bottom:10px; }
+    .modal-content p { color:#b7bdc9; margin-bottom:18px; }
     .modal-content input { margin-bottom: 10px; }
-    .modal-content button:hover {
-      transform: scale(1.03);
-      box-shadow: 0 0 12px rgba(126, 224, 194, 0.3);
-    }
+    .modal-content button:hover { transform: scale(1.03); box-shadow: 0 0 12px rgba(126,224,194,.3); }
     .close {
-      position: absolute;
-      top: 12px;
-      right: 18px;
-      font-size: 1.8rem;
-      color: #aaa;
-      cursor: pointer;
+      position: absolute; top: 12px; right: 18px; font-size: 1.8rem; color: #aaa; cursor: pointer;
     }
     .close:hover { color: #fff; }
   </style>
 </head>
 
 <body>
-  <!-- 🌄 Background slideshow -->
-<!-- 🎞️ Login Slideshow Hero -->
-<section id="login-hero">
-  <div class="slide active" style="background-image:url('images/family1.jpg')"></div>
-  <div class="slide" style="background-image:url('images/family2.jpg')"></div>
-  <div class="slide" style="background-image:url('images/family3.jpg')"></div>
-  <div class="overlay">
-    <h1>Welcome Family 💚</h1>
-    <p>Sign in to join the Williams Family Reunion 2026!</p>
-  </div>
-</section>
+  <!-- 🎞️ Login Slideshow Hero -->
+  <section id="login-hero">
+    <div class="slide active" style="background-image:url('images/family1.jpg')"></div>
+    <div class="slide" style="background-image:url('images/family2.jpg')"></div>
+    <div class="slide" style="background-image:url('images/family3.jpg')"></div>
+    <div class="overlay">
+      <h1>Welcome Family 💚</h1>
+      <p>Sign in to join the Williams Family Reunion 2026!</p>
+    </div>
+  </section>
 
-    <input id="emailInput" type="email" placeholder="Email address" required />
-    <input id="passwordInput" type="password" placeholder="Password" required />
+  <!-- Centered login card -->
+  <section class="login-wrapper">
+    <div class="login-card">
+      <h2>Family Login</h2>
+      <p>Sign in or create your account using your email and password.</p>
 
-    <button id="loginBtn" class="login-btn">Log In</button>
-    <button id="createBtn" class="login-btn" style="margin-top:10px;background:#7EE0C2;color:#000;">
-      Create Account
-    </button>
-  </div>
+      <input id="emailInput" type="email" placeholder="Email address" required />
+      <input id="passwordInput" type="password" placeholder="Password" required />
+
+      <button id="loginBtn" class="login-btn">Log In</button>
+      <button id="createBtn" class="login-btn" style="margin-top:10px;background:#7EE0C2;color:#000;">Create Account</button>
+    </div>
+  </section>
 
   <p class="invite-note">
     Need access? <a href="#" id="emailLink">📧 Email Taylor to Request Approval</a>
@@ -212,7 +153,7 @@
   <!-- 🪟 Create Account Modal -->
   <div id="createModal" class="modal">
     <div class="modal-content">
-      <span class="close">&times;</span>
+      <span class="close" aria-label="Close">&times;</span>
       <h3>Create Account</h3>
       <p>Enter your email and password to create your account.</p>
       <input id="createEmail" type="email" placeholder="Email address" required />
@@ -221,16 +162,14 @@
     </div>
   </div>
 
-  <!-- ✅ Firebase login script -->
+  <!-- ✅ Firebase login (module) -->
   <script type="module">
     import { auth, db } from "./firebase-init.js";
     import {
-      createUserWithEmailAndPassword,
       signInWithEmailAndPassword,
       signOut
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { doc, getDoc, setDoc }
-      from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     const loginBtn = document.getElementById("loginBtn");
     const emailInput = document.getElementById("emailInput");
@@ -254,7 +193,6 @@
         const userCred = await signInWithEmailAndPassword(auth, email, password);
         const approved = await isApproved(email);
         if (approved) {
-          alert("✅ Welcome back! Redirecting...");
           window.location.href = "index.html";
         } else {
           alert("⚠️ Your account is pending approval. Please email Taylor.");
@@ -263,6 +201,8 @@
       } catch (error) {
         if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password") {
           alert("❌ Invalid password. Try again or reset your password.");
+        } else if (error.code === "auth/too-many-requests") {
+          alert("Too many attempts. Please wait a moment and try again.");
         } else {
           alert("❌ " + (error.message || "Something went wrong."));
         }
@@ -270,8 +210,14 @@
     });
   </script>
 
-  <!-- 🪟 Create Account Modal Logic -->
-  <script>
+  <!-- 🪟 Create Account Modal Logic + Create (module) -->
+  <script type="module">
+    import { auth, db } from "./firebase-init.js";
+    import { createUserWithEmailAndPassword, signOut } 
+      from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { doc, setDoc } 
+      from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
     const modal = document.getElementById("createModal");
     const createBtn = document.getElementById("createBtn");
     const closeBtn = document.querySelector(".close");
@@ -287,30 +233,32 @@
       if (!email || !password) { alert("Please enter both fields."); return; }
 
       try {
-        const { auth, db } = await import("./firebase-init.js");
-        const { createUserWithEmailAndPassword, signOut } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js");
-        const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
-
         await createUserWithEmailAndPassword(auth, email, password);
         await setDoc(doc(db, "approvedUsers", email), { approved: false });
         alert("✅ Account created! Pending approval — please email Taylor.");
         await signOut(auth);
         modal.style.display = "none";
       } catch (err) {
-        alert("❌ " + (err.message || "Something went wrong."));
+        if (err.code === "auth/email-already-in-use") {
+          alert("That email already has an account. Try logging in.");
+        } else if (err.code === "auth/weak-password") {
+          alert("Password should be at least 6 characters.");
+        } else {
+          alert("❌ " + (err.message || "Something went wrong."));
+        }
       }
     });
   </script>
 
-  <!-- 💫 Background Slideshow Logic -->
+  <!-- 🎞️ Slideshow Logic -->
   <script>
-    const slides = document.querySelectorAll(".bg-slide");
-    let idx = 0;
+    const loginSlides = document.querySelectorAll("#login-hero .slide");
+    let currentSlide = 0;
     setInterval(() => {
-      slides[idx].classList.remove("active");
-      idx = (idx + 1) % slides.length;
-      slides[idx].classList.add("active");
-    }, 7000);
+      loginSlides[currentSlide].classList.remove("active");
+      currentSlide = (currentSlide + 1) % loginSlides.length;
+      loginSlides[currentSlide].classList.add("active");
+    }, 6000);
   </script>
 
   <!-- 📧 Email popup for Taylor -->
@@ -329,24 +277,12 @@
         const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
         if (isMobile) window.location.href = mailtoURL;
         else {
-          const popup = window.open(gmailURL, "gmailCompose",
+          const popup = window.open(gmailURL,"gmailCompose",
             `width=700,height=600,left=${window.innerWidth/2-350},top=${window.innerHeight/2-300}`);
-          setTimeout(() => {
-            if (!popup || popup.closed || typeof popup.closed === "undefined") window.location.href = mailtoURL;
-          }, 600);
+          setTimeout(()=>{ if(!popup||popup.closed||typeof popup.closed==="undefined") window.location.href = mailtoURL; },600);
         }
       });
     });
   </script>
-<script>
-  const loginSlides = document.querySelectorAll("#login-hero .slide");
-  let currentSlide = 0;
-  setInterval(() => {
-    loginSlides[currentSlide].classList.remove("active");
-    currentSlide = (currentSlide + 1) % loginSlides.length;
-    loginSlides[currentSlide].classList.add("active");
-  }, 6000);
-</script>
-  
 </body>
 </html>
