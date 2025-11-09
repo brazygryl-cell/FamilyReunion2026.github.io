@@ -7,216 +7,72 @@
 
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
-
-  <style>
-/* 🌙 Unified Dark Mint Theme */
-body {
-  margin: 0;
-  font-family: "Poppins", sans-serif;
-  color: #f5f6f8;
-  background: radial-gradient(circle at 30% 20%, #161a25 0%, #0f121a 70%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* 🎞️ Clean Login Slideshow – banner style */
+<style>
+/* 🐾 Compact Square Slideshow — Mint Glow Edition */
 #login-hero {
   position: relative;
-  width: 100%;
-  height: 25vh;              /* smaller, banner-like */
-  min-height: 180px;
+  width: 300px;
+  height: 300px;
+  border-radius: 22px;
   overflow: hidden;
-  border-radius: 0 0 25px 25px;
-  margin-bottom: 2rem;
+  box-shadow: 0 0 20px rgba(126, 224, 194, 0.15);
+  border: 2px solid rgba(126, 224, 194, 0.3);
+  margin-bottom: 1.8rem;
+  transition: box-shadow 0.5s ease, border-color 0.5s ease;
+}
+#login-hero:hover {
+  box-shadow: 0 0 30px rgba(126, 224, 194, 0.35);
+  border-color: rgba(126, 224, 194, 0.55);
 }
 
 #login-hero .slide {
   position: absolute;
   inset: 0;
-  background-size: cover;    /* fill nicely */
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   opacity: 0;
-  transition: opacity 1.5s ease-in-out;
+  transition: opacity 1.2s ease-in-out, transform 8s ease;
 }
-
 #login-hero .slide.active {
   opacity: 1;
+  transform: scale(1.05); /* gentle zoom effect */
 }
 
-/* Dark overlay for readability */
+/* Dim overlay for legibility */
 #login-hero::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    rgba(0,0,0,0.45),
-    rgba(0,0,0,0.6)
-  );
+  background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.45));
   z-index: 1;
 }
 
 #login-hero .overlay {
   position: absolute;
-  top: 50%;
+  bottom: 12px;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   text-align: center;
   color: #fff;
   z-index: 2;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+  text-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 
 #login-hero h1 {
   font-family: "Playfair Display", serif;
-  font-size: 1.9rem;
+  font-size: 1.3rem;
   color: #7ee0c2;
+  margin-bottom: 4px;
 }
 
 #login-hero p {
+  font-size: 0.9rem;
   color: #d0d6e0;
-  font-size: 1rem;
-}
-
-/* 💫 Login Card */
-.login-wrapper {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  padding: 0 20px;
-}
-
-.login-card {
-  background: linear-gradient(180deg, rgba(20, 24, 34, 0.9), rgba(12, 15, 22, 0.95));
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 40px 32px;
-  text-align: center;
-  box-shadow: 0 0 30px rgba(0, 255, 200, 0.08);
-  max-width: 420px;
-  width: 100%;
-  backdrop-filter: blur(10px);
-  animation: fadeIn 0.8s ease forwards;
-  z-index: 5;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(40px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.login-card h2 {
-  font-family: "Playfair Display", serif;
-  font-size: 2rem;
-  margin-bottom: 8px;
-  color: #ffffff;
-}
-
-.login-card p {
-  color: #aeb4c1;
-  font-size: 1.05rem;
-  margin-bottom: 28px;
-  line-height: 1.6;
-}
-
-input {
-  width: 100%;
-  background: rgba(15, 18, 26, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 12px 14px;
-  color: #f5f6f8;
-  margin-bottom: 14px;
-  font-size: 1.05rem;
-  transition: all 0.2s ease;
-}
-input:focus {
-  border-color: #7ee0c2;
-  outline: none;
-  box-shadow: 0 0 6px rgba(126, 224, 194, 0.3);
-}
-
-.login-btn {
-  background: linear-gradient(90deg, #7ee0c2, #57d6a5);
-  color: #000;
-  font-weight: 700;
-  font-size: 1.05rem;
-  border: none;
-  border-radius: 10px;
-  padding: 12px 22px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  width: 100%;
-}
-.login-btn:hover {
-  transform: scale(1.04);
-  box-shadow: 0 0 20px rgba(126, 224, 194, 0.4);
-}
-
-.invite-note {
-  margin-top: 1rem;
-  text-align: center;
-  color: #a7aebb;
-  font-size: 0.95rem;
-}
-.invite-note a {
-  color: #7ee0c2;
-  font-weight: 600;
-  text-decoration: none;
-}
-.invite-note a:hover {
-  text-decoration: underline;
-}
-
-/* 🪟 Create Account Modal */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  justify-content: center;
-  align-items: center;
-}
-.modal-content {
-  background: linear-gradient(180deg, #161a25, #0f121a);
-  padding: 28px 26px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 25px rgba(126, 224, 194, 0.15);
-  width: 90%;
-  max-width: 380px;
-  text-align: center;
-  transform: scale(0.9);
-  animation: popUp 0.35s ease forwards;
-}
-@keyframes popUp {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-.close {
-  position: absolute;
-  top: 12px;
-  right: 18px;
-  font-size: 1.8rem;
-  color: #aaa;
-  cursor: pointer;
-}
-.close:hover { color: #fff; }
-
-@media (max-width: 600px) {
-  #login-hero { height: 22vh; }
-  #login-hero h1 { font-size: 1.5rem; }
-  #login-hero p { font-size: 0.9rem; }
 }
 </style>
 
-<!-- 🎞️ Login Slideshow Hero -->
+<!-- 🐾 Mint Glow Slideshow -->
 <section id="login-hero">
   <div class="slide active" style="background-image:url('images/pet1.jpg')"></div>
   <div class="slide" style="background-image:url('images/pet2.jpg')"></div>
@@ -225,6 +81,17 @@ input:focus {
     <p>Sign in to join the Williams Family Reunion 2026!</p>
   </div>
 </section>
+
+<script>
+  const loginSlides = document.querySelectorAll("#login-hero .slide");
+  let currentSlide = 0;
+  setInterval(() => {
+    loginSlides[currentSlide].classList.remove("active");
+    currentSlide = (currentSlide + 1) % loginSlides.length;
+    loginSlides[currentSlide].classList.add("active");
+  }, 5000);
+</script>
+
 
 
   <!-- 💫 Login Card -->
