@@ -1,4 +1,4 @@
-// forum.js — Firebase-only version
+// forum.js — Firebase-only version with comments
 import { auth, db } from "./firebase-init.js";
 import {
   collection,
@@ -26,24 +26,147 @@ function showStatus(message = "", type = "") {
   statusMessage.className = `status-message${type ? " " + type : ""}`;
 }
 
-// Load posts from Firestore
-async function loadPosts(user) {
+// Helper: label display
+function displayLabel(name, email, currentEmail) {
+  if (name) return name;
+  if (email && email === currentEmail) return "You";
+  return "Family Member";
+}
+
+// Load comments for a specific post
+async function loadComments(postId, wrapperEl, currentEmail) {
+  const commentsCol = collection(db, "posts", postId, "comments");
+  const q = query(commentsCol, orderBy("timestamp", "asc"));
+  const snap = await getDocs(q);
+
+  const summary = wrapperEl.querySelector(".comment-summary");
+  const list = wrapperEl.querySelector(".comments-list");
+
+  summary.querySelector(".count").textContent = snap.size;
+  list.innerHTML = "";
+
+  snap.forEach((doc) => {
+    const c = doc.data();
+    const el = document.createElement("div");
+    el.className = "comment";
+    el.innerHTML = `
+      <p>${c.message}</p>
+      <span class="byline">— ${displayLabel(c.name, c.email, currentEmail)}, 
+      ${new Date(c.timestamp).toLocaleString()}</span>
+    `;
+    list.appendChild(el);
+  });
+}
+
+// Attach a comment UI to each post
+function attachCommentUI(postCardEl, postId, currentUser) {
+  const section = document.createElement("div");
+  section.className = "comment-section";
+  section.innerHTML = `
+    <details>
+      <summary class="comment-summary">
+        <span>💬 Comments</span>
+        <span class="count" aria-label="comment count">0</span>
+      </summary>
+      <div class="comments-body">
+        <div class="comments-list"></div>
+        <input class="comment-name" type="text" placeholder="Your name (optional)" maxlength="40" style="
+          width:100%; background:#0f121a; border:1px solid var(--border);
+          border-radius:8px; padding:8px 10px; color:var(--text);
+          margin-bottom:8px; font-size:1.02rem;">
+        <textarea class="comment-input" placeholder="Add a reply…"></textarea>
+        <button class="send-comment" type="button">Send</button>
+      </div>
+    </details>
+  `;
+  postCardEl.appendChild(section);
+
+  const detailsEl = section.querySelector("details");
+  const sendBtn = section.querySelector(".send-comment");
+  const input = section.querySelector(".comment-input");
+  const nameField = section.querySelector(".comment-name");
+
+  let firstOpenLoaded = false;
+  detailsEl.addEventListener("toggle", async () => {
+    if (detailsEl.open) {
+      await loadComments(postId, section, currentUser?.email || "");
+      firstOpenLoaded = true;
+    }
+  });
+
+  sendBtn.addEventListener("click", async () => {
+    const message = input.value.trim();
+    const name = nameField.value.trim() || "Family Member";
+    if (!message) return;
+
+    const commentsCol = collection(db, "posts", postId, "comments");
+    try {
+      sendBtn.disabled = true;
+      await addDoc(commentsCol, {
+        name,
+        email: currentUser?.email || "anonymous",
+        message,
+        timestamp: Date.now(),
+      });
+
+      // Update comment count immediately
+      const summary = section.querySelector(".comment-summary");
+      if (summary) {
+        const countEl = summary.querySelector(".count");
+        if (countEl) {
+          const newCount = parseInt(countEl.textContent || "0", 10) + 1;
+          countEl.textContent = newCount;
+          countEl.style.transform = "scale(1.3)";
+          countEl.style.transition = "transform 0.2s ease";
+          setTimeout(() => (countEl.style.transform = "scale(1)"), 200);
+        }
+      }
+
+      input.value = "";
+      nameField.value = "";
+      if (detailsEl.open || !firstOpenLoaded) {
+        await loadComments(postId, section, currentUser?.email || "");
+      }
+    } catch (e) {
+      console.error("Failed to add comment:", e);
+      showStatus("Could not add comment. Please try again.", "error");
+    } finally {
+      sendBtn.disabled = false;
+    }
+  });
+}
+
+// Load all posts with attached comments
+async function loadPosts(currentUser) {
   try {
     const q = query(postsCol, orderBy("timestamp", "desc"));
     const snapshot = await getDocs(q);
     postsContainer.innerHTML = snapshot.empty ? "No posts yet." : "";
 
-    snapshot.forEach((doc) => {
+    snapshot.forEach(async (doc) => {
       const data = doc.data();
-      const div = document.createElement("div");
-      div.className = "post";
-      div.innerHTML = `
+      const postEl = document.createElement("div");
+      postEl.className = "post";
+      if (data.email === (currentUser?.email || "")) postEl.classList.add("mine");
+
+      postEl.innerHTML = `
         <p>${data.message}</p>
-        <span class="meta">— ${data.name || "Family Member"}, ${new Date(
-          data.timestamp
-        ).toLocaleString()}</span>
+        <span class="meta">— ${displayLabel(
+          data.name,
+          data.email,
+          currentUser?.email || ""
+        )}, ${new Date(data.timestamp).toLocaleString()}</span>
       `;
-      postsContainer.appendChild(div);
+
+      postsContainer.appendChild(postEl);
+      attachCommentUI(postEl, doc.id, currentUser);
+
+      // Immediately show comment count
+      const commentsCol = collection(db, "posts", doc.id, "comments");
+      const snap = await getDocs(commentsCol);
+      const count = snap.size;
+      const summary = postEl.querySelector(".comment-summary");
+      if (summary) summary.querySelector(".count").textContent = count;
     });
   } catch (err) {
     console.error("Failed to load posts:", err);
@@ -51,24 +174,24 @@ async function loadPosts(user) {
   }
 }
 
-// Submit new post
+// Post new message
 async function postMessage(user) {
   const message = postField.value.trim();
+  const nameInput = document.getElementById("posterName");
+  const name = nameInput?.value.trim() || "Family Member";
+
   if (!message) {
     showStatus("Please write something before posting.", "info");
     return;
   }
-
-  const nameInput = document.getElementById("posterName");
-  const name = nameInput ? nameInput.value.trim() : "";
 
   try {
     submitButton.disabled = true;
     showStatus("Saving your post...", "info");
 
     await addDoc(postsCol, {
-      name: name || "Family Member",
-      email: user?.email || "anonymous",
+      name,
+      email: user.email || "anonymous",
       message,
       timestamp: Date.now(),
     });
@@ -85,12 +208,11 @@ async function postMessage(user) {
   }
 }
 
-// ✅ Listen to Firebase Auth state
+// ✅ Firebase auth listener
 onAuthStateChanged(auth, (user) => {
   if (user) {
     form.style.display = "block";
     loadPosts(user);
-
     form.onsubmit = (e) => {
       e.preventDefault();
       postMessage(user);
