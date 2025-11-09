@@ -169,6 +169,27 @@
       }
     }
   });
+  // ✅ Handle Create Account separately
+const createBtn = document.getElementById("createBtn");
+createBtn.addEventListener("click", async () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+  if (!email || !password) {
+    alert("Please enter both email and password.");
+    return;
+  }
+
+  try {
+    const newUser = await createUserWithEmailAndPassword(auth, email, password);
+    await setDoc(doc(db, "approvedUsers", email), { approved: false });
+    alert("✅ Account created! Pending approval — please email Taylor.");
+    await signOut(auth);
+  } catch (err) {
+    console.error(err);
+    alert("❌ " + err.message);
+  }
+});
+
 </script>
 
 
