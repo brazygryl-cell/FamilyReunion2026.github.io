@@ -38,7 +38,6 @@ export function loadNavbar() {
           </a>
         </span>
       </p>
-      <p>Art by Andre Clark</p>
     `;
   }
 
