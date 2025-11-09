@@ -98,6 +98,7 @@
 <footer></footer>
 
 <!-- ✅ Firebase login logic -->
+<!-- ✅ Login Script (must come after the button exists) -->
 <script type="module">
   import { auth, db } from "./firebase-init.js";
   import { 
@@ -121,13 +122,19 @@
   loginBtn.addEventListener("click", async () => {
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
-    if (!email || !password) return alert("Please enter both email and password.");
+    if (!email || !password) {
+      alert("Please enter both email and password.");
+      return;
+    }
+
+    console.log("Attempting login for:", email);
 
     try {
       // Try login first
-      await signInWithEmailAndPassword(auth, email, password);
-      const approved = await isApproved(email);
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      console.log("Login success:", userCred.user.email);
 
+      const approved = await isApproved(email);
       if (approved) {
         alert("✅ Welcome back! Redirecting...");
         window.location.href = "index.html";
@@ -137,20 +144,28 @@
       }
 
     } catch (error) {
+      console.warn("Login failed:", error.code);
+
       if (error.code === "auth/user-not-found") {
-        // Auto-create new account
+        console.log("Creating new user...");
         try {
-          await createUserWithEmailAndPassword(auth, email, password);
+          const newUser = await createUserWithEmailAndPassword(auth, email, password);
+          console.log("User created:", newUser.user.email);
+
           await setDoc(doc(db, "approvedUsers", email), { approved: false });
           alert("✅ Account created! Pending approval — please email Taylor.");
           await signOut(auth);
         } catch (createError) {
-          alert("❌ " + createError.message);
+          console.error("Create failed:", createError.code, createError.message);
+          alert("❌ Create failed: " + createError.message);
         }
-      } else if (error.code === "auth/invalid-credential") {
+      } 
+      else if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password") {
         alert("❌ Invalid password. Try again or reset your password.");
-      } else {
-        alert("❌ " + error.message);
+      } 
+      else {
+        console.error("Unhandled error:", error);
+        alert("❌ " + (error.message || "Something went wrong."));
       }
     }
   });
