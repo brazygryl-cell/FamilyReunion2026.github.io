@@ -7,7 +7,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAS69ZrrV62qx1DRNy_BdIImevD1IL2Grc",
   authDomain: "family-reunion-2026.firebaseapp.com",
   projectId: "family-reunion-2026",
-  storageBucket: "family-reunion-2026.firebasestorage.app",
+  storageBucket: "family-reunion-2026.appspot.com",
   messagingSenderId: "110890823431",
   appId: "1:110890823431:web:524b468c6371c260405fa2",
   measurementId: "G-4ZSYWZKJ4W"
