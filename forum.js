@@ -1,12 +1,13 @@
-// forum.js
-import { db } from "./firebase-init.js";
+// forum.js — Firebase-only version
+import { auth, db } from "./firebase-init.js";
 import {
   collection,
   addDoc,
   getDocs,
   query,
-  orderBy
+  orderBy,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 // DOM elements
 const postsContainer = document.getElementById("posts");
@@ -26,7 +27,7 @@ function showStatus(message = "", type = "") {
 }
 
 // Load posts from Firestore
-async function loadPosts() {
+async function loadPosts(user) {
   try {
     const q = query(postsCol, orderBy("timestamp", "desc"));
     const snapshot = await getDocs(q);
@@ -38,7 +39,9 @@ async function loadPosts() {
       div.className = "post";
       div.innerHTML = `
         <p>${data.message}</p>
-        <span class="meta">— ${data.email}, ${new Date(data.timestamp).toLocaleString()}</span>
+        <span class="meta">— ${data.name || "Family Member"}, ${new Date(
+          data.timestamp
+        ).toLocaleString()}</span>
       `;
       postsContainer.appendChild(div);
     });
@@ -49,38 +52,51 @@ async function loadPosts() {
 }
 
 // Submit new post
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
+async function postMessage(user) {
   const message = postField.value.trim();
   if (!message) {
     showStatus("Please write something before posting.", "info");
     return;
   }
 
-  const user =
-    window.netlifyIdentity && window.netlifyIdentity.currentUser();
-  const email = user ? user.email : "anonymous";
+  const nameInput = document.getElementById("posterName");
+  const name = nameInput ? nameInput.value.trim() : "";
 
   try {
     submitButton.disabled = true;
     showStatus("Saving your post...", "info");
 
     await addDoc(postsCol, {
-      email,
+      name: name || "Family Member",
+      email: user?.email || "anonymous",
       message,
       timestamp: Date.now(),
     });
 
     postField.value = "";
+    if (nameInput) nameInput.value = "";
     showStatus("Post published!", "success");
-    loadPosts();
+    await loadPosts(user);
   } catch (err) {
     console.error("Failed to submit post:", err);
     showStatus(`Could not submit your post: ${err.message}`, "error");
   } finally {
     submitButton.disabled = false;
   }
-});
+}
 
-// Load posts on page load
-loadPosts();
+// ✅ Listen to Firebase Auth state
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    form.style.display = "block";
+    loadPosts(user);
+
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      postMessage(user);
+    };
+  } else {
+    form.style.display = "none";
+    postsContainer.textContent = "Please log in to view and post.";
+  }
+});
