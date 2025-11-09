@@ -185,12 +185,16 @@
 
 <body>
   <!-- 🌄 Background slideshow -->
-  <div class="bg-slide active" style="background-image:url('images/pet1.jpg')"></div>
-  <div class="bg-slide" style="background-image:url('images/pet2.jpg')"></div>
-
-  <div class="login-card">
-    <h2>Welcome Back 💚</h2>
-    <p>Sign in to stay connected and share the love for the 2026 Williams Family Reunion!</p>
+<!-- 🎞️ Login Slideshow Hero -->
+<section id="login-hero">
+  <div class="slide active" style="background-image:url('images/family1.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family2.jpg')"></div>
+  <div class="slide" style="background-image:url('images/family3.jpg')"></div>
+  <div class="overlay">
+    <h1>Welcome Family 💚</h1>
+    <p>Sign in to join the Williams Family Reunion 2026!</p>
+  </div>
+</section>
 
     <input id="emailInput" type="email" placeholder="Email address" required />
     <input id="passwordInput" type="password" placeholder="Password" required />
@@ -334,5 +338,15 @@
       });
     });
   </script>
+<script>
+  const loginSlides = document.querySelectorAll("#login-hero .slide");
+  let currentSlide = 0;
+  setInterval(() => {
+    loginSlides[currentSlide].classList.remove("active");
+    currentSlide = (currentSlide + 1) % loginSlides.length;
+    loginSlides[currentSlide].classList.add("active");
+  }, 6000);
+</script>
+  
 </body>
 </html>
