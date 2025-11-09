@@ -1,7 +1,6 @@
-// firebase-init.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 // 🔥 Your Firebase config
 // (keep the same values from your env.js or Firebase console)
@@ -14,11 +13,6 @@ const firebaseConfig = {
   appId: "1:110890823431:web:524b468c6371c260405fa2"
 };
 
-// Initialize
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-
-// Export for use across pages
-export { app, db, auth, provider };
+export const auth = getAuth(app);
+export const db = getFirestore(app);
