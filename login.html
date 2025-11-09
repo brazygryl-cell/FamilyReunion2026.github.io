@@ -8,51 +8,71 @@
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
 
-  <style>
-    /* Page base */
-    body {
-      margin: 0;
-      font-family: "Poppins", sans-serif;
-      color: #f5f6f8;
-      background: radial-gradient(circle at 30% 20%, #161a25 0%, #0f121a 70%);
-    }
+ <style>
+/* 🌙 Unified Dark Mint Theme */
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  color: #f5f6f8;
+  background: radial-gradient(circle at 30% 20%, #161a25 0%, #0f121a 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  overflow: hidden;
+}
 
-    /* 🎞️ Login Slideshow */
-   /* 🎞️ Login Slideshow (Smaller Header Version) */
+/* 🎞️ Login Slideshow – readable + polished */
 #login-hero {
   position: relative;
-  height: 30vh; /* reduced from 60vh */
-  min-height: 180px; /* ensures it still looks good on small screens */
+  height: 35vh;
+  min-height: 220px;
   overflow: hidden;
   border-radius: 0 0 30px 30px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
   margin-bottom: 1.5rem;
 }
 
+/* Show full image without cropping + blurred edge fill */
 #login-hero .slide {
   position: absolute;
   inset: 0;
-  background-size: contain;   /* 👈 show entire photo */
+  background-size: contain;
   background-repeat: no-repeat;
-  background-position: center center;
-  background-color: #0f121a;  /* subtle backdrop fill */
+  background-position: center;
   opacity: 0;
   transition: opacity 2s ease-in-out;
 }
+#login-hero .slide.active { opacity: 1; }
 
-#login-hero .slide.active {
-  opacity: 1;
-  transform: scale(1);
+/* Blur + dim behind for seamless fill */
+#login-hero .slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  background-size: cover;
+  background-position: center;
+  filter: blur(25px) brightness(0.5);
+  transform: scale(1.1);
+  z-index: -1;
 }
 
+/* Dim overlay for text readability */
 #login-hero::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.5) 0%,
+    rgba(0, 0, 0, 0.6) 50%,
+    rgba(0, 0, 0, 0.75) 100%
+  );
   z-index: 1;
 }
 
+/* Text overlay */
 #login-hero .overlay {
   position: absolute;
   top: 50%;
@@ -61,97 +81,171 @@
   text-align: center;
   color: #fff;
   z-index: 2;
-  max-width: 800px;
+  max-width: 700px;
   padding: 0 1rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
 #login-hero h1 {
   font-family: "Playfair Display", serif;
-  font-size: 1.8rem; /* smaller title */
+  font-size: 2.1rem;
   margin-bottom: 0.3rem;
+  color: #7ee0c2;
+  text-shadow: 0 0 12px rgba(126, 224, 194, 0.4);
 }
 
 #login-hero p {
   color: #d0d6e0;
-  font-size: 1rem;
+  font-size: 1.05rem;
 }
 
-/* Adjust login wrapper spacing since hero is shorter */
-.login-wrapper {
-  margin-top: 1rem;
+#login-hero h1::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #7ee0c2, #57d6a5);
+  margin: 0.6rem auto 0;
+  border-radius: 2px;
 }
 
-    /* Centered login card */
-    .login-wrapper {
-      display: flex; align-items: center; justify-content: center;
-      min-height: 40vh; padding: 2rem 1rem; /* sits below hero */
-    }
-    .login-card {
-      background: linear-gradient(180deg, rgba(20,24,34,.9), rgba(12,15,22,.95));
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
-      padding: 40px 32px; text-align: center;
-      box-shadow: 0 0 30px rgba(0,255,200,0.08);
-      max-width: 420px; width: 100%;
-      backdrop-filter: blur(10px);
-      animation: fadeIn .8s ease forwards;
-    }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
-    .login-card h2 {
-      font-family: "Playfair Display", serif; font-size: 2rem;
-      margin-bottom: 10px; color: #fff;
-    }
-    .login-card p { color:#aeb4c1; font-size:1.05rem; margin-bottom: 24px; }
+/* 💫 Login Card */
+.login-card {
+  background: linear-gradient(180deg, rgba(20, 24, 34, 0.9), rgba(12, 15, 22, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(0, 255, 200, 0.08);
+  max-width: 420px;
+  width: 100%;
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.8s ease forwards;
+  z-index: 5;
+}
 
-    input {
-      width: 100%; background: rgba(15,18,26,.85);
-      border: 1px solid rgba(255,255,255,.1); border-radius: 10px;
-      padding: 12px 14px; color: #f5f6f8; margin-bottom: 14px; font-size: 1.05rem;
-      transition: all .2s ease;
-    }
-    input:focus {
-      border-color: #7ee0c2; outline: none; box-shadow: 0 0 6px rgba(126,224,194,.3);
-    }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-    .login-btn {
-      background: linear-gradient(90deg, #7ee0c2, #57d6a5);
-      color: #000; font-weight: 700; font-size: 1.05rem;
-      border: none; border-radius: 10px; padding: 12px 22px;
-      cursor: pointer; transition: all .25s ease; width: 100%;
-    }
-    .login-btn:hover { transform: scale(1.04); box-shadow: 0 0 20px rgba(126,224,194,.4); }
+.login-card h2 {
+  font-family: "Playfair Display", serif;
+  font-size: 2rem;
+  margin-bottom: 8px;
+  color: #ffffff;
+}
 
-    .invite-note {
-      text-align: center; color: #a7aebb; font-size: .95rem;
-      padding: 1rem 1rem 2rem;
-    }
-    .invite-note a { color: #7ee0c2; font-weight: 600; text-decoration: none; }
-    .invite-note a:hover { text-decoration: underline; }
+.login-card p {
+  color: #aeb4c1;
+  font-size: 1.05rem;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
 
-    /* 🪟 Create Account Modal */
-    .modal {
-      display: none; position: fixed; inset: 0; z-index: 1000;
-      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
-      justify-content: center; align-items: center; animation: fadeIn .5s ease;
-    }
-    .modal-content {
-      background: linear-gradient(180deg, #161a25, #0f121a);
-      padding: 28px 26px; border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.1);
-      box-shadow: 0 0 25px rgba(126,224,194,.15);
-      width: 90%; max-width: 380px; text-align: center;
-      transform: scale(.9); animation: popUp .35s ease forwards; position: relative;
-    }
-    @keyframes popUp { from{transform:scale(.8);opacity:0} to{transform:scale(1);opacity:1} }
-    .modal-content h3 { font-family:"Playfair Display",serif; color:#fff; margin-bottom:10px; }
-    .modal-content p { color:#b7bdc9; margin-bottom:18px; }
-    .modal-content input { margin-bottom: 10px; }
-    .modal-content button:hover { transform: scale(1.03); box-shadow: 0 0 12px rgba(126,224,194,.3); }
-    .close {
-      position: absolute; top: 12px; right: 18px; font-size: 1.8rem; color: #aaa; cursor: pointer;
-    }
-    .close:hover { color: #fff; }
-  </style>
+input {
+  width: 100%;
+  background: rgba(15, 18, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #f5f6f8;
+  margin-bottom: 14px;
+  font-size: 1.05rem;
+  transition: all 0.2s ease;
+}
+input:focus {
+  border-color: #7ee0c2;
+  outline: none;
+  box-shadow: 0 0 6px rgba(126, 224, 194, 0.3);
+}
+
+.login-btn {
+  background: linear-gradient(90deg, #7ee0c2, #57d6a5);
+  color: #000;
+  font-weight: 700;
+  font-size: 1.05rem;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 22px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  width: 100%;
+}
+.login-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 20px rgba(126, 224, 194, 0.4);
+}
+
+.invite-note {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #a7aebb;
+  font-size: 0.95rem;
+  width: 100%;
+}
+.invite-note a {
+  color: #7ee0c2;
+  font-weight: 600;
+  text-decoration: none;
+}
+.invite-note a:hover {
+  text-decoration: underline;
+}
+
+/* 🪟 Create Account Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.5s ease;
+}
+.modal-content {
+  background: linear-gradient(180deg, #161a25, #0f121a);
+  padding: 28px 26px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 25px rgba(126, 224, 194, 0.15);
+  width: 90%;
+  max-width: 380px;
+  text-align: center;
+  transform: scale(0.9);
+  animation: popUp 0.35s ease forwards;
+}
+@keyframes popUp {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.modal-content h3 {
+  font-family: "Playfair Display", serif;
+  color: #fff;
+  margin-bottom: 10px;
+}
+.modal-content p { color: #b7bdc9; margin-bottom: 18px; }
+.modal-content input { margin-bottom: 10px; }
+.modal-content button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 12px rgba(126, 224, 194, 0.3);
+}
+.close {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  font-size: 1.8rem;
+  color: #aaa;
+  cursor: pointer;
+}
+.close:hover { color: #fff; }
+</style>
+
 </head>
 
 <body>
