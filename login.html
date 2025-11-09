@@ -18,34 +18,66 @@
     }
 
     /* 🎞️ Login Slideshow */
-    #login-hero {
-      position: relative;
-      height: 60vh;
-      overflow: hidden;
-      border-radius: 0 0 40px 40px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-    }
-    #login-hero .slide {
-      position: absolute; inset: 0;
-      background-size: cover; background-position: center;
-      opacity: 0; transform: scale(1.05);
-      transition: opacity 2s ease-in-out, transform 6s ease-in-out;
-    }
-    #login-hero .slide.active { opacity: 1; transform: scale(1); }
-    #login-hero::after {
-      content: ""; position: absolute; inset: 0;
-      background: rgba(0,0,0,0.55); z-index: 1;
-    }
-    #login-hero .overlay {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center; color: #fff; z-index: 2; max-width: 800px;
-    }
-    #login-hero h1 {
-      font-family: "Playfair Display", serif;
-      font-size: 2.2rem; margin-bottom: .4rem;
-    }
-    #login-hero p { color: #d0d6e0; font-size: 1.1rem; }
+   /* 🎞️ Login Slideshow (Smaller Header Version) */
+#login-hero {
+  position: relative;
+  height: 30vh; /* reduced from 60vh */
+  min-height: 180px; /* ensures it still looks good on small screens */
+  overflow: hidden;
+  border-radius: 0 0 30px 30px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  margin-bottom: 1.5rem;
+}
+
+#login-hero .slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: scale(1.05);
+  transition: opacity 2s ease-in-out, transform 6s ease-in-out;
+}
+#login-hero .slide.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+#login-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1;
+}
+
+#login-hero .overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  z-index: 2;
+  max-width: 800px;
+  padding: 0 1rem;
+}
+
+#login-hero h1 {
+  font-family: "Playfair Display", serif;
+  font-size: 1.8rem; /* smaller title */
+  margin-bottom: 0.3rem;
+}
+
+#login-hero p {
+  color: #d0d6e0;
+  font-size: 1rem;
+}
+
+/* Adjust login wrapper spacing since hero is shorter */
+.login-wrapper {
+  margin-top: 1rem;
+}
 
     /* Centered login card */
     .login-wrapper {
