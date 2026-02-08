@@ -639,3 +639,113 @@ footer{
   backdrop-filter: blur(10px);
   color: rgba(7,16,31,.80);
 }
+/* =========================
+   HOME HERO: separated layout
+   ========================= */
+main.home{ padding: 18px 0 34px; }
+
+.home-hero-wrap{
+  width: min(1120px, calc(100% - 48px));
+  margin: 22px auto 0;
+  display: grid;
+  gap: 16px;
+}
+
+/* slideshow becomes a standalone “visual card” */
+#hero-slideshow.home-hero{
+  position: relative;
+  height: clamp(380px, 52vh, 520px); /* smaller + wide */
+  border-radius: 26px;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid rgba(255,255,255,.16);
+  box-shadow: 0 24px 80px rgba(0,0,0,.35);
+}
+
+/* brighten image vibe a bit */
+#hero-slideshow.home-hero .slide{
+  position:absolute;
+  inset:0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: scale(1.06);
+  transition: opacity 1.6s ease-in-out, transform 10s ease-in-out, filter 1.6s ease;
+  filter: saturate(1.18) contrast(1.05) brightness(1.02);
+}
+#hero-slideshow.home-hero .slide.active{
+  opacity: 1;
+  transform: scale(1.12);
+}
+
+/* add a sunny “festival wash” on top of photos */
+#hero-slideshow.home-hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(900px 520px at 12% 18%, rgba(255, 94, 98, .26), transparent 60%),
+    radial-gradient(900px 520px at 85% 22%, rgba(255, 209, 102, .28), transparent 62%),
+    radial-gradient(1100px 700px at 55% 92%, rgba(66, 245, 195, .18), transparent 65%),
+    linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.22));
+  mix-blend-mode: screen;
+  opacity: .85;
+}
+
+/* dots stay pinned to slideshow */
+.hero-dots{
+  position:absolute;
+  left:50%;
+  bottom:12px;
+  transform: translateX(-50%);
+  z-index: 3;
+  display:flex;
+  gap:8px;
+  padding: 8px 10px;
+  border-radius:999px;
+  background: rgba(255,255,255,.22);
+  border: 1px solid rgba(255,255,255,.25);
+  backdrop-filter: blur(10px);
+}
+.hero-dots button{
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(0,0,0,.22);
+  cursor: pointer;
+}
+.hero-dots button.active{
+  background: linear-gradient(90deg, #ff5e62, #ff9966, #ffd166);
+}
+
+/* info card (separate, below slideshow) */
+.hero-info .hero-panel{
+  width: 100%;
+  border-radius: 22px;
+  padding: 22px 18px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 18px 55px rgba(0,0,0,.25);
+  backdrop-filter: blur(14px);
+}
+
+/* make buttons feel “theme park” vibrant */
+.hero-actions .btn{
+  background: linear-gradient(90deg, #ff5e62, #ff9966, #ffd166, #42f5c3);
+  color: #061014;
+  font-weight: 900;
+}
+.hero-actions .btn.secondary{
+  background: linear-gradient(90deg, rgba(122,167,255,.25), rgba(66,245,195,.18));
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,.22);
+}
+
+/* responsive */
+@media (max-width: 640px){
+  .home-hero-wrap{ width: calc(100% - 28px); }
+  #hero-slideshow.home-hero{ border-radius: 22px; }
+}
+
