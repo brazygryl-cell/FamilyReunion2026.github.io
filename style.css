@@ -255,3 +255,269 @@ footer{
   background:rgba(8,20,38,.6);
   border-top:1px solid var(--border);
 }
+/* ===============================
+   FORUM PAGE STYLES (clean + matching theme)
+   Paste into style.css
+   =============================== */
+
+/* Section/container (in case you don’t already have these globally) */
+.section{
+  padding: 28px 0 40px;
+}
+
+.container{
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Forum hero */
+#forum-hero{
+  max-width: 1120px;
+  margin: 22px auto 26px;
+  height: 300px;
+  border-radius: 26px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  background: #000;
+}
+
+#forum-hero .slide{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  opacity:0;
+  transform: scale(1.05);
+  transition: opacity 1.4s ease-in-out, transform 6s ease-in-out;
+}
+
+#forum-hero .slide.active{
+  opacity:1;
+  transform: scale(1);
+}
+
+/* cleaner overlay (less “dark wash”) */
+#forum-hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,.25) 0%,
+    rgba(0,0,0,.55) 65%,
+    rgba(0,0,0,.65) 100%
+  );
+  z-index:1;
+}
+
+#forum-hero .overlay{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding: 18px;
+}
+
+#forum-hero .overlay h1{
+  font-family:"Playfair Display", serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  margin: 0 0 8px;
+}
+
+#forum-hero .overlay p{
+  margin:0;
+  color: rgba(246,251,255,.82);
+  font-size: 1.05rem;
+}
+
+/* Page headings */
+.container h2{
+  margin: 10px 0 4px;
+  font-size: 1.6rem;
+}
+
+.container p{
+  margin: 0 0 18px;
+  color: var(--muted);
+}
+
+/* Forum form */
+#forumForm{
+  margin-top: 18px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+#posterName,
+#postBody{
+  width: 100%;
+  background: rgba(8,20,38,.65);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 1.05rem;
+}
+
+#posterName{
+  margin-bottom: 10px;
+}
+
+#postBody{
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* Button */
+#submitPost{
+  margin-top: 12px;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 800;
+  cursor: pointer;
+  background: linear-gradient(90deg, var(--accent-yellow), var(--accent-orange));
+  color: #081426;
+  box-shadow: var(--shadow);
+}
+
+#submitPost:disabled{
+  opacity: .65;
+  cursor: not-allowed;
+}
+
+/* Status message */
+.status-message{
+  margin: 12px 0 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.05);
+  color: var(--muted);
+}
+
+.status-message.success{
+  border-color: rgba(255,154,31,.35);
+  color: rgba(255,209,102,.95);
+}
+
+.status-message.error{
+  border-color: rgba(255,70,70,.35);
+  color: rgba(255,170,170,.95);
+}
+
+.status-message.info{
+  border-color: rgba(45,226,230,.25);
+  color: rgba(246,251,255,.85);
+}
+
+/* Posts */
+#posts{
+  margin-top: 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.post{
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 16px;
+  box-shadow: var(--shadow);
+}
+
+.post p{
+  margin: 0 0 8px;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.post .meta{
+  display:block;
+  color: var(--muted);
+  font-size: .95rem;
+}
+
+/* Comments (if you expand later / keep forum.js comment UI) */
+.comment-section{
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255,255,255,.04);
+  overflow: hidden;
+}
+
+.comment-summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  cursor:pointer;
+  padding: 10px 14px;
+  background: rgba(8,20,38,.75);
+  color: var(--text);
+  font-weight:700;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.comment-summary:hover{
+  color: var(--accent-yellow);
+}
+
+.comments-body{
+  padding: 12px 14px;
+  background: rgba(0,0,0,.18);
+}
+
+.comment{
+  background: rgba(255,255,255,.06);
+  border-left: 3px solid rgba(255,154,31,.8);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+
+.comment .byline{
+  display:block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: .92rem;
+  font-style: italic;
+}
+
+.comment-input{
+  width:100%;
+  background: rgba(8,20,38,.65);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: var(--text);
+  margin-top: 10px;
+}
+
+.send-comment{
+  margin-top: 10px;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 800;
+  cursor: pointer;
+  background: linear-gradient(90deg, var(--accent-yellow), var(--accent-orange));
+  color: #081426;
+}
+
+/* Responsive */
+@media (max-width: 640px){
+  #forum-hero{ height: 240px; border-radius: 22px; }
+  #forumForm, .post{ padding: 14px; }
+}
+
