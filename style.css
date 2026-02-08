@@ -654,3 +654,240 @@ body{
   font-size: 1.05rem;
   letter-spacing: .25px;
 }
+/* =========================================================
+   HOME HERO + NAV UPGRADE (place near bottom of style.css)
+   ========================================================= */
+
+/* ------------- NAV: match hero width + feel “thicker” ------------- */
+header.site-header{
+  background: rgba(10,12,28,.60);
+  border-bottom: 1px solid rgba(255,255,255,.10);
+}
+
+nav.navbar{
+  /* match hero width */
+  width: min(1120px, calc(100% - 48px));
+  margin: 0 auto;
+
+  /* make it less skinny */
+  min-height: 72px;
+  padding: 16px 18px;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.brand .title{ font-size: 21px; }
+
+.nav-links a{
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+@media (max-width: 640px){
+  nav.navbar{
+    width: calc(100% - 28px);
+    min-height: 66px;
+    padding: 14px 14px;
+  }
+}
+
+
+/* ------------- HERO: keep your new size, but stop covering photos ------------- */
+#hero-slideshow.home-hero{
+  position:relative;
+  width: min(1120px, calc(100% - 48px));
+  margin: 22px auto 18px;
+  height: clamp(520px, 72vh, 680px);
+  border-radius: 26px;
+  overflow:hidden;
+  isolation:isolate;
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 24px 80px rgba(0,0,0,.55);
+}
+
+/* Keep your slides under everything */
+#hero-slideshow.home-hero .slide{ z-index: 0; }
+
+/* Your FX layers should float above slides but below caption */
+#hero-slideshow.home-hero .fx-nebula,
+#hero-slideshow.home-hero .fx-stars,
+#hero-slideshow.home-hero .fx-twinkles,
+#hero-slideshow.home-hero .fx-sparkles{ z-index: 1; }
+
+/* Big GRAPHIC: a diagonal ribbon/swoosh (no extra HTML needed) */
+#hero-slideshow.home-hero::before{
+  content:"";
+  position:absolute;
+  inset:-30%;
+  z-index: 2;
+  pointer-events:none;
+
+  /* ribbon / swoosh */
+  background:
+    conic-gradient(from 210deg at 60% 55%,
+      rgba(255,77,141,.00) 0deg,
+      rgba(255,77,141,.18) 35deg,
+      rgba(255,209,102,.16) 85deg,
+      rgba(66,245,195,.18) 140deg,
+      rgba(122,167,255,.16) 200deg,
+      rgba(255,77,141,.00) 320deg
+    );
+
+  filter: blur(18px) saturate(1.1);
+  opacity: .60;
+  transform: rotate(-8deg);
+  animation: ribbonDrift 14s cubic-bezier(.2,.9,.2,1) infinite alternate;
+  mix-blend-mode: screen;
+}
+
+@keyframes ribbonDrift{
+  0%{ transform: rotate(-10deg) translate3d(-1%, -1%, 0) scale(1.02); }
+  100%{ transform: rotate(-6deg) translate3d(1%, 1%, 0) scale(1.06); }
+}
+
+/* Replace the “center overlay covers gallery” behavior:
+   Dock overlay to bottom like a caption bar */
+#hero-slideshow.home-hero .overlay{
+  position:absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: auto;
+  transform: none;
+
+  z-index: 4;
+  padding: 18px 18px 16px;
+
+  /* makes bottom readable while keeping the image visible */
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,.78) 0%,
+    rgba(0,0,0,.45) 35%,
+    rgba(0,0,0,.18) 65%,
+    rgba(0,0,0,0) 100%
+  );
+
+  display: block;
+}
+
+/* Make the hero panel a WIDE “caption card”, not a giant centered sheet */
+#hero-slideshow.home-hero .hero-panel{
+  width: min(1080px, 100%);
+  margin: 0 auto;
+  text-align: left;
+
+  padding: 16px 16px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 50px rgba(0,0,0,.45);
+}
+
+/* Make chips sit left and feel tighter */
+#hero-slideshow.home-hero .hero-chips{
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+/* Title row: left aligned so it feels like a real “hero banner” */
+#hero-slideshow.home-hero h1{
+  margin: 0 0 8px;
+  font-size: clamp(2.1rem, 4.6vw, 3.8rem);
+}
+
+#hero-slideshow.home-hero h1::after{
+  margin: 12px 0 0;  /* left underline instead of centered */
+  width: 240px;
+}
+
+/* Put sub + countdown + buttons in a responsive grid so it doesn’t cover photos */
+#hero-slideshow.home-hero .sub{
+  margin: 8px 0 0;
+}
+
+#hero-slideshow.home-hero .countdown{
+  justify-content: flex-start;
+  margin: 14px 0 0;
+  gap: 12px;
+}
+
+#hero-slideshow.home-hero .count-chip{
+  min-width: 110px;
+  padding: 14px 12px;
+  background: rgba(255,255,255,.07);
+}
+
+/* Buttons align right on desktop; stack on mobile */
+#hero-slideshow.home-hero .hero-actions{
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+/* Layout helper: caption content splits into 2 columns on wide screens */
+@media (min-width: 820px){
+  #hero-slideshow.home-hero .hero-panel{
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 14px 18px;
+    align-items: end;
+  }
+
+  /* left column: chips + title + sub */
+  #hero-slideshow.home-hero .hero-chips{ grid-column: 1 / -1; }
+  #hero-slideshow.home-hero h1{ grid-column: 1 / -1; }
+  #hero-slideshow.home-hero .sub{ grid-column: 1 / 2; }
+
+  /* right column: buttons */
+  #hero-slideshow.home-hero .hero-actions{
+    grid-column: 2 / 3;
+    justify-content: flex-end;
+    align-self: start;
+    margin-top: 0;
+  }
+
+  /* countdown spans full width below */
+  #hero-slideshow.home-hero .countdown{ grid-column: 1 / -1; }
+}
+
+/* Mobile: keep it clean */
+@media (max-width: 640px){
+  #hero-slideshow.home-hero{
+    width: calc(100% - 28px);
+    border-radius: 22px;
+  }
+
+  #hero-slideshow.home-hero .overlay{ padding: 14px 12px 12px; }
+  #hero-slideshow.home-hero .hero-panel{ padding: 14px 14px; }
+
+  #hero-slideshow.home-hero .hero-actions{
+    justify-content: flex-start;
+  }
+
+  #hero-slideshow.home-hero .count-chip{ min-width: 140px; }
+}
+
+
+/* ------------- EXTRA TWINKLES: add a second star layer ------------- */
+#hero-slideshow.home-hero .fx-stars::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:.22;
+  background:
+    radial-gradient(1px 1px at 6% 18%, rgba(255,255,255,.90), transparent 60%),
+    radial-gradient(1px 1px at 14% 86%, rgba(255,255,255,.75), transparent 60%),
+    radial-gradient(1.5px 1.5px at 40% 10%, rgba(255,255,255,.85), transparent 60%),
+    radial-gradient(1px 1px at 58% 44%, rgba(255,255,255,.78), transparent 60%),
+    radial-gradient(1.5px 1.5px at 74% 18%, rgba(255,255,255,.88), transparent 60%),
+    radial-gradient(1px 1px at 92% 72%, rgba(255,255,255,.80), transparent 60%);
+  animation: starDrift2 90s linear infinite;
+  pointer-events:none;
+}
+@keyframes starDrift2{
+  0%{ transform: translate3d(0,0,0); }
+  100%{ transform: translate3d(2%, -1.2%, 0); }
+}
+
+
