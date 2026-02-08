@@ -1,171 +1,155 @@
 /* =========================================================
-   Williams Family Reunion — FLORIDA SUMMER (DAYTIME)
-   Bright sky + sunshine + coral. Real visible motion.
-   Clean file. No duplicates.
+   Williams Family Reunion — FLORIDA SUMMER / AMUSEMENT PARK
+   Vibrant + fun + obvious motion (confetti + sparkles + glow).
+   Clean single-file style.css (no duplicates).
    ========================================================= */
 
+/* -------------------- TOKENS -------------------- */
 :root{
-  /* Daytime background */
-  --skyTop:#7DD3FC;     /* sky blue */
-  --skyMid:#A7F3D0;     /* seafoam */
-  --skyBot:#FED7AA;     /* warm sand */
+  /* Sky + warmth */
+  --sky1:#2EC5FF;     /* bright sky */
+  --sky2:#33E6C7;     /* tropical aqua */
+  --sky3:#FFB13D;     /* sunset orange */
+  --sky4:#FF3D77;     /* pink-red */
 
-  /* Text + surfaces (light theme) */
-  --ink:#0b1220;
-  --muted: rgba(11,18,32,.70);
-  --card: rgba(255,255,255,.74);
-  --card2: rgba(255,255,255,.60);
-  --stroke: rgba(11,18,32,.14);
+  /* UI */
+  --ink:#07101F;
+  --muted: rgba(7,16,31,.72);
+  --card: rgba(255,255,255,.64);
+  --card2: rgba(255,255,255,.50);
+  --stroke: rgba(7,16,31,.14);
 
-  /* Accents (YOU WILL SEE THESE) */
-  --sun:#FFD54A;        /* sunshine */
-  --mango:#FF9F1C;      /* orange */
-  --coral:#FF4D6D;      /* pink-red */
-  --pink:#FF68C9;       /* hot pink */
-  --aqua:#14F7D3;       /* tropical aqua */
-  --teal:#00C2A8;       /* teal */
-  --lime:#B7F34A;       /* lime */
+  /* Accents (LOUD) */
+  --sun:#FFD000;
+  --mango:#FF7A00;
+  --coral:#FF2D55;
+  --pink:#FF3FD2;
+  --aqua:#00F5D4;
+  --teal:#00BFA6;
+  --lime:#B9F800;
+  --blue:#2B7BFF;
 
-  --radius: 18px;
-  --shadow: 0 22px 60px rgba(11,18,32,.18);
-  --shadowSoft: 0 12px 26px rgba(11,18,32,.14);
+  --radius:18px;
+  --radiusSm:12px;
+  --shadow: 0 22px 60px rgba(7,16,31,.18);
+  --shadowSoft: 0 12px 26px rgba(7,16,31,.14);
   --blur: 14px;
   --ease: cubic-bezier(.2,.9,.2,1);
 }
 
+/* -------------------- BASE -------------------- */
 *{ box-sizing:border-box; }
 
 html,body{
   margin:0;
   padding:0;
-  color: var(--ink);
-  font-family: Poppins,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
+  font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
   line-height:1.6;
   overflow-x:hidden;
+  color:var(--ink);
 
-  /* BRIGHT summer background */
+  /* Bright summer gradient */
   background:
-    radial-gradient(1200px 700px at 12% 8%, rgba(255,77,109,.28), transparent 58%),
-    radial-gradient(1100px 740px at 90% 10%, rgba(255,159,28,.25), transparent 60%),
-    radial-gradient(1200px 800px at 50% 110%, rgba(20,247,211,.18), transparent 62%),
-    linear-gradient(180deg, var(--skyTop) 0%, var(--skyMid) 52%, var(--skyBot) 100%);
+    radial-gradient(1000px 650px at 12% 10%, rgba(255,61,119,.30), transparent 60%),
+    radial-gradient(900px 600px at 88% 12%, rgba(255,208,0,.30), transparent 62%),
+    radial-gradient(1200px 800px at 50% 110%, rgba(0,245,212,.18), transparent 64%),
+    linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 42%, var(--sky3) 82%, #FFE8C7 120%);
   position:relative;
 }
 
-/* Links */
-a{ color: #0a6cff; text-decoration:none; }
+@media (prefers-reduced-motion: reduce){
+  *{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+    scroll-behavior:auto !important;
+  }
+}
+
+/* links */
+a{ color: var(--blue); text-decoration:none; }
 a:hover{ color: var(--coral); text-decoration: underline; text-underline-offset:3px; }
 
-/* Layout */
 .container{ max-width:1100px; margin:0 auto; padding:26px; }
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce){
-  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
-}
-
-/* =========================================================
-   GLOBAL MOTION (OBVIOUS): clouds + sparkles + sunrays
+/* -------------------- FUN BACKGROUND MOTION --------------------
+   Confetti drift + sparkles twinkle.
    No extra HTML needed.
-   ========================================================= */
+--------------------------------------------------------------- */
 
-/* Slow clouds (large soft blobs drifting) */
+/* Confetti layer (obvious movement) */
 body::before{
-  content:"";
-  position:fixed;
-  inset:-20% -20%;
-  z-index:-3;
-  pointer-events:none;
-  background:
-    radial-gradient(260px 160px at 15% 22%, rgba(255,255,255,.55), transparent 70%),
-    radial-gradient(340px 190px at 38% 16%, rgba(255,255,255,.48), transparent 72%),
-    radial-gradient(300px 170px at 62% 24%, rgba(255,255,255,.50), transparent 72%),
-    radial-gradient(360px 210px at 82% 18%, rgba(255,255,255,.46), transparent 74%),
-    radial-gradient(260px 160px at 70% 55%, rgba(255,255,255,.35), transparent 74%),
-    radial-gradient(320px 180px at 22% 62%, rgba(255,255,255,.32), transparent 76%);
-  filter: blur(2px);
-  opacity:.85;
-  animation: cloudDrift 22s linear infinite;
-}
-@keyframes cloudDrift{
-  0%{ transform: translate3d(0,0,0); }
-  100%{ transform: translate3d(-6%, 2%, 0); }
-}
-
-/* Sparkles (small twinkles that move) */
-body::after{
   content:"";
   position:fixed;
   inset:0;
   z-index:-2;
   pointer-events:none;
+  opacity:.85;
+
+  /* confetti pieces as tiny gradients at random positions */
   background:
-    radial-gradient(1.5px 1.5px at 10% 20%, rgba(255,255,255,.95), transparent 65%),
-    radial-gradient(1.2px 1.2px at 28% 40%, rgba(255,255,255,.85), transparent 65%),
-    radial-gradient(1.6px 1.6px at 44% 16%, rgba(255,255,255,.90), transparent 65%),
-    radial-gradient(1.2px 1.2px at 62% 32%, rgba(255,255,255,.80), transparent 65%),
-    radial-gradient(1.6px 1.6px at 76% 22%, rgba(255,255,255,.88), transparent 65%),
-    radial-gradient(1.2px 1.2px at 88% 46%, rgba(255,255,255,.78), transparent 65%),
-    radial-gradient(1.6px 1.6px at 20% 78%, rgba(255,255,255,.78), transparent 65%),
-    radial-gradient(1.2px 1.2px at 52% 82%, rgba(255,255,255,.74), transparent 65%),
+    radial-gradient(6px 10px at 8% 18%, rgba(255,45,85,.95), transparent 70%),
+    radial-gradient(6px 10px at 16% 40%, rgba(255,208,0,.95), transparent 70%),
+    radial-gradient(7px 12px at 22% 70%, rgba(0,245,212,.95), transparent 70%),
+    radial-gradient(6px 10px at 35% 28%, rgba(255,122,0,.95), transparent 70%),
+    radial-gradient(7px 12px at 46% 52%, rgba(185,248,0,.95), transparent 70%),
+    radial-gradient(6px 10px at 55% 20%, rgba(255,63,210,.95), transparent 70%),
+    radial-gradient(7px 12px at 64% 74%, rgba(43,123,255,.95), transparent 70%),
+    radial-gradient(6px 10px at 78% 36%, rgba(255,45,85,.90), transparent 70%),
+    radial-gradient(7px 12px at 86% 62%, rgba(0,245,212,.92), transparent 70%),
+    radial-gradient(6px 10px at 92% 24%, rgba(255,208,0,.95), transparent 70%);
 
-    radial-gradient(10px 10px at 14% 36%, rgba(255,159,28,.14), transparent 70%),
-    radial-gradient(12px 12px at 84% 68%, rgba(255,77,109,.12), transparent 72%),
-    radial-gradient(14px 14px at 56% 72%, rgba(20,247,211,.12), transparent 74%);
-  opacity:.75;
-  animation: sparkleDrift 12s ease-in-out infinite alternate;
-}
-@keyframes sparkleDrift{
-  0%{ transform: translate3d(0,0,0); filter: brightness(1); }
-  100%{ transform: translate3d(14px,-10px,0); filter: brightness(1.2); }
+  filter: blur(.2px);
+  animation: confettiFall 8s linear infinite;
 }
 
-/* Sun rays (subtle but clearly visible) */
-@supports (background: conic-gradient(from 0deg, #000, #fff)){
-  html::before{
-    content:"";
-    position:fixed;
-    inset:-40%;
-    z-index:-1;
-    pointer-events:none;
-    background: conic-gradient(
-      from 210deg at 60% 10%,
-      rgba(255,213,74,.00) 0deg,
-      rgba(255,213,74,.28) 20deg,
-      rgba(255,159,28,.18) 55deg,
-      rgba(255,77,109,.14) 95deg,
-      rgba(20,247,211,.10) 130deg,
-      rgba(255,213,74,.00) 320deg
-    );
-    opacity:.55;
-    filter: blur(10px);
-    mix-blend-mode: screen;
-    animation: raysSpin 10s linear infinite;
-  }
-}
-@keyframes raysSpin{
-  0%{ transform: rotate(0deg); }
-  100%{ transform: rotate(360deg); }
+@keyframes confettiFall{
+  0%   { transform: translate3d(0,-10px,0) rotate(0deg); }
+  100% { transform: translate3d(-20px, 90px,0) rotate(18deg); }
 }
 
-/* =========================================================
-   HEADER / NAV (no more skinny + summer glass)
-   ========================================================= */
+/* Sparkle twinkles (second motion layer) */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:.70;
 
+  background:
+    radial-gradient(2px 2px at 12% 22%, rgba(255,255,255,.95), transparent 65%),
+    radial-gradient(1.5px 1.5px at 22% 58%, rgba(255,255,255,.85), transparent 65%),
+    radial-gradient(2px 2px at 40% 14%, rgba(255,255,255,.92), transparent 65%),
+    radial-gradient(1.5px 1.5px at 52% 42%, rgba(255,255,255,.80), transparent 65%),
+    radial-gradient(2px 2px at 68% 20%, rgba(255,255,255,.88), transparent 65%),
+    radial-gradient(1.5px 1.5px at 84% 46%, rgba(255,255,255,.78), transparent 65%),
+    radial-gradient(2px 2px at 18% 82%, rgba(255,255,255,.78), transparent 65%),
+    radial-gradient(1.5px 1.5px at 62% 86%, rgba(255,255,255,.74), transparent 65%);
+
+  animation: twinkleMove 10s ease-in-out infinite alternate;
+}
+
+@keyframes twinkleMove{
+  0%   { transform: translate3d(0,0,0); filter: brightness(1); }
+  100% { transform: translate3d(16px,-10px,0); filter: brightness(1.25); }
+}
+
+/* -------------------- HEADER / NAV -------------------- */
 header.site-header{
   position:sticky;
   top:0;
   z-index:50;
-  background: rgba(255,255,255,.50);
+  background: rgba(255,255,255,.55);
   backdrop-filter: blur(var(--blur));
-  border-bottom: 1px solid rgba(11,18,32,.10);
-  box-shadow: 0 10px 22px rgba(11,18,32,.10);
+  border-bottom: 1px solid rgba(7,16,31,.10);
+  box-shadow: 0 10px 22px rgba(7,16,31,.10);
 }
 
 nav.navbar{
   width: min(1120px, calc(100% - 48px));
   margin: 0 auto;
-  min-height: 82px;
+  min-height: 84px;
   padding: 18px 20px;
   display:flex;
   align-items:center;
@@ -173,21 +157,15 @@ nav.navbar{
   gap:18px;
 }
 
-/* if your nav inject doesn't include .brand, these won't hurt */
 .brand{ display:flex; align-items:center; gap:12px; }
 .brand .logo{
   width:46px;height:46px;border-radius:14px;
   display:grid;place-items:center;
   font-weight:900;
-  color: #0b1220;
-  background: radial-gradient(120% 120% at 20% 10%,
-    rgba(255,213,74,1) 0%,
-    rgba(255,159,28,.98) 35%,
-    rgba(255,77,109,.92) 72%,
-    rgba(20,247,211,.88) 100%);
+  color:#07101F;
+  background: linear-gradient(135deg, var(--sun), var(--mango), var(--coral), var(--pink), var(--aqua));
   box-shadow: var(--shadowSoft);
 }
-
 .brand .title{
   font-family:"Playfair Display",serif;
   font-weight:900;
@@ -195,39 +173,46 @@ nav.navbar{
   letter-spacing:.2px;
 }
 
-.nav-links{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+.nav-links{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+/* ALL nav buttons colorful (theme park pills) */
 .nav-links a{
   padding: 10px 14px;
   border-radius: 999px;
-  font-weight: 800;
-  color: var(--ink);
-  border: 1px solid transparent;
-  background: rgba(255,255,255,.35);
-  transition: transform .12s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
+  font-weight: 900;
+  color: #061014;
+  border: 1px solid rgba(7,16,31,.10);
+  background: linear-gradient(90deg, rgba(255,208,0,.65), rgba(255,122,0,.55), rgba(255,45,85,.45), rgba(0,245,212,.38));
+  box-shadow: 0 10px 18px rgba(7,16,31,.10);
+  transition: transform .12s var(--ease), filter .16s var(--ease), box-shadow .16s var(--ease);
 }
+
 .nav-links a:hover{
   transform: translateY(-1px);
-  background: rgba(255,255,255,.58);
-  border-color: rgba(11,18,32,.10);
-  box-shadow: 0 10px 18px rgba(11,18,32,.12);
+  filter: saturate(1.25) brightness(1.05);
+  box-shadow: 0 16px 28px rgba(7,16,31,.14);
 }
+
+/* Active pops even more */
 .nav-links a.active{
-  background: linear-gradient(90deg, rgba(255,213,74,.70), rgba(255,159,28,.55), rgba(255,77,109,.45), rgba(20,247,211,.40));
-  border-color: rgba(11,18,32,.12);
-  box-shadow: 0 12px 22px rgba(11,18,32,.14);
+  background: linear-gradient(90deg, var(--sun), var(--mango), var(--coral), var(--pink), var(--aqua));
+  box-shadow: 0 18px 34px rgba(7,16,31,.16);
 }
 
 @media (max-width: 640px){
   nav.navbar{
     width: calc(100% - 28px);
-    min-height: 74px;
+    min-height: 76px;
     padding: 14px 14px;
   }
 }
 
-/* =========================================================
-   CARDS
-   ========================================================= */
+/* -------------------- CARDS -------------------- */
 .card{
   background: linear-gradient(180deg, var(--card) 0%, var(--card2) 100%);
   border: 1px solid var(--stroke);
@@ -237,27 +222,171 @@ nav.navbar{
   transition: transform .18s var(--ease), box-shadow .18s var(--ease);
 }
 .card.pad{ padding:22px; }
-.card:hover{ transform: translateY(-2px); box-shadow: 0 30px 80px rgba(11,18,32,.18); }
+.card:hover{ transform: translateY(-2px); box-shadow: 0 30px 80px rgba(7,16,31,.20); }
 
-/* =========================================================
-   COUNTDOWN
-   ========================================================= */
+/* -------------------- HERO (home) --------------------
+   Works with your #hero-slideshow structure.
+------------------------------------------------------ */
+#hero-slideshow{
+  position:relative;
+  width: min(1120px, calc(100% - 48px));
+  margin: 22px auto 18px;
+  height: clamp(520px, 72vh, 680px);
+  border-radius: 26px;
+  overflow:hidden;
+  isolation:isolate;
+  border: 1px solid rgba(255,255,255,.55);
+  box-shadow: 0 28px 90px rgba(7,16,31,.18);
+}
+
+/* Slides: bright + saturated */
+#hero-slideshow .slide{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  opacity:0;
+  transform: scale(1.06);
+  transition: opacity 1.4s ease-in-out, transform 8s ease-in-out;
+  filter: brightness(1.03) contrast(1.04) saturate(1.28);
+}
+#hero-slideshow .slide.active{
+  opacity:1;
+  transform: scale(1.02);
+}
+
+/* SUN GLOW wash (not dark!) */
+#hero-slideshow::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  background:
+    radial-gradient(900px 520px at 18% 18%, rgba(255,208,0,.55), transparent 62%),
+    radial-gradient(900px 520px at 85% 24%, rgba(255,45,85,.40), transparent 64%),
+    radial-gradient(900px 520px at 55% 92%, rgba(0,245,212,.30), transparent 66%),
+    linear-gradient(180deg, rgba(255,255,255,.10) 0%, rgba(7,16,31,.10) 85%);
+}
+
+/* HERO MOTION: big shimmer sweep across the image */
+#hero-slideshow::before{
+  content:"";
+  position:absolute;
+  inset:-25%;
+  z-index:1;
+  pointer-events:none;
+  background: linear-gradient(115deg,
+    rgba(255,208,0,.00) 0%,
+    rgba(255,208,0,.24) 18%,
+    rgba(255,45,85,.22) 40%,
+    rgba(0,245,212,.18) 62%,
+    rgba(255,122,0,.22) 82%,
+    rgba(255,208,0,.00) 100%);
+  mix-blend-mode: overlay;
+  filter: saturate(1.5) blur(.6px);
+  opacity: .95;
+  animation: heroShimmer 5.5s linear infinite;
+}
+
+@keyframes heroShimmer{
+  0%   { transform: translate3d(-10%, -6%, 0) rotate(-2deg); }
+  100% { transform: translate3d(10%, 6%, 0) rotate(2deg); }
+}
+
+/* Overlay container */
+#hero-slideshow .overlay{
+  position:absolute;
+  inset:0;
+  z-index:3;
+  display:grid;
+  place-items:center;
+  padding: 22px 16px;
+}
+
+/* Panel (readable but not dull) */
+#hero-slideshow .hero-panel{
+  width: min(900px, 92%);
+  text-align:center;
+  padding: 22px 20px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.58);
+  border: 1px solid rgba(7,16,31,.12);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 22px 60px rgba(7,16,31,.16);
+}
+
+/* Chips */
+#hero-slideshow .hero-chips{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-bottom: 12px;
+}
+#hero-slideshow .hero-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(7,16,31,.10);
+  background: rgba(255,255,255,.62);
+  font-weight: 900;
+}
+#hero-slideshow .hero-chip .dot{
+  width:10px;height:10px;border-radius:999px;
+  background: linear-gradient(90deg, var(--sun), var(--mango), var(--coral), var(--aqua));
+}
+
+/* Title */
+#hero-slideshow h1{
+  font-family:"Playfair Display",serif;
+  font-weight: 900;
+  font-size: clamp(2.1rem, 5.2vw, 4.2rem);
+  margin: 0 0 10px;
+  line-height:1.08;
+  color: var(--ink);
+}
+#hero-slideshow h1::after{
+  content:"";
+  display:block;
+  height:5px;
+  width: min(280px, 72%);
+  margin: 14px auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--sun), var(--mango), var(--coral), var(--pink), var(--aqua));
+  box-shadow: 0 10px 22px rgba(7,16,31,.12);
+}
+
+/* Subtitle */
+#hero-slideshow .sub{
+  display:inline-block;
+  font-size: 1.05rem;
+  color: rgba(7,16,31,.70);
+  margin: 8px 0 14px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(7,16,31,.10);
+  background: rgba(255,255,255,.55);
+}
+
+/* Countdown */
 .countdown{
   display:flex;
   justify-content:center;
   gap:14px;
   flex-wrap:wrap;
-  margin: 24px auto 10px;
+  margin: 16px auto 14px;
 }
 .count-chip{
-  padding: 18px 20px;
+  padding: 16px 18px;
   min-width: 118px;
   text-align:center;
   border-radius: 16px;
-  border: 1px solid rgba(11,18,32,.12);
-  background: rgba(255,255,255,.55);
+  border: 1px solid rgba(7,16,31,.12);
+  background: rgba(255,255,255,.60);
   box-shadow: var(--shadowSoft);
-  backdrop-filter: blur(10px);
 }
 .count-chip .n{
   font-weight: 900;
@@ -271,75 +400,242 @@ nav.navbar{
 .count-chip .l{
   margin-top: 2px;
   font-size: 13px;
-  color: rgba(11,18,32,.68);
+  color: rgba(7,16,31,.68);
 }
 
-/* =========================================================
-   FOOTER
-   ========================================================= */
+/* Buttons */
+#hero-slideshow .hero-actions{
+  display:flex;
+  gap: 12px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-top: 8px;
+}
+
+#hero-slideshow .btn{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding: 0.95rem 1.55rem;
+  border-radius: 999px;
+  font-weight: 900;
+  letter-spacing:.2px;
+  border: 1px solid rgba(7,16,31,.10);
+  box-shadow: 0 18px 34px rgba(7,16,31,.16);
+  transition: transform .12s var(--ease), filter .12s var(--ease);
+  color:#07101F;
+  background: linear-gradient(90deg, var(--sun), var(--mango), var(--coral), var(--pink), var(--aqua));
+}
+#hero-slideshow .btn:hover{ transform: translateY(-1px); filter: saturate(1.25) brightness(1.05); }
+#hero-slideshow .btn:active{ transform: translateY(0) scale(.99); }
+
+/* Secondary is ALSO colorful but different */
+#hero-slideshow .btn.secondary{
+  background: linear-gradient(90deg, var(--aqua), var(--lime), var(--sun), var(--mango));
+}
+
+/* Slide dots (if you use them) */
+#hero-slideshow .hero-dots{
+  position:absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  z-index:4;
+  display:flex;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.55);
+  border: 1px solid rgba(7,16,31,.10);
+  backdrop-filter: blur(10px);
+}
+#hero-slideshow .hero-dots button{
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(7,16,31,.25);
+  cursor:pointer;
+  padding:0;
+}
+#hero-slideshow .hero-dots button.active{
+  background: linear-gradient(90deg, var(--sun), var(--mango), var(--coral), var(--aqua));
+  box-shadow: 0 8px 18px rgba(7,16,31,.14);
+}
+
+/* Responsive */
+@media (max-width: 640px){
+  #hero-slideshow{ width: calc(100% - 28px); border-radius: 22px; }
+  .count-chip{ min-width: 140px; }
+  #hero-slideshow .hero-panel{ padding: 18px 16px; }
+}
+
+/* -------------------- ITINERARY DETAILS -------------------- */
+.itinerary details{
+  background: rgba(255,255,255,.58);
+  border: 1px solid rgba(7,16,31,.12);
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadowSoft);
+  overflow:hidden;
+  transition: transform .18s var(--ease), filter .18s var(--ease);
+}
+.itinerary details[open]{ transform: translateY(-1px); filter: saturate(1.08); }
+
+.itinerary summary{
+  cursor:pointer;
+  font-weight:900;
+  padding: 1rem 1.2rem;
+  font-size: 1.06rem;
+  color: var(--ink);
+  background: linear-gradient(90deg, rgba(255,208,0,.55), rgba(255,45,85,.35), rgba(0,245,212,.30));
+  border-bottom: 1px solid rgba(7,16,31,.10);
+  list-style:none;
+}
+.itinerary summary::-webkit-details-marker{ display:none; }
+
+.itinerary ul{
+  padding: 1rem 1.5rem;
+  margin:0;
+  color: rgba(7,16,31,.72);
+}
+
+/* -------------------- FORUM / POSTS -------------------- */
+.post{
+  background: rgba(255,255,255,.60);
+  border: 1px solid rgba(7,16,31,.12);
+  border-left: 6px solid rgba(255,45,85,.70);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 1.2rem;
+  color: var(--ink);
+  box-shadow: var(--shadowSoft);
+  transition: transform .14s var(--ease), box-shadow .14s var(--ease);
+}
+.post:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 18px 45px rgba(7,16,31,.16);
+}
+.post.mine{
+  border-left-color: rgba(0,245,212,.80);
+}
+
+.meta{
+  font-size: .95rem;
+  color: rgba(7,16,31,.66);
+  margin-top: 10px;
+  display:block;
+  font-style: italic;
+}
+
+.replies-wrapper{
+  margin-top: 10px;
+  background: rgba(255,255,255,.45);
+  border: 1px solid rgba(7,16,31,.12);
+  border-radius: 12px;
+  padding: 10px;
+}
+.replies-wrapper summary{
+  font-weight:900;
+  color: #0b3cff;
+  cursor:pointer;
+}
+.replies{
+  margin-top: 8px;
+  padding-left: 12px;
+  border-left: 2px solid rgba(7,16,31,.14);
+}
+.reply{
+  margin-bottom: 8px;
+  background: rgba(255,255,255,.55);
+  border: 1px solid rgba(7,16,31,.10);
+  border-radius: 12px;
+  padding: 10px 10px;
+  box-shadow: 0 10px 24px rgba(7,16,31,.12);
+}
+.reply summary{
+  cursor:pointer;
+  font-size: .98rem;
+  font-weight:900;
+  color: #0b3cff;
+}
+.reply p{
+  margin: 8px 0 0;
+  font-size: .98rem;
+}
+
+/* inputs + buttons */
+#postBody,
+.reply-text{
+  width:100%;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(7,16,31,.14);
+  background: rgba(255,255,255,.62);
+  color: var(--ink);
+  outline: none;
+  transition: box-shadow .16s var(--ease), border-color .16s var(--ease);
+}
+#postBody:focus,
+.reply-text:focus{
+  border-color: rgba(255,45,85,.45);
+  box-shadow: 0 0 0 4px rgba(255,45,85,.18);
+}
+
+/* unified button look */
+#submitPost,
+.send-reply{
+  border:none;
+  cursor:pointer;
+  font-weight:900;
+  padding: 10px 16px;
+  border-radius: 999px;
+  color: #07101F;
+  background: linear-gradient(90deg, var(--sun), var(--mango), var(--coral), var(--pink), var(--aqua));
+  box-shadow: 0 16px 34px rgba(7,16,31,.16);
+  transition: transform .12s var(--ease), filter .12s var(--ease);
+}
+#submitPost:hover,
+.send-reply:hover{
+  transform: translateY(-1px);
+  filter: saturate(1.25) brightness(1.05);
+}
+#submitPost:active,
+.send-reply:active{ transform: translateY(0) scale(.99); }
+
+/* shimmer placeholder */
+.loading-shimmer{
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.35) 25%,
+    rgba(255,255,255,0.70) 37%,
+    rgba(255,255,255,0.35) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.05s infinite linear;
+  border-radius: 14px;
+  height: 90px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(7,16,31,.10);
+}
+@keyframes shimmer{
+  0%{ background-position: -420px 0; }
+  100%{ background-position: 420px 0; }
+}
+
+/* email links */
+.email-link{
+  color: #0b3cff;
+  font-weight: 900;
+  word-break: break-all;
+}
+.email-link:hover{ color: var(--coral); }
+
+/* -------------------- FOOTER -------------------- */
 footer{
   background: rgba(255,255,255,.55);
-  border-top: 1px solid rgba(11,18,32,.10);
+  border-top: 1px solid rgba(7,16,31,.10);
   text-align:center;
   padding: 22px 16px;
   margin-top: 44px;
   backdrop-filter: blur(10px);
-  color: rgba(11,18,32,.80);
+  color: rgba(7,16,31,.80);
 }
-
-/* =========================================================
-   HOME HERO OVERRIDES (IMPORTANT)
-   Your hero was dark because of the black overlay.
-   This forces a bright, summery wash even if you have inline styles.
-   ========================================================= */
-
-/* If your hero section is #hero-slideshow */
-#hero-slideshow{
-  border-radius: 26px;
-  box-shadow: 0 28px 90px rgba(11,18,32,.18);
-  border: 1px solid rgba(255,255,255,.45);
-}
-
-/* Kill the dark "night filter" look on slides */
-#hero-slideshow .slide{
-  filter: brightness(1.02) contrast(1.02) saturate(1.18) !important;
-}
-
-/* Replace the dark overlay with warm sunny glaze */
-#hero-slideshow::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index: 2;
-  pointer-events:none;
-  background:
-    radial-gradient(900px 520px at 20% 20%, rgba(255,213,74,.35), transparent 62%),
-    radial-gradient(900px 520px at 85% 25%, rgba(255,77,109,.22), transparent 62%),
-    radial-gradient(900px 520px at 60% 90%, rgba(20,247,211,.20), transparent 65%),
-    linear-gradient(180deg, rgba(255,255,255,.08) 0%, rgba(11,18,32,.12) 85%);
-}
-
-/* Make hero text readable without turning into a dark sheet */
-#hero-slideshow .hero-panel{
-  background: rgba(255,255,255,.55) !important;
-  border: 1px solid rgba(11,18,32,.12) !important;
-  color: var(--ink) !important;
-  backdrop-filter: blur(16px);
-}
-#hero-slideshow h1{ color: var(--ink) !important; }
-#hero-slideshow .sub{ color: rgba(11,18,32,.75) !important; }
-#hero-slideshow .hero-chip{ color: var(--ink) !important; background: rgba(255,255,255,.60) !important; }
-
-/* Buttons: bright */
-#hero-slideshow .btn{
-  background: linear-gradient(90deg, var(--sun), var(--mango), var(--coral), var(--aqua)) !important;
-  color: #08101f !important;
-  font-weight: 900;
-  border-radius: 999px;
-}
-#hero-slideshow .btn.secondary{
-  background: rgba(255,255,255,.70) !important;
-  border: 1px solid rgba(11,18,32,.12) !important;
-  color: var(--ink) !important;
-}
-
