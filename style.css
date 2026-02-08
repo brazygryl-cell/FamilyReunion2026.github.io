@@ -1,37 +1,39 @@
 /* =========================================================
-   Williams Family Reunion — Florida Summer / Amusement Park
-   Clean, single-source style.css (no duplicates / conflicts)
+   Williams Family Reunion — FLORIDA SUMMER / AMUSEMENT PARK
+   One clean stylesheet. Big warm colors. Visible motion.
    ========================================================= */
 
 /* -------------------- THEME TOKENS -------------------- */
 :root{
-  /* Florida night-sky but SUMMER (warm + tropical) */
-  --bg0:#071028;
-  --bg1:#0b1430;
-  --bg2:#140a2e;
+  /* Warm sunset base (not purple) */
+  --bg0:#08101f;        /* deep navy */
+  --bg1:#0b1630;        /* night sky */
+  --bg2:#141a33;        /* cool base for contrast */
 
   --text:#FBFCFF;
   --muted: rgba(251,252,255,.72);
 
-  /* Tropical / amusement park palette */
-  --sun:#FFD84A;      /* sunshine */
-  --mango:#FFB703;    /* warm gold */
-  --coral:#FF4D6D;    /* pink coral */
-  --peach:#FF9E7A;    /* warm peach */
-  --aqua:#2FFFE2;     /* pool water */
-  --teal:#20D8B5;     /* tropical teal */
-  --sky:#53B6FF;      /* Florida sky */
-  --grape:#8B5CFF;    /* tiny hint of old purple (accent only) */
+  /* SUMMER PALETTE (actually used) */
+  --sun:#FFE15A;        /* sunshine yellow */
+  --mango:#FFB020;      /* orange-gold */
+  --coral:#FF4B6E;      /* hot pink/coral */
+  --pink:#FF67C7;       /* neon pink */
+  --peach:#FF9B6A;      /* peach */
+  --aqua:#2FFFE2;       /* water */
+  --teal:#1ED9B0;       /* tropical teal */
+  --sky:#4DB7FF;        /* sky blue */
+  --lime:#B8FF4A;       /* lime pop */
 
-  --card: rgba(255,255,255,.08);
-  --card2: rgba(255,255,255,.06);
-  --stroke: rgba(255,255,255,.14);
-  --stroke2: rgba(255,255,255,.20);
+  /* UI surfaces */
+  --card: rgba(255,255,255,.10);
+  --card2: rgba(255,255,255,.07);
+  --stroke: rgba(255,255,255,.16);
+  --stroke2: rgba(255,255,255,.22);
 
   --radius: 18px;
   --radius-sm: 12px;
 
-  --shadow: 0 22px 70px rgba(0,0,0,.46);
+  --shadow: 0 24px 80px rgba(0,0,0,.48);
   --shadow-soft: 0 14px 34px rgba(0,0,0,.30);
 
   --blur: 14px;
@@ -47,33 +49,30 @@ html,body{
   line-height:1.6;
   overflow-x:hidden;
 
-  /* Big, colorful Florida “night carnival” background */
+  /* BIG WARM BACKGROUND (you will see oranges/pinks immediately) */
   background:
-    radial-gradient(1100px 800px at 10% 12%, rgba(255,77,109,.22), transparent 55%),
-    radial-gradient(900px 700px at 92% 18%, rgba(47,255,226,.18), transparent 55%),
-    radial-gradient(1000px 850px at 60% 95%, rgba(83,182,255,.18), transparent 60%),
-    radial-gradient(900px 700px at 35% 80%, rgba(255,216,74,.14), transparent 60%),
-    linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 45%, var(--bg2) 100%);
+    radial-gradient(900px 650px at 8% 12%,  rgba(255,75,110,.32), transparent 60%),
+    radial-gradient(900px 700px at 92% 18%, rgba(255,176,32,.26), transparent 62%),
+    radial-gradient(1100px 800px at 60% 95%, rgba(47,255,226,.18), transparent 65%),
+    radial-gradient(1000px 700px at 35% 85%, rgba(255,103,199,.20), transparent 62%),
+    linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 52%, var(--bg2) 100%);
   position:relative;
 }
 
-/* Reduced motion support */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce){
   *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
 }
 
 /* -------------------- LINKS -------------------- */
 a{ color: var(--aqua); text-decoration:none; }
-a:hover{ color: var(--teal); text-decoration:underline; text-underline-offset:3px; }
+a:hover{ color: var(--lime); text-decoration:underline; text-underline-offset:3px; }
 
 /* -------------------- LAYOUT -------------------- */
 .container{ max-width:1100px; margin:0 auto; padding:26px; }
 
 /* =========================================================
-   GLOBAL BACKGROUND ANIMATION (visible, but not obnoxious)
-   - moving sparkle field
-   - floating “bubbles”
-   - slow sun-ray sweep
+   GLOBAL BACKGROUND MOTION (VISIBLE)
    ========================================================= */
 
 /* Sparkles */
@@ -83,83 +82,85 @@ body::before{
   inset:0;
   z-index:-3;
   pointer-events:none;
-  opacity:.55;
   background:
-    radial-gradient(1.6px 1.6px at 8% 16%, rgba(255,255,255,.90), transparent 60%),
-    radial-gradient(1.2px 1.2px at 18% 52%, rgba(255,255,255,.80), transparent 60%),
-    radial-gradient(1.8px 1.8px at 36% 22%, rgba(255,255,255,.88), transparent 60%),
-    radial-gradient(1.2px 1.2px at 56% 12%, rgba(255,255,255,.78), transparent 60%),
-    radial-gradient(1.6px 1.6px at 74% 24%, rgba(255,255,255,.86), transparent 60%),
-    radial-gradient(1.2px 1.2px at 88% 56%, rgba(255,255,255,.74), transparent 60%),
-    radial-gradient(1.8px 1.8px at 66% 76%, rgba(255,255,255,.82), transparent 60%),
-    radial-gradient(1.2px 1.2px at 28% 84%, rgba(255,255,255,.72), transparent 60%);
-  animation: twinkleGlobal 2.3s ease-in-out infinite;
+    radial-gradient(1.6px 1.6px at 8% 18%,  rgba(255,255,255,.92), transparent 65%),
+    radial-gradient(1.2px 1.2px at 18% 52%, rgba(255,255,255,.82), transparent 65%),
+    radial-gradient(1.8px 1.8px at 36% 22%, rgba(255,255,255,.90), transparent 65%),
+    radial-gradient(1.2px 1.2px at 56% 14%, rgba(255,255,255,.78), transparent 65%),
+    radial-gradient(1.6px 1.6px at 74% 24%, rgba(255,255,255,.88), transparent 65%),
+    radial-gradient(1.2px 1.2px at 88% 56%, rgba(255,255,255,.76), transparent 65%),
+    radial-gradient(1.8px 1.8px at 66% 76%, rgba(255,255,255,.84), transparent 65%),
+    radial-gradient(1.2px 1.2px at 28% 84%, rgba(255,255,255,.74), transparent 65%),
+    radial-gradient(1.6px 1.6px at 50% 40%, rgba(255,225,90,.55), transparent 70%),
+    radial-gradient(1.6px 1.6px at 80% 72%, rgba(255,75,110,.45), transparent 70%);
+  opacity:.65;
+  animation: twinkle 2.1s ease-in-out infinite;
 }
-@keyframes twinkleGlobal{
-  0%,100%{ opacity:.42; filter: brightness(1); }
-  50%{ opacity:.70; filter: brightness(1.25); }
+@keyframes twinkle{
+  0%,100%{ opacity:.45; filter: brightness(1); }
+  50%{ opacity:.85; filter: brightness(1.35); }
 }
 
-/* Floating bubbles / bokeh */
+/* Floating bokeh (warm!) */
 body::after{
   content:"";
   position:fixed;
   inset:-10% -10%;
   z-index:-2;
   pointer-events:none;
-  opacity:.75;
   background:
-    radial-gradient(18px 18px at 14% 78%, rgba(47,255,226,.18), transparent 70%),
-    radial-gradient(26px 26px at 24% 88%, rgba(255,216,74,.14), transparent 72%),
-    radial-gradient(20px 20px at 80% 70%, rgba(83,182,255,.14), transparent 72%),
-    radial-gradient(30px 30px at 88% 86%, rgba(255,77,109,.12), transparent 74%),
-    radial-gradient(16px 16px at 66% 92%, rgba(255,158,122,.12), transparent 70%),
-    radial-gradient(22px 22px at 44% 68%, rgba(139,92,255,.10), transparent 72%);
-  animation: floatGlobal 7s ease-in-out infinite alternate;
+    radial-gradient(26px 26px at 14% 78%, rgba(47,255,226,.16), transparent 72%),
+    radial-gradient(32px 32px at 24% 88%, rgba(255,176,32,.18), transparent 74%),
+    radial-gradient(28px 28px at 80% 70%, rgba(77,183,255,.14), transparent 74%),
+    radial-gradient(36px 36px at 88% 86%, rgba(255,75,110,.16), transparent 76%),
+    radial-gradient(24px 24px at 66% 92%, rgba(255,155,106,.14), transparent 74%),
+    radial-gradient(30px 30px at 44% 68%, rgba(255,103,199,.12), transparent 76%);
+  opacity:.85;
+  animation: floaties 6.6s ease-in-out infinite alternate;
 }
-@keyframes floatGlobal{
+@keyframes floaties{
   0%{ transform: translate3d(0,0,0); }
-  100%{ transform: translate3d(-16px, -10px, 0); }
+  100%{ transform: translate3d(-18px, -12px, 0); }
 }
 
-/* Slow sun-ray sweep (conic gradient) */
+/* Sun-ray sweep */
 @supports (background: conic-gradient(from 0deg, #000, #fff)){
   html::before{
     content:"";
     position:fixed;
-    inset:-35%;
+    inset:-40%;
     z-index:-1;
     pointer-events:none;
-    opacity:.35;
     background:
       conic-gradient(from 210deg at 60% 40%,
-        rgba(255,216,74,.00) 0deg,
-        rgba(255,216,74,.14) 22deg,
-        rgba(47,255,226,.08) 58deg,
-        rgba(83,182,255,.10) 94deg,
-        rgba(255,77,109,.08) 130deg,
-        rgba(255,216,74,.00) 320deg
+        rgba(255,225,90,.00) 0deg,
+        rgba(255,225,90,.18) 22deg,
+        rgba(255,176,32,.12) 55deg,
+        rgba(255,75,110,.10) 95deg,
+        rgba(47,255,226,.08) 130deg,
+        rgba(255,225,90,.00) 320deg
       );
+    opacity:.45;
     filter: blur(10px) saturate(1.2);
     mix-blend-mode: screen;
-    animation: raysSpin 10s linear infinite;
+    animation: rays 9s linear infinite;
   }
 }
-@keyframes raysSpin{
+@keyframes rays{
   0%{ transform: rotate(0deg); }
   100%{ transform: rotate(360deg); }
 }
 
 /* =========================================================
-   HEADER / NAV (thicker + matches your hero width)
+   HEADER / NAV (thicker + vibrant)
    ========================================================= */
 header.site-header{
   position:sticky;
   top:0;
   z-index:50;
-  background: rgba(7,10,22,.55);
+  background: rgba(10,12,28,.52);
   backdrop-filter: blur(var(--blur));
-  border-bottom: 1px solid rgba(255,255,255,.10);
+  border-bottom: 1px solid rgba(255,255,255,.12);
   box-shadow: 0 10px 30px rgba(0,0,0,.26);
 }
 
@@ -170,7 +171,7 @@ nav.navbar{
   align-items:center;
   justify-content:space-between;
   gap:18px;
-  min-height: 78px;
+  min-height: 80px;
   padding: 18px 20px;
 }
 
@@ -185,7 +186,11 @@ nav.navbar{
   font-weight:900;
   letter-spacing:.3px;
   background:
-    radial-gradient(120% 120% at 18% 12%, rgba(255,216,74,1) 0%, rgba(255,77,109,.95) 30%, rgba(47,255,226,.90) 70%, rgba(83,182,255,.95) 100%);
+    radial-gradient(120% 120% at 18% 12%,
+      rgba(255,225,90,1) 0%,
+      rgba(255,176,32,.98) 30%,
+      rgba(255,75,110,.92) 62%,
+      rgba(47,255,226,.90) 100%);
   box-shadow: var(--shadow-soft);
   position:relative;
   overflow:hidden;
@@ -194,14 +199,14 @@ nav.navbar{
   content:"";
   position:absolute;
   inset:-40%;
-  background: radial-gradient(circle, rgba(255,255,255,.70), transparent 55%);
+  background: radial-gradient(circle, rgba(255,255,255,.75), transparent 55%);
   transform: translateX(-35%);
   opacity:.25;
-  animation: logoSheen 2.6s var(--ease) infinite;
+  animation: logoSheen 2.4s var(--ease) infinite;
 }
 @keyframes logoSheen{
   0%{ transform: translateX(-35%) rotate(0deg); opacity:.10 }
-  50%{ transform: translateX(20%) rotate(12deg); opacity:.30 }
+  50%{ transform: translateX(18%) rotate(12deg); opacity:.32 }
   100%{ transform: translateX(55%) rotate(22deg); opacity:.12 }
 }
 
@@ -212,46 +217,40 @@ nav.navbar{
   letter-spacing:.2px;
 }
 
-.nav-links{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  justify-content:center;
-}
+.nav-links{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
 
 .nav-links a{
   padding: 10px 14px;
   border-radius: 999px;
   border: 1px solid transparent;
   color: var(--text);
-  background: transparent;
+  background: rgba(255,255,255,.02);
   transition: transform .12s var(--ease), background .2s var(--ease), border-color .2s var(--ease), box-shadow .2s var(--ease);
 }
 
 .nav-links a:hover{
   transform: translateY(-1px);
-  background: rgba(255,255,255,.08);
-  border-color: rgba(255,255,255,.18);
+  background: rgba(255,255,255,.10);
+  border-color: rgba(255,255,255,.20);
   box-shadow: 0 10px 18px rgba(0,0,0,.22);
 }
 
 .nav-links a.active{
-  background: linear-gradient(90deg, rgba(255,216,74,.20), rgba(47,255,226,.16), rgba(83,182,255,.16));
-  border-color: rgba(255,255,255,.18);
+  background: linear-gradient(90deg, rgba(255,225,90,.26), rgba(255,75,110,.18), rgba(47,255,226,.16));
+  border-color: rgba(255,255,255,.22);
   box-shadow: 0 12px 22px rgba(0,0,0,.26);
 }
 
-/* Mobile nav width */
 @media (max-width: 640px){
   nav.navbar{
     width: calc(100% - 28px);
-    min-height: 70px;
+    min-height: 72px;
     padding: 14px 14px;
   }
 }
 
 /* =========================================================
-   HERO (generic .hero sections)
+   HERO (generic)
    ========================================================= */
 .hero{
   padding: 54px 22px 40px;
@@ -263,32 +262,26 @@ nav.navbar{
   font-size: clamp(30px,4.4vw,52px);
   margin: 0 0 12px;
   line-height:1.12;
-  text-shadow: 0 16px 34px rgba(0,0,0,.38);
+  text-shadow: 0 16px 34px rgba(0,0,0,.36);
 }
-
 .hero h1::after{
   content:"";
   display:block;
-  width:min(240px, 65%);
+  width:min(260px, 70%);
   height:4px;
   margin: 14px auto 0;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--coral), var(--sun), var(--aqua), var(--sky));
-  opacity:.95;
+  background: linear-gradient(90deg, var(--coral), var(--sun), var(--mango), var(--aqua), var(--sky));
+  opacity:.98;
 }
-
-.hero p{
-  color:var(--muted);
-  margin: 0 auto 22px;
-  max-width: 720px;
-}
+.hero p{ color:var(--muted); margin: 0 auto 22px; max-width: 720px; }
 
 /* =========================================================
    CARDS
    ========================================================= */
 .card{
-  background: linear-gradient(180deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,.06) 100%);
-  border: 1px solid rgba(255,255,255,.14);
+  background: linear-gradient(180deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.07) 100%);
+  border: 1px solid rgba(255,255,255,.16);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   position:relative;
@@ -298,10 +291,28 @@ nav.navbar{
 
 .card.pad{ padding:22px; }
 
+.card::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  border-radius: calc(var(--radius) + 2px);
+  background: linear-gradient(120deg, rgba(255,75,110,.60), rgba(255,176,32,.35), rgba(255,225,90,.30), rgba(47,255,226,.32), rgba(77,183,255,.34));
+  filter: blur(18px);
+  opacity:.22;
+  z-index:0;
+  pointer-events:none;
+  animation: cardGlow 7.5s ease-in-out infinite alternate;
+}
+@keyframes cardGlow{
+  0%{ transform: translate3d(-1%, -1%, 0) scale(1.02); opacity:.18 }
+  100%{ transform: translate3d(1%, 1%, 0) scale(1.05); opacity:.28 }
+}
+.card > *{ position:relative; z-index:1; }
+
 .card:hover{
   transform: translateY(-2px);
-  border-color: rgba(255,255,255,.20);
-  box-shadow: 0 26px 78px rgba(0,0,0,.52);
+  border-color: rgba(255,255,255,.22);
+  box-shadow: 0 28px 90px rgba(0,0,0,.54);
 }
 
 /* =========================================================
@@ -320,8 +331,8 @@ nav.navbar{
   min-width: 118px;
   text-align:center;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.16);
-  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.08);
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(10px);
 }
@@ -330,20 +341,16 @@ nav.navbar{
   font-weight: 900;
   font-size: 28px;
   letter-spacing:.3px;
-  background: linear-gradient(90deg, var(--sun), var(--aqua), var(--sky));
+  background: linear-gradient(90deg, var(--sun), var(--mango), var(--coral), var(--aqua));
   -webkit-background-clip:text;
   background-clip:text;
   color: transparent;
   filter: drop-shadow(0 10px 16px rgba(0,0,0,.30));
 }
-.count-chip .l{
-  margin-top: 2px;
-  font-size: 13px;
-  color: var(--muted);
-}
+.count-chip .l{ margin-top: 2px; font-size: 13px; color: var(--muted); }
 
 /* =========================================================
-   LODGING / SLIDESHOW
+   LODGING SLIDESHOW
    ========================================================= */
 .lodging-grid{
   display:grid;
@@ -362,7 +369,7 @@ nav.navbar{
   overflow: hidden;
   height: 380px;
   box-shadow: var(--shadow);
-  border: 1px solid rgba(255,255,255,.14);
+  border: 1px solid rgba(255,255,255,.16);
 }
 
 #villa-slideshow::after{
@@ -370,14 +377,14 @@ nav.navbar{
   position:absolute;
   inset:0;
   background:
-    radial-gradient(600px 300px at 15% 20%, rgba(255,77,109,.20), transparent 55%),
-    radial-gradient(520px 280px at 80% 25%, rgba(47,255,226,.16), transparent 60%),
-    radial-gradient(620px 340px at 70% 90%, rgba(83,182,255,.16), transparent 62%),
-    linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.52));
+    radial-gradient(650px 320px at 15% 20%, rgba(255,75,110,.20), transparent 55%),
+    radial-gradient(560px 300px at 82% 22%, rgba(255,176,32,.16), transparent 60%),
+    radial-gradient(640px 340px at 70% 90%, rgba(47,255,226,.14), transparent 62%),
+    linear-gradient(180deg, rgba(0,0,0,.16), rgba(0,0,0,.52));
   mix-blend-mode: screen;
-  opacity:.60;
+  opacity:.68;
   pointer-events:none;
-  animation: washMove 7.5s ease-in-out infinite alternate;
+  animation: washMove 7.2s ease-in-out infinite alternate;
 }
 @keyframes washMove{
   0%{ transform: translate3d(-1%, -1%, 0) }
@@ -391,7 +398,7 @@ nav.navbar{
   background-position:center;
   opacity:0;
   transition: opacity 1.8s ease-in-out;
-  filter: brightness(78%) contrast(1.05) saturate(1.15);
+  filter: brightness(80%) contrast(1.05) saturate(1.18);
   transform: scale(1.02);
 }
 #villa-slideshow .slide.active{
@@ -407,27 +414,19 @@ nav.navbar{
   position:absolute;
   bottom:0; left:0; right:0;
   padding: 2rem 2rem 1.6rem;
-  background: linear-gradient(to top, rgba(0,0,0,.72), rgba(0,0,0,.10) 70%, transparent);
+  background: linear-gradient(to top, rgba(0,0,0,.70), rgba(0,0,0,.08) 70%, transparent);
   color:#fff;
   backdrop-filter: blur(6px);
 }
-#villa-slideshow h2{
-  font-family:"Playfair Display",serif;
-  font-size: 2.2rem;
-  margin:0;
-}
-#villa-slideshow p{
-  font-size: 1.05rem;
-  margin-top:.75rem;
-  opacity:.95;
-}
+#villa-slideshow h2{ font-family:"Playfair Display",serif; font-size: 2.2rem; margin:0; }
+#villa-slideshow p{ font-size: 1.05rem; margin-top:.75rem; opacity:.95; }
 
 /* =========================================================
    ITINERARY DETAILS
    ========================================================= */
 .itinerary details{
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.16);
   border-radius: 16px;
   margin-bottom: 1rem;
   box-shadow: var(--shadow-soft);
@@ -436,17 +435,17 @@ nav.navbar{
 }
 .itinerary details[open]{
   transform: translateY(-1px);
-  border-color: rgba(47,255,226,.40);
-  background: rgba(255,255,255,.09);
+  border-color: rgba(47,255,226,.42);
+  background: rgba(255,255,255,.10);
 }
 .itinerary summary{
   cursor:pointer;
-  font-weight:800;
+  font-weight:900;
   padding: 1rem 1.2rem;
   font-size: 1.08rem;
   color: var(--text);
-  background: linear-gradient(90deg, rgba(255,77,109,.14), rgba(255,216,74,.10), rgba(47,255,226,.10), rgba(83,182,255,.10));
-  border-bottom: 1px solid rgba(255,255,255,.12);
+  background: linear-gradient(90deg, rgba(255,75,110,.16), rgba(255,176,32,.12), rgba(255,225,90,.12), rgba(47,255,226,.10));
+  border-bottom: 1px solid rgba(255,255,255,.14);
   transition: filter .18s var(--ease), transform .18s var(--ease);
   list-style:none;
 }
@@ -458,9 +457,9 @@ nav.navbar{
    FORUM / POSTS
    ========================================================= */
 .post{
-  background: linear-gradient(180deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,.06) 100%);
-  border: 1px solid rgba(255,255,255,.14);
-  border-left: 4px solid rgba(47,255,226,.75);
+  background: linear-gradient(180deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.07) 100%);
+  border: 1px solid rgba(255,255,255,.16);
+  border-left: 4px solid rgba(47,255,226,.78);
   border-radius: 16px;
   padding: 18px 20px;
   margin-bottom: 1.2rem;
@@ -473,12 +472,12 @@ nav.navbar{
 .post:hover{
   transform: translateY(-2px);
   box-shadow: 0 18px 45px rgba(0,0,0,.42);
-  border-color: rgba(255,255,255,.20);
-  border-left-color: rgba(255,216,74,.85);
+  border-color: rgba(255,255,255,.22);
+  border-left-color: rgba(255,225,90,.90);
 }
 .post.mine{
-  border-left-color: rgba(255,77,109,.80);
-  background: linear-gradient(180deg, rgba(255,77,109,.12) 0%, rgba(255,255,255,.06) 100%);
+  border-left-color: rgba(255,75,110,.85);
+  background: linear-gradient(180deg, rgba(255,75,110,.14) 0%, rgba(255,255,255,.07) 100%);
 }
 
 .post .meta,
@@ -493,44 +492,35 @@ nav.navbar{
 /* replies */
 .replies-wrapper{
   margin-top: 10px;
-  background: rgba(255,255,255,.05);
-  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.16);
   border-radius: 12px;
   padding: 10px;
 }
-.replies-wrapper summary{
-  font-weight:800;
-  color: var(--aqua);
-  cursor:pointer;
-}
-.replies-wrapper[open]{ background: rgba(255,255,255,.07); }
+.replies-wrapper summary{ font-weight:900; color: var(--aqua); cursor:pointer; }
+.replies-wrapper[open]{ background: rgba(255,255,255,.08); }
 
 .replies{
   margin-top: 8px;
   padding-left: 12px;
-  border-left: 2px solid rgba(255,255,255,.16);
+  border-left: 2px solid rgba(255,255,255,.18);
 }
 
 .reply{
   margin-bottom: 8px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.14);
   border-radius: 12px;
   padding: 10px 10px;
   box-shadow: 0 10px 24px rgba(0,0,0,.22);
 }
-
 .reply summary{
   cursor:pointer;
   font-size: .98rem;
-  font-weight:800;
-  color: rgba(83,182,255,.95);
+  font-weight:900;
+  color: rgba(77,183,255,.96);
 }
-.reply p{
-  margin: 8px 0 0;
-  font-size: .98rem;
-  color: var(--text);
-}
+.reply p{ margin: 8px 0 0; font-size: .98rem; color: var(--text); }
 
 /* inputs */
 #postBody,
@@ -538,16 +528,16 @@ nav.navbar{
   width:100%;
   padding: 12px 12px;
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.16);
-  background: rgba(7,10,22,.55);
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(8,12,24,.55);
   color: var(--text);
   outline: none;
   transition: border-color .16s var(--ease), box-shadow .16s var(--ease);
 }
 #postBody:focus,
 .reply-text:focus{
-  border-color: rgba(47,255,226,.55);
-  box-shadow: 0 0 0 4px rgba(47,255,226,.16);
+  border-color: rgba(255,176,32,.55);
+  box-shadow: 0 0 0 4px rgba(255,176,32,.16);
 }
 
 /* buttons */
@@ -558,50 +548,38 @@ nav.navbar{
   font-weight:900;
   padding: 10px 16px;
   border-radius: 999px;
-  color: #061014;
-  background: linear-gradient(90deg, var(--sun), var(--aqua), var(--sky));
+  color: #071018;
+  background: linear-gradient(90deg, var(--sun), var(--mango), var(--coral), var(--aqua));
   box-shadow: 0 16px 34px rgba(0,0,0,.34);
   transition: transform .12s var(--ease), filter .12s var(--ease);
 }
 #submitPost:hover,
-.send-reply:hover{
-  transform: translateY(-1px);
-  filter: brightness(1.05);
-}
+.send-reply:hover{ transform: translateY(-1px); filter: brightness(1.05); }
 #submitPost:active,
-.send-reply:active{
-  transform: translateY(0px) scale(.99);
-}
+.send-reply:active{ transform: translateY(0px) scale(.99); }
 
 /* email links */
 .email-link{
   color: var(--aqua);
-  font-weight: 800;
-  text-decoration: none;
+  font-weight: 900;
   word-break: break-all;
 }
-.email-link:hover{
-  color: var(--teal);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
+.email-link:hover{ color: var(--lime); text-decoration: underline; text-underline-offset: 3px; }
 
 /* =========================================================
-   MICRO-ANIMATIONS (entrance + shimmer)
+   MICRO-ANIMATIONS
    ========================================================= */
 @keyframes fadeInUp{
   from{ opacity:0; transform: translateY(10px) }
   to{ opacity:1; transform: translateY(0) }
 }
-.post, .reply, .card{
-  animation: fadeInUp .45s var(--ease) both;
-}
+.post, .reply, .card{ animation: fadeInUp .45s var(--ease) both; }
 
 .loading-shimmer{
   background: linear-gradient(
     90deg,
     rgba(255,255,255,0.06) 25%,
-    rgba(255,255,255,0.14) 37%,
+    rgba(255,225,90,0.12) 37%,
     rgba(255,255,255,0.06) 63%
   );
   background-size: 400% 100%;
@@ -609,7 +587,7 @@ nav.navbar{
   border-radius: 14px;
   height: 90px;
   margin-bottom: 10px;
-  border: 1px solid rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.14);
 }
 @keyframes shimmer{
   0%{ background-position: -420px 0; }
@@ -620,17 +598,14 @@ nav.navbar{
    FOOTER
    ========================================================= */
 footer{
-  background: rgba(255,255,255,.07);
+  background: rgba(255,255,255,.08);
   color: rgba(251,252,255,.88);
-  border-top: 1px solid rgba(255,255,255,.14);
+  border-top: 1px solid rgba(255,255,255,.16);
   text-align:center;
   padding: 22px 16px;
   margin-top: 44px;
   backdrop-filter: blur(10px);
 }
 
-/* Optional readability lift */
-body{
-  font-size: 1.05rem;
-  letter-spacing: .25px;
-}
+/* Readability */
+body{ font-size: 1.05rem; letter-spacing: .25px; }
